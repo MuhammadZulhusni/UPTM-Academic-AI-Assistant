@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->text('address')->nullable();
             $table->enum('role', ['admin', 'user'])->default('user'); // Creates an 'enum' column for the user's role with 'admin' and 'user' options, defaulting to 'user'.
-            $table->unsignedBigInteger('plan_id')->default(1); // Creates an unsigned big integer column for the plan ID, with a default of 1.
+            $table->unsignedBigInteger('plan_id')->default(1); // Creates an unsigned big integer column for the plan ID, with a default of 1. 0 for access everything.
             $table->integer('current_word_usage')->default(1000); // Creates an integer column for the current word usage, defaulting to 1000 for a free plan.
             $table->integer('words_used')->default(0); // Creates an integer column for the number of words used, defaulting to 0.
             $table->string('status')->default('1'); // Creates a 'status' column for active or inactive, defaulting to '1 = active'.
@@ -30,7 +30,7 @@ return new class extends Migration
 
             // Creates a relationship between users & plans tables. It ensures that every user is connected to a specific plan. 
             // The nullOnDelete() part is a safety net: if a plan is ever removed from system, the users who were on that plan will simply have their plan_id field set to 'null' instead of being deleted as well. 
-            $table->foreign('plan_id')->references('id')->on('plans')->nullOnDelete();
+            // $table->foreign('plan_id')->references('id')->on('plans')->nullOnDelete();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
