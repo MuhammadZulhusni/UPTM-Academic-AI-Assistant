@@ -17,7 +17,9 @@
                         srcset="{{ asset('backend/images/logo-icon2x.png 2x') }}" alt="">
                 </div>
             </a>
-        </div></div><div class="nk-sidebar-element nk-sidebar-body">
+        </div><!-- end nk-sidebar-brand -->
+    </div><!-- end nk-sidebar-element -->
+    <div class="nk-sidebar-element nk-sidebar-body">
         <div class="nk-sidebar-content h-100" data-simplebar>
             <div class="nk-sidebar-menu">
                 <ul class="nk-menu">
@@ -34,17 +36,18 @@
                             <span class="nk-menu-icon">
                                 <em class="icon ni ni-folder-list"></em>
                             </span>
-                            <span class="nk-menu-text">Documents</span>
+                            <span class="nk-menu-text">Account</span>
                         </a>
                         <ul class="nk-menu-sub">
                             <li class="nk-menu-item">
-                                <a href="document-saved.html" class="nk-menu-link">
-                                    <span class="nk-menu-text">Saved</span>
+                                {{-- Link to the admin profile page --}}
+                                <a href="{{ route('admin.profile') }}" class="nk-menu-link">
+                                    <span class="nk-menu-text">Profile</span>
                                 </a>
                             </li>
                             <li class="nk-menu-item">
                                 <a href="document-drafts.html" class="nk-menu-link">
-                                    <span class="nk-menu-text">Drafts</span>
+                                    <span class="nk-menu-text">Change Password</span>
                                 </a>
                             </li>
                         </ul>
@@ -58,6 +61,7 @@
                         </a>
                     </li>
                     <li class="nk-menu-item">
+                        {{-- Link to the admin logout route --}}
                         <a href="{{ route('admin.logout') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
                                 <em class="icon ni ni-wallet"></em>
@@ -66,7 +70,10 @@
                         </a>
                     </li>
                 </ul>
-            </div></div></div><div class="nk-sidebar-element nk-sidebar-footer">
+            </div><!-- .nk-sidebar-menu -->
+        </div><!-- .nk-sidebar-content -->
+    </div><!-- .nk-sidebar-element -->
+    <div class="nk-sidebar-element nk-sidebar-footer">
         <div class="nk-sidebar-footer-extended pt-3">
             <div class="border border-light rounded-3">
                 {{-- <div class="px-3 py-2 bg-white border-bottom border-light rounded-top-3">
@@ -82,9 +89,8 @@
                     </div>
                     <h6 class="lead-text mt-2">1,360 <span class="text-light">words left</span></h6>
                 </div> --}}
-
-
-                {{-- Retrieve the authenticated user's profile data --}}
+                
+                {{-- Retrieve authenticated user's profile data --}}
                 @php
                     $id = Auth::user()->id;
                     $profileData = App\Models\User::find($id);
@@ -92,7 +98,8 @@
                 <a class="d-flex px-3 py-2 bg-primary bg-opacity-10 rounded-bottom-3" href="profile.html">
                     <div class="media-group">
                         <div class="media media-sm media-middle media-circle text-bg-primary">
-                            <img src="images/avatar/a.png" />
+                             {{-- Check if user has a photo, and display it or a placeholder --}}
+                            <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" />
                         </div>
                         <div class="media-text">
                             {{-- Display the authenticated user's name --}}
@@ -105,4 +112,5 @@
                 </a>
             </div>
         </div>
-    </div></div>
+    </div><!-- .nk-sidebar-element -->
+</div><!-- .nk-sidebar -->
