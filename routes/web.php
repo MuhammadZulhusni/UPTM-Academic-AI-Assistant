@@ -21,7 +21,7 @@ Route::middleware(['auth', IsUser::class])->group(function () {
 // Group of routes for authenticated admins only, protected by the IsAdmin middleware.
 Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () {
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+        return view('admin.index');
     })->name('admin.dashboard');
 });
 
