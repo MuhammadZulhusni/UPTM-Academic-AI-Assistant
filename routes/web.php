@@ -28,6 +28,11 @@ Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () 
 
 // Logout route for admin 
 Route::get('/admin/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
+// Admin Profile
+Route::get('/admin/profile', [AdminController::class, 'AdminProfile'])->name('admin.profile');
+// Store Admin Profile
+Route::post('/admin/profile/store', [AdminController::class, 'AdminProfileStore'])->name('admin.profile.store');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
