@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 return new class extends Migration
 {
@@ -13,15 +14,27 @@ return new class extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->integer('monthly_word_limit'); // Column for the plan's monthly word limit.
-            // Creates a decimal column for the plan's price, with a total of 8 digits and 2 decimal places.
-            // It is also set to be nullable, meaning a price is not always required.
-            $table->decimal('price', 8, 2)->nullable();
-            $table->string('templates')->nullable(); // Column for plan templates, allowing it to be nullable.
+            $table->string('name'); // Plan name (Diamond)
+            $table->integer('monthly_word_limit'); // Monthly word usage limit
+            $table->string('templates')->nullable(); // Number of available templates
             $table->timestamps();
         });
+
+        // Insert Diamond plan for all users
+        DB::table('plans')->insert([
+            'id' => 1,
+            'name' => 'Diamond',
+            'monthly_word_limit' => 5000, // Word limit per month
+            'templates' => '6', // Number of templates allowed
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
+    
+    // Personal note: Access Levels Are Determined By:
+    // - monthly_word_limit = How many words user can generate
+    // - templates = How many templates user can access
+    // All users get plan_id = 1 (Diamond plan)
 
     /**
      * Reverse the migrations.
