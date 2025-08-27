@@ -35,10 +35,16 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Create user with Diamond plan (ID 1) automatically
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'plan_id' => 1, // Always assign Diamond plan
+            'current_word_usage' => 5000, // Diamond plan word limit
+            'words_used' => 0,
+            'role' => 'user',
+            'status' => '1',
         ]);
 
         event(new Registered($user));
