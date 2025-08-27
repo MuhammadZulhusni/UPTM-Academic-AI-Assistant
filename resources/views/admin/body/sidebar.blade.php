@@ -46,7 +46,7 @@
                                 </a>
                             </li>
                             <li class="nk-menu-item">
-                                <a href="document-drafts.html" class="nk-menu-link">
+                                <a href="{{ route('admin.change.password') }}" class="nk-menu-link">
                                     <span class="nk-menu-text">Change Password</span>
                                 </a>
                             </li>
@@ -89,7 +89,7 @@
                     </div>
                     <h6 class="lead-text mt-2">1,360 <span class="text-light">words left</span></h6>
                 </div> --}}
-                
+
                 {{-- Retrieve authenticated user's profile data --}}
                 @php
                     $id = Auth::user()->id;
