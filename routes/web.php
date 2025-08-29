@@ -5,6 +5,7 @@ use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Backend\Admin\AdminController;
+use App\Http\Controllers\Backend\Admin\TemplateController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +37,18 @@ Route::post('/admin/profile/store', [AdminController::class, 'AdminProfileStore'
 Route::get('/admin/change/password', [AdminController::class, 'AdminChangePassword'])->name('admin.change.password');
 // Admin Update Password
 Route::post('/admin/password/update', [AdminController::class, 'AdminPasswordUpdate'])->name('admin.password.update');
+
+// Route for Template Management
+Route::controller(TemplateController::class)->group(function(){
+    Route::get('/admin/template', 'AdminTemplate')->name('admin.template'); 
+    Route::get('/add/template', 'AddTemplate')->name('add.template'); 
+    Route::post('/store/template', 'StoreTemplate')->name('store.template');
+});
+
+
+
+
+
 
 
 Route::middleware('auth')->group(function () {

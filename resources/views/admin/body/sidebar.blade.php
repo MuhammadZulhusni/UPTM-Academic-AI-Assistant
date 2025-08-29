@@ -53,11 +53,11 @@
                         </ul>
                     </li>
                     <li class="nk-menu-item">
-                        <a href="profile.html" class="nk-menu-link">
+                        <a href="{{ route('admin.template') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
                                 <em class="icon ni ni-user"></em>
                             </span>
-                            <span class="nk-menu-text">Profile</span>
+                            <span class="nk-menu-text">Template</span>
                         </a>
                     </li>
                     <li class="nk-menu-item">
