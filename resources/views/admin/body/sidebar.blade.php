@@ -1,3 +1,21 @@
+<style>
+    .nk-sidebar-head {
+        padding: 20px 15px; /* Add some padding to give the logo breathing room */
+    }
+
+    .logo-wrap {
+        width: 120px; /* Set a fixed width for the logo container */
+        height: auto; /* Allow the height to adjust automatically */
+        overflow: visible; /* Ensure nothing is hidden */
+    }
+    
+    .logo-img {
+        width: 100%; 
+        height: auto; 
+        object-fit: contain; /* Ensure the entire image is visible and not cropped */
+    }
+</style>
+
 <div class="nk-sidebar nk-sidebar-fixed" id="sidebar">
     <div class="nk-compact-toggle">
         <button class="btn btn-xs btn-outline-light btn-icon compact-toggle text-light bg-white rounded-3">
@@ -9,12 +27,13 @@
         <div class="nk-sidebar-brand">
             <a href="index.html" class="logo-link">
                 <div class="logo-wrap">
-                    <img class="logo-img logo-light" src="{{ asset('backend/images/logo.png') }}"
-                        srcset="{{ asset('backend/images/logo2x.png 2x') }}" alt="">
-                    <img class="logo-img logo-dark" src="{{ asset('backend/images/logo-dark.png') }}"
-                        srcset="{{ asset('backend/images/logo-dark2x.png 2x') }}" alt="">
-                    <img class="logo-img logo-icon" src="{{ asset('backend/images/logo-icon.png') }}"
-                        srcset="{{ asset('backend/images/logo-icon2x.png 2x') }}" alt="">
+                    <img class="logo-img logo-light" src="{{ asset('upload/uptm.png') }}"
+                        srcset="{{ asset('upload/uptm.png') }}" alt="">
+                    <img class="logo-img logo-dark" src="{{ asset('upload/uptm.png') }}"
+                        srcset="{{ asset('upload/uptm.png') }}" alt="">
+                    <!-- The logo below is for the collapsed sidebar. You should use a compact, icon-only image here. -->
+                    <img class="logo-img logo-icon" src="{{ asset('upload/uptm-icon.png') }}"
+                        srcset="{{ asset('upload/uptm-icon.png') }}" alt="">
                 </div>
             </a>
         </div><!-- end nk-sidebar-brand -->
@@ -26,7 +45,15 @@
                     <li class="nk-menu-item">
                         <a href="index.html" class="nk-menu-link">
                             <span class="nk-menu-icon">
-                                <em class="icon ni ni-dashboard-fill"></em>
+                                @php
+                                    // Assuming a variable to check the user's role exists
+                                    $role = Auth::user()->role;
+                                @endphp
+                                @if($role === 'admin')
+                                    <em class="icon ni ni-layers-fill icon-outline-blue"></em>
+                                @else
+                                    <em class="icon ni ni-home-fill icon-outline-blue"></em>
+                                @endif
                             </span>
                             <span class="nk-menu-text">Dashboard</span>
                         </a>
@@ -34,7 +61,11 @@
                     <li class="nk-menu-item has-sub">
                         <a href="#" class="nk-menu-link nk-menu-toggle">
                             <span class="nk-menu-icon">
-                                <em class="icon ni ni-folder-list"></em>
+                                @if($role === 'admin')
+                                    <em class="icon ni ni-users-fill icon-outline-blue"></em>
+                                @else
+                                    <em class="icon ni ni-user-circle-fill icon-outline-blue"></em>
+                                @endif
                             </span>
                             <span class="nk-menu-text">Account</span>
                         </a>
@@ -55,7 +86,7 @@
                     <li class="nk-menu-item">
                         <a href="{{ route('admin.template') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
-                                <em class="icon ni ni-user"></em>
+                                <em class="icon ni ni-user icon-outline-blue"></em>
                             </span>
                             <span class="nk-menu-text">Template</span>
                         </a>
@@ -64,7 +95,7 @@
                         {{-- Link to the admin logout route --}}
                         <a href="{{ route('admin.logout') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
-                                <em class="icon ni ni-wallet"></em>
+                                <em class="icon ni ni-wallet icon-outline-blue"></em>
                             </span>
                             <span class="nk-menu-text">Logout</span>
                         </a>
@@ -113,3 +144,4 @@
         </div>
     </div><!-- .nk-sidebar-element -->
 </div><!-- .nk-sidebar -->
+
