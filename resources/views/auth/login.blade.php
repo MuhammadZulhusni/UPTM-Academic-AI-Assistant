@@ -9,6 +9,16 @@
     <link rel="shortcut icon" href="{{ asset('backend/images/favicon.png') }}">
     <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css?v1.0.0') }}">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >
+    <style>
+        .logo-wrap img {
+            width: 150px; 
+            height: auto; 
+        }
+        .logo-link {
+            margin-bottom: 30px; 
+            display: inline-block; 
+        }
+    </style>
 </head>
 <body>
     <div class="nk-app-root" data-sidebar-collapse="lg">
@@ -19,12 +29,12 @@
                 <div class="text-center pt-5">
                     <a href="index.html" class="logo-link">
                         <div class="logo-wrap">
-                            <img class="logo-img logo-light" src="{{ asset('backend/images/logo.png') }}"
-                                srcset="{{ asset('backend/images/logo2x.png 2x') }}" alt="">
-                            <img class="logo-img logo-dark" src="{{ asset('backend/images/logo-dark.png') }}"
-                                srcset="{{ asset('backend/images/logo-dark2x.png 2x') }}" alt="">
-                            <img class="logo-img logo-icon" src="{{ asset('backend/images/logo-icon.png') }}"
-                                srcset="{{ asset('backend/images/logo-icon2x.png 2x') }}" alt="">
+                            <img class="logo-img logo-light" src="{{ asset('upload/uptm.png') }}"
+                                srcset="{{ asset('upload/uptm.png') }}" alt="">
+                            <img class="logo-img logo-dark" src="{{ asset('upload/uptm.pngg') }}"
+                                srcset="{{ asset('upload/uptm.png') }}" alt="">
+                            <img class="logo-img logo-icon" src="{{ asset('upload/uptm.png') }}"
+                                srcset="{{ asset('upload/uptm.png') }}" alt="">
                         </div>
                     </a>
                 </div>
