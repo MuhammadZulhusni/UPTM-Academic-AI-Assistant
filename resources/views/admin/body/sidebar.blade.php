@@ -107,7 +107,6 @@
                             {{-- Display the authenticated user's email --}}
                             <span class="text-light fs-7">{{ $profileData->email }}</span>
                         </div>
-                        <em class="icon ni ni-chevron-right ms-auto ps-1"></em>
                     </div>
                 </a>
             </div>
