@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Plan name (Diamond)
-            $table->integer('monthly_word_limit'); // Monthly word usage limit
+            $table->integer('monthly_word_limit')->nullable(); // Monthly word usage limit (null = unlimited)
             $table->string('templates')->nullable(); // Number of available templates
             $table->timestamps();
         });
@@ -24,7 +24,7 @@ return new class extends Migration
         DB::table('plans')->insert([
             'id' => 1,
             'name' => 'Diamond',
-            'monthly_word_limit' => 5000, // Word limit per month
+            'monthly_word_limit' => null, // Word limit per month
             'templates' => '6', // Number of templates allowed
             'created_at' => now(),
             'updated_at' => now(),

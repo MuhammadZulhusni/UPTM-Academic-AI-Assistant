@@ -45,6 +45,8 @@ Route::controller(TemplateController::class)->group(function(){
     Route::post('/store/template', 'StoreTemplate')->name('store.template');
     Route::get('/edit/template/{id}', 'EditTemplate')->name('edit.template'); 
     Route::post('/update/template/{id}', 'UpdateTemplate')->name('update.template'); 
+    Route::get('/details/template/{id}', 'DetailsTemplate')->name('details.template');
+    Route::post('/content/generate/{id}', 'AdminContentGenerate')->name('content.generate');
 });
 
 

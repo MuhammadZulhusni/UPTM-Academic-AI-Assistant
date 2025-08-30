@@ -16,7 +16,7 @@ class PlanSeeder extends Seeder
         Plan::create([
             'id' => 1,
             'name' => 'Diamond',
-            'monthly_word_limit' => 5000,
+            'monthly_word_limit' => null, // null = unlimited words
             'templates' => '6',
         ]);
     }

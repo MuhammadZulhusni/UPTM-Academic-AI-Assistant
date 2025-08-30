@@ -1,4 +1,8 @@
 <style>
+    /*
+     * The styles below are from the original file.
+     * They are kept as-is, as they do not affect the icon change.
+     */
     .nk-sidebar-head {
         padding: 20px 15px; /* Add some padding to give the logo breathing room */
     }
@@ -16,16 +20,22 @@
     }
 </style>
 
+<!-- Bootstrap Icons CDN link - This is necessary for the icons to render -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+
 <div class="nk-sidebar nk-sidebar-fixed" id="sidebar">
     <div class="nk-compact-toggle">
         <button class="btn btn-xs btn-outline-light btn-icon compact-toggle text-light bg-white rounded-3">
-            <em class="icon off ni ni-chevron-left"></em>
-            <em class="icon on ni ni-chevron-right"></em>
+            <!-- Replaced ni ni-chevron-left with bi-chevron-left -->
+            <em class="icon off bi bi-chevron-left"></em>
+            <!-- Replaced ni ni-chevron-right with bi-chevron-right -->
+            <em class="icon on bi bi-chevron-right"></em>
         </button>
     </div>
     <div class="nk-sidebar-element nk-sidebar-head">
         <div class="nk-sidebar-brand">
-            <a href="index.html" class="logo-link">
+            <a href="{{ route('admin.dashboard') }}" class="logo-link">
                 <div class="logo-wrap">
                     <img class="logo-img logo-light" src="{{ asset('upload/uptm.png') }}"
                         srcset="{{ asset('upload/uptm.png') }}" alt="">
@@ -43,28 +53,32 @@
             <div class="nk-sidebar-menu">
                 <ul class="nk-menu">
                     <li class="nk-menu-item">
-                        <a href="index.html" class="nk-menu-link">
+                        <a href="{{ route('admin.dashboard') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
                                 @php
                                     // Assuming a variable to check the user's role exists
                                     $role = Auth::user()->role;
                                 @endphp
                                 @if($role === 'admin')
-                                    <em class="icon ni ni-layers-fill icon-outline-blue"></em>
+                                    <!-- Replaced ni ni-layers-fill with bi-stack -->
+                                    <em class="icon bi bi-houses-fill icon-outline-blue"></em>
                                 @else
-                                    <em class="icon ni ni-home-fill icon-outline-blue"></em>
+                                    <!-- Replaced ni ni-home-fill with bi-house-fill -->
+                                    <em class="icon bi bi-house-fill icon-outline-blue"></em> 
                                 @endif
                             </span>
                             <span class="nk-menu-text">Dashboard</span>
                         </a>
                     </li>
                     <li class="nk-menu-item has-sub">
-                        <a href="#" class="nk-menu-link nk-menu-toggle">
+                        <a href="#" class="nk-menu-link nk-menu-toggle"> 
                             <span class="nk-menu-icon">
                                 @if($role === 'admin')
-                                    <em class="icon ni ni-users-fill icon-outline-blue"></em>
+                                    <!-- Replaced ni ni-users-fill with bi-people-fill -->
+                                    <em class="icon bi bi-person-fill-check icon-outline-blue"></em>
                                 @else
-                                    <em class="icon ni ni-user-circle-fill icon-outline-blue"></em>
+                                    <!-- Replaced ni ni-user-circle-fill with bi-person-circle -->
+                                    <em class="icon bi bi-person-fill-check icon-outline-blue"></em>
                                 @endif
                             </span>
                             <span class="nk-menu-text">Account</span>
@@ -86,7 +100,8 @@
                     <li class="nk-menu-item">
                         <a href="{{ route('admin.template') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
-                                <em class="icon ni ni-user icon-outline-blue"></em>
+                                <!-- Replaced ni ni-user with bi-person -->
+                                <em class="icon bi bi-stack icon-outline-blue"></em>
                             </span>
                             <span class="nk-menu-text">Template</span>
                         </a>
@@ -95,7 +110,8 @@
                         {{-- Link to the admin logout route --}}
                         <a href="{{ route('admin.logout') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
-                                <em class="icon ni ni-wallet icon-outline-blue"></em>
+                                <!-- Replaced ni ni-wallet with bi-box-arrow-right -->
+                                <em class="icon bi bi-box-arrow-right icon-outline-blue"></em>
                             </span>
                             <span class="nk-menu-text">Logout</span>
                         </a>
@@ -144,4 +160,3 @@
         </div>
     </div><!-- .nk-sidebar-element -->
 </div><!-- .nk-sidebar -->
-
