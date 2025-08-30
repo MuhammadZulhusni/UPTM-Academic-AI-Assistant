@@ -41,7 +41,7 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'plan_id' => 1, // Always assign Diamond plan
-            'current_word_usage' => 5000, // Diamond plan word limit
+            'current_word_usage' => null, // null = unlimited
             'words_used' => 0,
             'role' => 'user',
             'status' => '1',

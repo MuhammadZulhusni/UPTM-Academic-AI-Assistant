@@ -22,7 +22,7 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->enum('role', ['admin', 'user'])->default('user');
             $table->unsignedBigInteger('plan_id')->default(1); // Set default plan_id to 1 (Diamond plan)
-            $table->integer('current_word_usage')->default(5000); // Set default word usage to Diamond plan limit (5000)
+            $table->integer('current_word_usage')->nullable();  // null = unlimited words
             $table->integer('words_used')->default(0);
             $table->string('status')->default('1');
             $table->rememberToken();
