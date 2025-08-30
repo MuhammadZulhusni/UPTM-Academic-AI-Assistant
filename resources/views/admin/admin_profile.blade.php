@@ -74,7 +74,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-12 col-xl-12">
-                                <button type="submit" class="btn btn-secondary">Save Changes</button> 
+                                <button type="submit" class="btn btn-primary mt-1">Save Changes</button> 
                             </div>
                         </div>
                     </form> 

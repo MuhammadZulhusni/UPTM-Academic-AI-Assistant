@@ -46,12 +46,6 @@
                                     <div class="form-control-wrap">
                                         <select name="category" class="form-select" id="category" aria-label="Default select example">
                                             <option selected="">Select Category</option>
-                                            <option value="Ads">Ads</option>
-                                            <option value="Articles and Contents">Articles and Contents</option>
-                                            <option value="Blog Post">Blog Post</option>
-                                            <option value="Ecommerce">Ecommerce</option>
-                                            <option value="Website">Website</option>
-                                            <option value="Social Media">Social Media</option>
                                             <option value="Student">Student</option>
                                             <option value="Lecturer">Lecturer</option>
                                         </select>
@@ -129,7 +123,7 @@
                         </div>
  
                         <div class="col-lg-12 col-xl-12">
-                            <button type="submit" class="btn btn-secondary">Save Changes</button> 
+                            <button type="submit" class="btn btn-primary mt-4">Save Changes</button> 
                         </div>
                     </form> 
                 </div>

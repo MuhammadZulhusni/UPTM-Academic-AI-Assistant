@@ -25,11 +25,22 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Try to authenticate manually
+        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            // Error notification
+            $notification = [
+                'message' => 'Invalid login details. Please try again.',
+                'alert-type' => 'error'
+            ];
+
+            return redirect()->back()->with($notification);
+        }
+
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        // Admin
+        // Admin Part
         $user = $request->user();
         if ($user->role === 'admin') {
             // Add the success notification for admin login
@@ -41,7 +52,11 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('admin.dashboard', absolute: false))->with($notification);
         }
 
-        // User
+        // User Part
+        $notification = [
+            'message' => 'Login Successfully',
+            'alert-type' => 'success'
+        ];
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

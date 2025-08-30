@@ -48,14 +48,8 @@
                                     <div class="form-control-wrap">
                                         <select name="category" class="form-select" id="category" aria-label="Default select example">
                                             <option selected="">Select Category</option>
-                                            <option value="Ads" {{ $template->category == 'Ads' ? 'selected' : '' }} >Ads</option>
-                                            <option value="Articles and Contents" {{ $template->category == 'Articles and Contents' ? 'selected' : '' }}>Articles and Contents</option>
-                                            <option value="Blog Post" {{ $template->category == 'Blog Post' ? 'selected' : '' }}>Blog Post</option>
-                                            <option value="Ecommerce" {{ $template->category == 'Ecommerce' ? 'selected' : '' }}>Ecommerce</option>
-                                            <option value="Website" {{ $template->category == 'Website' ? 'selected' : '' }}>Website</option>
-                                            <option value="Social Media" {{ $template->category == 'Social Media' ? 'selected' : '' }}>Social Media</option>
-                                            <option value="Marketing" {{ $template->category == 'Marketing' ? 'selected' : '' }}>Marketing</option>
-                                            <option value="Emails" {{ $template->category == 'Emails' ? 'selected' : '' }}>Emails</option>
+                                            <option value="Student" {{ $template->category == 'Student' ? 'selected' : '' }}>Student</option>
+                                            <option value="Lecturer" {{ $template->category == 'Lecturer' ? 'selected' : '' }}>Lecturer</option>
                                         </select>
                                     </div>
                                 </div>
@@ -132,7 +126,7 @@
                             </div>
  
                             <div class="col-lg-12 col-xl-12">
-                                <button type="submit" class="btn btn-secondary">Save Changes</button> 
+                                <button type="submit" class="btn btn-primary">Save Changes</button> 
                             </div>
                         </div>
                     </form> 
