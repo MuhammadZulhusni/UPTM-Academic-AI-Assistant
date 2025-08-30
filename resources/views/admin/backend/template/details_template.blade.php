@@ -175,19 +175,15 @@
                                                 <button class="btn btn-md btn-light rounded-pill" type="button" data-bs-toggle="dropdown">
                                                     <span>Export</span>
                                                     <em class="icon ni ni-chevron-down"></em>
-                                                </button>
-                                                <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
-                                                    <div class="dropdown-content">
-                                                        <ul class="link-list link-list-hover-bg-primary link-list-md">
-                                                            <li>
-                                                                <a href="#" id="copy-text"><em class="icon ni ni-file-doc"></em><span>Copy Text</span></a>
-                                                            </li>
-                                                            <li>
-                                                                <a href="#"><em class="icon ni ni-file-text"></em><span>Text</span></a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                                </button> 
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                <a href="#" class="dropdown-item" id="copy-text"> Copy Text </a>
+                                                    </li>
+                                                    <li>
+                                                <a href="#" class="dropdown-item"> Text File </a>
+                                                    </li>
+                                                </ul>          
                                             </div>
                                         </li>
                                         <li>
@@ -216,131 +212,194 @@
 </div> 
 
 <script>
-    // This part handles the form submission using AJAX to prevent a full page reload.
-    document.getElementById('generateForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // Prevents the browser from submitting the form normally.
+// This part handles the form submission using AJAX to prevent a full page reload.
+document.getElementById('generateForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevents the browser from submitting the form normally.
 
-        const form = this;
-        const formData = new FormData(form);
-        const generateBtn = document.getElementById('generateBtn');
-        const loadingOverlay = document.getElementById('loadingOverlay');
+    const form = this;
+    const formData = new FormData(form);
+    const generateBtn = document.getElementById('generateBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
-        // Calls a function to show the loading states on the button and overlay.
-        showLoading(generateBtn, loadingOverlay);
+    // Calls a function to show the loading states on the button and overlay.
+    showLoading(generateBtn, loadingOverlay);
 
-        // Uses the Fetch API to send the form data to the server.
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                // These headers are crucial for Laravel to recognize this as an AJAX request.
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => {
-            // Checks if the server response was successful. If not, it throws an error.
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response Data:', data);
-            if (data.success) {
-                const editor = document.getElementById('editor-v1');
-                if (editor) {
-                    // Formats the generated content and injects it into the editor.
-                    const formattedContent = formatContent(data.output, formData);
-                    editor.innerHTML = formattedContent;
-                    // Updates the word and character counts.
-                    updateCounts();
-                } else {
-                    console.error('Editor element not found');
-                }
+    // Uses the Fetch API to send the form data to the server.
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            // These headers are crucial for Laravel to recognize this as an AJAX request.
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        }
+    })
+    .then(response => {
+        // Checks if the server response was successful. If not, it throws an error.
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response Data:', data);
+        if (data.success) {
+            const editor = document.getElementById('editor-v1');
+            if (editor) {
+                // Formats the generated content and injects it into the editor.
+                const formattedContent = formatContent(data.output, formData);
+                editor.innerHTML = formattedContent;
+                // Updates the word and character counts.
+                updateCounts();
             } else {
-                // Displays an alert if the server returns a failure message.
-                alert(data.message || 'Failed to generate content.');
+                console.error('Editor element not found');
             }
-        })
-        .catch(error => {
-            // Catches and handles any network or server-side errors.
-            console.error('Error:', error);
-            let errorMessage = 'An error occurred while generating content.';
-            
-            // Provides specific error messages for different HTTP status codes.
-            if (error.message.includes('status: 422')) {
-                errorMessage = 'Validation error. Please check your input fields.';
-            } else if (error.message.includes('status: 400')) {
-                errorMessage = 'Word limit exceeded. Please try with fewer words.';
-            } else if (error.message.includes('status: 500')) {
-                errorMessage = 'Server error. Please try again later.';
-            }
-            
-            alert(errorMessage);
-        })
-        .finally(() => {
-            // Always hides the loading states, regardless of success or failure.
-            hideLoading(generateBtn, loadingOverlay);
-        });
+        } else {
+            // Displays an alert if the server returns a failure message.
+            alert(data.message || 'Failed to generate content.');
+        }
+    })
+    .catch(error => {
+        // Catches and handles any network or server-side errors.
+        console.error('Error:', error);
+        let errorMessage = 'An error occurred while generating content.';
+        
+        // Provides specific error messages for different HTTP status codes.
+        if (error.message.includes('status: 422')) {
+            errorMessage = 'Validation error. Please check your input fields.';
+        } else if (error.message.includes('status: 400')) {
+            errorMessage = 'Word limit exceeded. Please try with fewer words.';
+        } else if (error.message.includes('status: 500')) {
+            errorMessage = 'Server error. Please try again later.';
+        }
+        
+        alert(errorMessage);
+    })
+    .finally(() => {
+        // Always hides the loading states, regardless of success or failure.
+        hideLoading(generateBtn, loadingOverlay);
     });
+});
 
-    // Function to handle showing the loading UI.
-    function showLoading(btn, overlay) {
-        btn.classList.add('generate-btn-loading');
-        btn.querySelector('.btn-text').style.display = 'none';
-        btn.querySelector('.btn-loading').style.display = 'inline-flex';
-        btn.disabled = true;
-        
-        overlay.style.display = 'flex';
+// Function to handle showing the loading UI.
+function showLoading(btn, overlay) {
+    btn.classList.add('generate-btn-loading');
+    btn.querySelector('.btn-text').style.display = 'none';
+    btn.querySelector('.btn-loading').style.display = 'inline-flex';
+    btn.disabled = true;
+    
+    overlay.style.display = 'flex';
+}
+
+// Function to handle hiding the loading UI.
+function hideLoading(btn, overlay) {
+    btn.classList.remove('generate-btn-loading');
+    btn.querySelector('.btn-text').style.display = 'inline';
+    btn.querySelector('.btn-loading').style.display = 'none';
+    btn.disabled = false;
+    
+    overlay.style.display = 'none';
+}
+
+// Function to count and display words and characters.
+function updateCounts() {
+    const editor = document.getElementById('editor-v1');
+    if (editor) {
+        const content = editor.textContent || editor.innerText;
+        const words = content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
+        const characters = content.length;
+        document.getElementById('word-count').textContent = words;
+        document.getElementById('char-count').textContent = characters;
+    }
+}  
+
+// Function to format the plain text output from the AI into structured HTML.
+function formatContent(output, formData) {
+    let title = 'Generated Content';
+    // Tries to find a suitable title from the user's input fields.
+    for (let [key, value] of formData.entries()) {
+        if (key === 'Article_Title' || key === 'Topic') {
+            title = value;
+            break;
+        }
     }
 
-    // Function to handle hiding the loading UI.
-    function hideLoading(btn, overlay) {
-        btn.classList.remove('generate-btn-loading');
-        btn.querySelector('.btn-text').style.display = 'inline';
-        btn.querySelector('.btn-loading').style.display = 'none';
-        btn.disabled = false;
-        
-        overlay.style.display = 'none';
-    }
+    const lines = output.split('\n').filter(line => line.trim() !== '');
+    let html = `<h2>${title}</h2>`; 
 
-    // Function to count and display words and characters.
-    function updateCounts() {
+    // Iterates through each line of the AI's output and wraps it in a paragraph tag.
+    for (let i = 0; i < lines.length; i++) {
+        html += `<p>${lines[i]}</p>`;
+        // Inserts a horizontal rule after every 3 paragraphs for visual separation.
+        if ((i + 1) % 3 === 0 && i + 1 < lines.length) {
+            html += '<hr>';
+        }
+    }
+    return html;
+}
+
+
+// Function to create and trigger a file download
+function downloadFile(content, fileName, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Handle export dropdown options
+document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(item => {
+    item.addEventListener('click', function(e) {
+        e.preventDefault();
         const editor = document.getElementById('editor-v1');
-        if (editor) {
+        if (!editor) {
+            // Changed from alert to a more graceful message
+            toastr.error('Editor content not found.');
+            return;
+        }
+
+        const action = this.id || this.textContent.trim();
+        const templateTitle = document.querySelector('.nk-editor-title h4').textContent.trim() || 'Generated_Content';
+        const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const fileNameBase = `${templateTitle}_${timestamp}`;
+
+        if (action === 'copy-text') {
+            // Copy Text (already implemented)
             const content = editor.textContent || editor.innerText;
-            const words = content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
-            const characters = content.length;
-            document.getElementById('word-count').textContent = words;
-            document.getElementById('char-count').textContent = characters;
-        }
-    }  
-
-    // Function to format the plain text output from the AI into structured HTML.
-    function formatContent(output, formData) {
-        let title = 'Generated Content';
-        // Tries to find a suitable title from the user's input fields.
-        for (let [key, value] of formData.entries()) {
-            if (key === 'Article_Title' || key === 'Topic') {
-                title = value;
-                break;
+            // Using a more robust clipboard API check
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(content).then(() => {
+                    toastr.success('Text copied to clipboard!');
+                }).catch(err => {
+                    toastr.error('Failed to copy text: ' + err);
+                });
+            } else {
+                // Fallback for older browsers
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = content;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                try {
+                    document.execCommand('copy');
+                    toastr.success('Text copied to clipboard!');
+                } catch (err) {
+                    toastr.error('Failed to copy text: ' + err);
+                }
+                document.body.removeChild(tempTextArea);
             }
-        }
-
-        const lines = output.split('\n').filter(line => line.trim() !== '');
-        let html = `<h2>${title}</h2>`; 
-
-        // Iterates through each line of the AI's output and wraps it in a paragraph tag.
-        for (let i = 0; i < lines.length; i++) {
-            html += `<p>${lines[i]}</p>`;
-            // Inserts a horizontal rule after every 3 paragraphs for visual separation.
-            if ((i + 1) % 3 === 0 && i + 1 < lines.length) {
-                html += '<hr>';
-            }
-        }
-        return html;
-    }
+        } else if (action === 'Text File') {
+            // Export as Text File
+            const content = editor.textContent || editor.innerText;
+            downloadFile(content, `${fileNameBase}.txt`, 'text/plain');
+            toastr.success('Text file downloaded successfully!');
+        }  
+    });
+});
 </script>
 
 @endsection
