@@ -130,7 +130,7 @@
                                 </div> 
                             </div>
                             
-                            <button type="submit" class="btn btn-primary mt-3" id="generateBtn">
+                            <button type="submit" class="btn btn-primary mt-3 mb-3" id="generateBtn">
                                 <span class="btn-text">Generate</span>
                                 <span class="btn-loading" style="display: none;">
                                     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
