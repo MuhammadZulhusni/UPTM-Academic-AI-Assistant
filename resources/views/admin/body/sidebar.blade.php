@@ -41,7 +41,6 @@
                         srcset="{{ asset('upload/uptm.png') }}" alt="">
                     <img class="logo-img logo-dark" src="{{ asset('upload/uptm.png') }}"
                         srcset="{{ asset('upload/uptm.png') }}" alt="">
-                    <!-- The logo below is for the collapsed sidebar. You should use a compact, icon-only image here. -->
                     <img class="logo-img logo-icon" src="{{ asset('upload/uptm-icon.png') }}"
                         srcset="{{ asset('upload/uptm-icon.png') }}" alt="">
                 </div>
@@ -98,12 +97,30 @@
                         </ul>
                     </li>
                     <li class="nk-menu-item">
+                        <a href="{{ route('add.template') }}" class="nk-menu-link">
+                            <span class="nk-menu-icon">
+                                <!-- Replaced ni ni-user with bi-person -->
+                                <em class="icon bi bi-file-earmark-plus-fill icon-outline-blue"></em>
+                            </span>
+                            <span class="nk-menu-text">Add New Template</span>
+                        </a>
+                    </li>
+                    <li class="nk-menu-item">
                         <a href="{{ route('admin.template') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
                                 <!-- Replaced ni ni-user with bi-person -->
                                 <em class="icon bi bi-stack icon-outline-blue"></em>
                             </span>
-                            <span class="nk-menu-text">Template</span>
+                            <span class="nk-menu-text">All Templates</span>
+                        </a>
+                    </li>
+                    <li class="nk-menu-item">
+                        <a href="{{ route('admin.document') }}" class="nk-menu-link">
+                            <span class="nk-menu-icon">
+                                <!-- Replaced ni ni-user with bi-person -->
+                                <em class="icon bi bi-file-spreadsheet-fill icon-outline-blue"></em>
+                            </span>
+                            <span class="nk-menu-text">Document</span>
                         </a>
                     </li>
                     <li class="nk-menu-item">

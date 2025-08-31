@@ -5,6 +5,7 @@ use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Backend\Admin\AdminController;
+use App\Http\Controllers\Backend\Admin\DocumentController;
 use App\Http\Controllers\Backend\Admin\TemplateController;
 
 Route::get('/', function () {
@@ -49,7 +50,10 @@ Route::controller(TemplateController::class)->group(function(){
     Route::post('/content/generate/{id}', 'AdminContentGenerate')->name('content.generate');
 });
 
-
+// Route for Document Management
+Route::controller(DocumentController::class)->group(function(){
+    Route::get('/admin/document', 'AdminDocument')->name('admin.document'); 
+});
 
 
 

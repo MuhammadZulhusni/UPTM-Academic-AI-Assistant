@@ -76,7 +76,7 @@
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
                                     <h6 class="mb-0 fs-6" id="total-count">{{ count($templates) }}</h6>
-                                    <span class="small text-muted d-block text-truncate">Total</span>
+                                    <span class="small text-muted d-block text-truncate">Total Templates</span>
                                 </div>
                             </div>
                         </div>
