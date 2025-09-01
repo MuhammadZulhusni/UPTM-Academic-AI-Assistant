@@ -121,7 +121,7 @@
                                 <div class="form-group mt-2">
                                     <label for="prompt">Custom Prompt</label>
                                     <textarea name="prompt" placeholder="Add Your Prompt Code" class="form-control" rows="3">{{ $template->prompt }}</textarea>
-                                    <small>Write a 400 word article about {topic} with an introduction</small> 
+                                    <small>Write a 400 word about {topic} with an introduction</small> 
                                 </div> 
                             </div>
  
