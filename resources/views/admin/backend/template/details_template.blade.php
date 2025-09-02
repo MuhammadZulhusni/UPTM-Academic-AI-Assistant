@@ -124,7 +124,7 @@
                                     <div class="form-group">
                                         <label for="result_length" class="form-label">Estimated Result Length</label>
                                         <div class="form-control-wrap">
-                                            <input type="number" name="result_length" class="form-control" id="result_length" value="200" min="1" max="1000" required>
+                                            <input type="number" name="result_length" class="form-control" id="result_length" value="50" min="1" max="200" required>
                                         </div>
                                     </div> 
                                 </div> 
@@ -186,9 +186,9 @@
                                                 </ul>          
                                             </div>
                                         </li>
-                                        <li>
+                                        <!-- <li>
                                             <button class="btn btn-md btn-primary rounded-pill" type="button">Save</button>
-                                        </li>
+                                        </li> -->
                                     </ul>
                                 </div>
                             </div>

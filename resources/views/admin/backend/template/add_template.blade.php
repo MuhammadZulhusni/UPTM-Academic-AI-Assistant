@@ -26,7 +26,7 @@
                                 <div class="form-group">
                                     <label for="exampleFormControlInputText1" class="form-label">Template Name</label>
                                     <div class="form-control-wrap">
-                                        <input type="text" name="title" class="form-control">
+                                        <input type="text" name="title" class="form-control" required>
                                     </div>
                                 </div>
                             </div>
@@ -35,7 +35,7 @@
                                 <div class="form-group">
                                     <label for="exampleFormControlInputText1" class="form-label">Template Description</label>
                                     <div class="form-control-wrap">
-                                        <input type="text" name="description" class="form-control">
+                                        <input type="text" name="description" class="form-control" required>
                                     </div>
                                 </div>
                             </div>
@@ -44,7 +44,7 @@
                                 <div class="form-group">
                                     <label for="category" class="form-label">Template Category</label>
                                     <div class="form-control-wrap">
-                                        <select name="category" class="form-select" id="category" aria-label="Default select example">
+                                        <select name="category" class="form-select" id="category" aria-label="Default select example" required>
                                             <option selected="">Select Category</option>
                                             <option value="Student">Student</option>
                                             <option value="Lecturer">Lecturer</option>
@@ -57,7 +57,7 @@
                                 <div class="form-group">
                                     <label for="exampleFormControlInputText1" class="form-label">Templates Icon</label>
                                     <div class="form-control-wrap">
-                                        <input type="text" name="icon" class="form-control" placeholder="(e.g., <i class="fa-solid fa-book"></i>
+                                        <input type="text" name="icon" class="form-control" placeholder="(e.g., <i class="fa-solid fa-book" required></i>
                                     </div>
                                 </div>
                             </div>
@@ -95,7 +95,7 @@
                                             <div class="form-group">
                                                 <label for="input_fields_0_type" class="form-label">Field Type *</label>
                                                 <div class="form-control-wrap">
-                                                    <select name="input_fields[0][type]" class="form-control" id="input_fields_0_type"> 
+                                                    <select name="input_fields[0][type]" class="form-control" id="input_fields_0_type" required> 
                                                         <option value="text">Input Field</option>
                                                         <option value="textarea">Textarea Field</option> 
                                                     </select>
@@ -117,7 +117,7 @@
 
                             <div class="form-group mt-2">
                                 <label for="prompt">Custom Prompt</label>
-                                <textarea name="prompt" placeholder="Add Your Prompt Code" class="form-control" rows="3"></textarea>
+                                <textarea name="prompt" placeholder="Add Your Prompt Code" class="form-control" rows="3" required></textarea>
                                 <small>Write a 400 word about {topic} with an introduction</small> 
                             </div>
                         </div>

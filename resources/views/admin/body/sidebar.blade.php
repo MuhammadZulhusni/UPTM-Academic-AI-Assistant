@@ -159,7 +159,7 @@
                     $id = Auth::user()->id;
                     $profileData = App\Models\User::find($id);
                 @endphp
-                <a class="d-flex px-3 py-2 bg-primary bg-opacity-10 rounded-bottom-3" href="profile.html">
+                <a class="d-flex px-3 py-2 bg-primary bg-opacity-10 rounded-bottom-3" href="{{ route('admin.profile') }}">
                     <div class="media-group">
                         <div class="media media-sm media-middle media-circle text-bg-primary">
                              {{-- Check if user has a photo, and display it or a placeholder --}}
