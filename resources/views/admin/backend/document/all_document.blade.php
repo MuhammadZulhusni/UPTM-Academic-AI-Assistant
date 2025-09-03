@@ -216,7 +216,7 @@
                                     <p class="mb-0" id="modalDocTitle">-</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold text-muted small">AUTHOR</label>
+                                    <label class="form-label fw-semibold text-muted small">USER</label>
                                     <p class="mb-0 d-flex align-items-center gap-2">
                                         <i class="bi bi-person-circle text-info"></i>
                                         <span id="modalUserName">-</span>

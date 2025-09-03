@@ -75,8 +75,8 @@
                                     <select name="language" class="form-select" id="language">
                                         <option value="English">English</option>
                                         <option value="Malay">Malay</option>
-                                        <option value="Mandarin">Mandarin</option>
-                                        <option value="Hindi">Hindi</option>
+                                        <!-- <option value="Mandarin">Mandarin</option>
+                                        <option value="Hindi">Hindi</option> -->
                                     </select>
                                 </div>
                             </div>  
@@ -331,9 +331,9 @@ function formatContent(output, formData) {
     for (let i = 0; i < lines.length; i++) {
         html += `<p>${lines[i]}</p>`;
         // Inserts a horizontal rule after every 3 paragraphs for visual separation.
-        if ((i + 1) % 3 === 0 && i + 1 < lines.length) {
-            html += '<hr>';
-        }
+        // if ((i + 1) % 3 === 0 && i + 1 < lines.length) {
+        //     html += '<hr>';
+        // }
     }
     return html;
 }
