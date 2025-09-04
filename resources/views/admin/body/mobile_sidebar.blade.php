@@ -18,15 +18,20 @@
                     </div>
                 </a>
             </div>
+            @php
+                $id = Auth::user()->id;
+                $profileData = App\Models\User::find($id);
+            @endphp
+
             <div class="nk-header-tools">
                 <ul class="nk-quick-nav ms-2">
                     <li class="dropdown d-inline-flex">
                         <a data-bs-toggle="dropdown" class="d-inline-flex" href="#">
                             <div class="media media-md media-circle media-middle text-bg-primary">
-                                <img src="images/avatar/a.png" />
+                                <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" />
                             </div>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-md rounded-3">
+                        <!-- <div class="dropdown-menu dropdown-menu-md rounded-3">
                             <div class="dropdown-content py-3">
                                 <div class="border border-light rounded-3">
                                     <div class="px-3 py-2 bg-white border-bottom border-light rounded-top-3">
@@ -56,7 +61,7 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </li>
                 </ul>
             </div>

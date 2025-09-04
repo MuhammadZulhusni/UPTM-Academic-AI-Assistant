@@ -28,16 +28,21 @@ Route::prefix('admin')->middleware(['auth', IsAdmin::class])->group(function () 
     })->name('admin.dashboard');
 });
 
-// Logout route for admin 
-Route::get('/admin/logout', [AdminController::class, 'AdminLogout'])->name('admin.logout');
-// Admin Profile
-Route::get('/admin/profile', [AdminController::class, 'AdminProfile'])->name('admin.profile');
-// Store Admin Profile
-Route::post('/admin/profile/store', [AdminController::class, 'AdminProfileStore'])->name('admin.profile.store');
-// Admin Change Password
-Route::get('/admin/change/password', [AdminController::class, 'AdminChangePassword'])->name('admin.change.password');
-// Admin Update Password
-Route::post('/admin/password/update', [AdminController::class, 'AdminPasswordUpdate'])->name('admin.password.update');
+// Group all admin
+Route::controller(AdminController::class)->group(function () {
+    // Admin Profile Routes
+    Route::get('/admin/profile', 'AdminProfile')->name('admin.profile');
+    Route::post('/admin/profile/store', 'AdminProfileStore')->name('admin.profile.store');
+    // Admin Password Routes
+    Route::get('/admin/change/password', 'AdminChangePassword')->name('admin.change.password');
+    Route::post('/admin/password/update', 'AdminPasswordUpdate')->name('admin.password.update');
+    // Admin User Routes
+    Route::get('/admin/users', 'AdminUsers')->name('admin.users');
+    // Admin Logout Route
+    Route::get('/admin/logout', 'AdminLogout')->name('admin.logout');
+    // Admin delete user
+    Route::delete('/admin/users/delete/{id}', 'AdminDeleteUser')->name('admin.user.delete');
+});
 
 // Route for Template Management
 Route::controller(TemplateController::class)->group(function(){

@@ -170,7 +170,7 @@ class TemplateController extends Controller
 
         // Validates static form inputs for language, AI model, and desired length.
         $validateData = $request->validate([
-            'language' => 'required|string|in:English,Malay,Mandarin,Hindi',
+            'language' => 'required|string|in:English,Malay',
             'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
             'result_length' => 'required|integer|min:1|max:1000',
         ]);
