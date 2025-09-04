@@ -166,4 +166,24 @@ class AdminController extends Controller
 
         return redirect()->route('login');
     }
+
+    public function AdminUsers()
+    {
+        // Fetches all users with the role 'user', excluding admins.
+        $users = User::where('role', 'user')->get(); 
+        return view('admin.admin_users', compact('users'));
+    }
+
+    public function AdminDeleteUser($id)
+    {
+        // Find the user by ID and delete them.
+        User::findOrFail($id)->delete();
+
+        $notification = [
+            'message' => 'User Deleted Successfully',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->back()->with($notification);
+    }
 }

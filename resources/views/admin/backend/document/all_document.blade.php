@@ -30,131 +30,140 @@
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 @if(count($document) > 0)
-                <div class="table-responsive">
-                    <table class="table table-middle table-hover mb-0" id="documentsTable">
-                        <thead class="table-light">
-                            <tr>
-                                <th class="tb-col d-none d-md-table-cell" style="width: 60px;">
-                                    <div class="fs-13px text-base fw-semibold">Sl</div>
-                                </th>
-                                <th class="tb-col">
-                                    <div class="fs-13px text-base fw-semibold">Document</div>
-                                </th>
-                                <th class="tb-col d-none d-lg-table-cell">
-                                    <div class="fs-13px text-base fw-semibold">User</div>
-                                </th>
-                                <th class="tb-col d-none d-md-table-cell">
-                                    <div class="fs-13px text-base fw-semibold">Category</div>
-                                </th>
-                                <th class="tb-col d-none d-sm-table-cell">
-                                    <div class="fs-13px text-base fw-semibold">Words</div>
-                                </th>
-                                <th class="tb-col d-none d-lg-table-cell">
-                                    <div class="fs-13px text-base fw-semibold">Created</div>
-                                </th>
-                                <th class="tb-col text-center">
-                                    <div class="fs-13px text-base fw-semibold">Action</div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($document as $key => $item)  
-                            <tr class="document-row">
-                                <td class="tb-col d-none d-md-table-cell">
-                                    <div class="caption-text fw-medium">{{ $key + 1 }}</div>
-                                </td>
-                                <td class="tb-col">
-                                    <div class="d-flex align-items-start gap-2">
-                                        <div class="flex-grow-1 min-width-0">
-                                            <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->template->title }}</div>
-                                            <div class="d-block d-lg-none">
-                                                <small class="text-muted d-block">By {{ $item->user->name }}</small>
-                                                <div class="d-flex gap-2 mt-1">
-                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1 small">
-                                                        {{ $item->template->category }}
-                                                    </span>
-                                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small d-sm-none">
-                                                        {{ number_format($item->word_count) }}
-                                                    </span>
+                <div id="document-table-container">
+                    <div class="table-responsive">
+                        <table class="table table-middle table-hover mb-0" id="documentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="tb-col d-none d-md-table-cell" style="width: 60px;">
+                                        <div class="fs-13px text-base fw-semibold">Sl</div>
+                                    </th>
+                                    <th class="tb-col">
+                                        <div class="fs-13px text-base fw-semibold">Document</div>
+                                    </th>
+                                    <th class="tb-col d-none d-lg-table-cell">
+                                        <div class="fs-13px text-base fw-semibold">User</div>
+                                    </th>
+                                    <th class="tb-col d-none d-md-table-cell">
+                                        <div class="fs-13px text-base fw-semibold">Category</div>
+                                    </th>
+                                    <th class="tb-col d-none d-sm-table-cell">
+                                        <div class="fs-13px text-base fw-semibold">Words</div>
+                                    </th>
+                                    <th class="tb-col d-none d-lg-table-cell">
+                                        <div class="fs-13px text-base fw-semibold">Created</div>
+                                    </th>
+                                    <th class="tb-col text-center">
+                                        <div class="fs-13px text-base fw-semibold">Action</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($document as $key => $item)  
+                                <tr class="document-row">
+                                    <td class="tb-col d-none d-md-table-cell">
+                                        <div class="caption-text fw-medium">{{ $key + 1 }}</div>
+                                    </td>
+                                    <td class="tb-col">
+                                        <div class="d-flex align-items-start gap-2">
+                                            <div class="flex-grow-1 min-width-0">
+                                                <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->template->title }}</div>
+                                                <div class="d-block d-lg-none">
+                                                    <small class="text-muted d-block">By {{ $item->user->name }}</small>
+                                                    <div class="d-flex gap-2 mt-1">
+                                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1 small">
+                                                            {{ $item->template->category }}
+                                                        </span>
+                                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small d-sm-none">
+                                                            {{ number_format($item->word_count) }}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="tb-col d-none d-lg-table-cell">
-                                    <div class="d-flex align-items-center gap-2">
-                                        @php
-                                            $id = Auth::user()->id;
-                                            $profileData = App\Models\User::find($id);
-                                        @endphp
-                                        <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                            <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
-                                                 class="w-100 h-100 object-fit-cover" alt="User"/>
+                                    </td>
+                                    <td class="tb-col d-none d-lg-table-cell">
+                                        <div class="d-flex align-items-center gap-2">
+                                            @php
+                                                $id = Auth::user()->id;
+                                                $profileData = App\Models\User::find($id);
+                                            @endphp
+                                            <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
+                                                     class="w-100 h-100 object-fit-cover" alt="User"/>
+                                            </div>
+                                            <div class="min-width-0">
+                                                <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->user->name }}</div>
+                                                <small class="text-muted text-truncate d-block">{{ $item->user->email ?? 'No email' }}</small>
+                                            </div>
                                         </div>
-                                        <div class="min-width-0">
-                                            <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->user->name }}</div>
-                                            <small class="text-muted text-truncate d-block">{{ $item->user->email ?? 'No email' }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="tb-col d-none d-md-table-cell">
-                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
-                                        {{ $item->template->category }}
-                                    </span>
-                                </td>
-                                <td class="tb-col d-none d-sm-table-cell">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge text-bg-success-soft rounded-pill px-3 py-2 fs-6 lh-sm fw-medium">
-                                            {{ number_format($item->word_count) }}
+                                    </td>
+                                    <td class="tb-col d-none d-md-table-cell">
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
+                                            {{ $item->template->category }}
                                         </span>
-                                        @if($item->word_count > 1000)
-                                            <i class="bi bi-star-fill text-warning d-none d-md-inline" title="High word count"></i>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="tb-col d-none d-lg-table-cell">
-                                    <div class="fs-7 text-muted">
-                                        {{ $item->created_at ? $item->created_at->format('M d, Y') : 'N/A' }}
-                                    </div>
-                                </td>
-                                <td class="tb-col">
-                                    <div class="d-flex justify-content-center gap-1">
-                                        <a href="{{ route('edit.admin.document', $item->id) }}" 
-                                           class="btn btn-outline-primary btn-sm" 
-                                           title="Edit Document"
-                                           data-bs-toggle="tooltip">
-                                            <i class="bi bi-pencil-square"></i>
-                                            <span class="d-none d-xl-inline ms-1">Edit</span>
-                                        </a>
-                                        <button class="btn btn-outline-info btn-sm" 
-                                                title="View Document"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#viewDocumentModal"
-                                                data-document-id="{{ $item->id }}"
-                                                data-document-title="{{ $item->template->title }}"
-                                                data-user-name="{{ $item->user->name }}"
-                                                data-category="{{ $item->template->category }}"
-                                                data-word-count="{{ $item->word_count }}"
-                                                data-created-date="{{ $item->created_at ? $item->created_at->format('M d, Y h:i A') : 'N/A' }}"
-                                                data-output="{{ base64_encode($item->output) }}"
-                                                onclick="loadDocumentContentFromData(this)">
-                                            <i class="bi bi-eye"></i>
-                                            <span class="d-none d-xl-inline ms-1">View</span>
-                                        </button>
-                                        <a href="{{ route('delete.admin.document', $item->id) }}" 
-                                           class="btn btn-outline-danger btn-sm" 
-                                           id="delete"
-                                           title="Delete Document"
-                                           data-bs-toggle="tooltip">
-                                            <i class="bi bi-trash"></i>
-                                            <span class="d-none d-xl-inline ms-1">Delete</span>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                    </td>
+                                    <td class="tb-col d-none d-sm-table-cell">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge text-bg-success-soft rounded-pill px-3 py-2 fs-6 lh-sm fw-medium">
+                                                {{ number_format($item->word_count) }}
+                                            </span>
+                                            @if($item->word_count > 1000)
+                                                <i class="bi bi-star-fill text-warning d-none d-md-inline" title="High word count"></i>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="tb-col d-none d-lg-table-cell">
+                                        <div class="fs-7 text-muted">
+                                            {{ $item->created_at ? $item->created_at->format('M d, Y') : 'N/A' }}
+                                        </div>
+                                    </td>
+                                    <td class="tb-col">
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <a href="{{ route('edit.admin.document', $item->id) }}" 
+                                               class="btn btn-outline-primary btn-sm" 
+                                               title="Edit Document"
+                                               data-bs-toggle="tooltip">
+                                                <i class="bi bi-pencil-square"></i>
+                                                <span class="d-none d-xl-inline ms-1">Edit</span>
+                                            </a>
+                                            <button class="btn btn-outline-info btn-sm" 
+                                                    title="View Document"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#viewDocumentModal"
+                                                    data-document-id="{{ $item->id }}"
+                                                    data-document-title="{{ $item->template->title }}"
+                                                    data-user-name="{{ $item->user->name }}"
+                                                    data-category="{{ $item->template->category }}"
+                                                    data-word-count="{{ $item->word_count }}"
+                                                    data-created-date="{{ $item->created_at ? $item->created_at->format('M d, Y h:i A') : 'N/A' }}"
+                                                    data-output="{{ base64_encode($item->output) }}"
+                                                    onclick="loadDocumentContentFromData(this)">
+                                                <i class="bi bi-eye"></i>
+                                                <span class="d-none d-xl-inline ms-1">View</span>
+                                            </button>
+                                            <a href="{{ route('delete.admin.document', $item->id) }}" 
+                                               class="btn btn-outline-danger btn-sm" 
+                                               id="delete"
+                                               title="Delete Document"
+                                               data-bs-toggle="tooltip">
+                                                <i class="bi bi-trash"></i>
+                                                <span class="d-none d-xl-inline ms-1">Delete</span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="no-search-results" class="text-center py-5 d-none">
+                    <div class="mb-4">
+                        <i class="bi bi-file-earmark-slash display-1 text-muted opacity-50"></i>
+                    </div>
+                    <h5 class="text-muted mb-2">No Documents Found</h5>
+                    <p class="text-muted mb-0">There are no documents matching your search query.</p>
                 </div>
                 @else
                 <div class="text-center py-5">
@@ -330,11 +339,27 @@
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.document-row');
-    
+    let foundDocuments = false;
+
     rows.forEach(row => {
         const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(searchTerm) ? '' : 'none';
+        const isMatch = text.includes(searchTerm);
+        row.style.display = isMatch ? '' : 'none';
+        if (isMatch) {
+            foundDocuments = true;
+        }
     });
+
+    const documentTableContainer = document.getElementById('document-table-container');
+    const noResultsMessage = document.getElementById('no-search-results');
+
+    if (foundDocuments) {
+        documentTableContainer.classList.remove('d-none');
+        noResultsMessage.classList.add('d-none');
+    } else {
+        documentTableContainer.classList.add('d-none');
+        noResultsMessage.classList.remove('d-none');
+    }
 });
 
 // This function initializes Bootstrap tooltips on elements that have the 'data-bs-toggle="tooltip"' attribute.

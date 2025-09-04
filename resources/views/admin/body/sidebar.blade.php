@@ -94,6 +94,11 @@
                                     <span class="nk-menu-text">Change Password</span>
                                 </a>
                             </li>
+                            <li class="nk-menu-item">
+                                <a href="{{ route('admin.users') }}" class="nk-menu-link">
+                                    <span class="nk-menu-text">All Users</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nk-menu-item">
