@@ -6,7 +6,7 @@
         <div class="nk-block-head nk-page-head">
             <div class="nk-block-head-between flex-wrap g-2">
                 <div class="nk-block-head-content">
-                    <h2 class="display-6">All Users</h2>
+                    <h2 class="display-6 fw-bold">All Users</h2>
                     <p class="text-muted mb-0 d-none d-md-block">Monitor all regular users</p>
                 </div>
             </div>

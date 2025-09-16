@@ -13,10 +13,11 @@ class DocumentController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function AdminDocument(){
-        // Retrieve all generated content, ordered by the newest first.
-        $document = GeneratedContent::orderBy('id','desc')->get();
-        return view('admin.backend.document.all_document',compact('document'));
+    public function AdminDocument()
+    {
+        // Retrieve generated content with pagination (10 per page), newest first
+        $document = GeneratedContent::orderBy('id', 'desc')->paginate(10);
+        return view('admin.backend.document.all_document', compact('document'));
     }
 
     /**

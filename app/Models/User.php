@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -42,5 +43,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the generated contents for the user.
+     * The foreign key is `user_id` on the `generated_contents` table.
+     */
+    public function generatedContents(): HasMany
+    {
+        return $this->hasMany(GeneratedContent::class);
+    }
+
+    /**
+     * Get the templates created by the user.
+     * The foreign key is `created_by` on the `templates` table.
+     */
+    public function createdTemplates(): HasMany
+    {
+        return $this->hasMany(Template::class, 'created_by');
     }
 }

@@ -2,14 +2,40 @@
 
 namespace App\Http\Controllers\Backend\Admin;
 
+use App\Models\User;
+use App\Models\Template;
 use Illuminate\Http\Request;
+use App\Models\GeneratedContent;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
+    public function AdminDashboard()
+    {
+        // Fetch the authenticated user and their counts
+        $user = User::withCount(['generatedContents', 'createdTemplates'])
+                    ->find(Auth::id());
+
+        // Count new users registered in the last 7 weeks with the role 'user'
+        $newUsersCount = User::where('created_at', '>=', Carbon::now()->subWeeks(7))
+            ->where('role', 'user') // This line ensures you only count users with the 'user' role
+            ->count();
+
+        // Count the total number of users with the role 'user'
+        $totalUsers = User::where('role', 'user')->count();
+
+        $totalDocuments = GeneratedContent::count();
+
+        $totalTemplates = Template::count();
+
+        $templates = Template::latest()->limit(4)->get();
+
+        return view('admin.index', compact('user', 'newUsersCount', 'totalUsers', 'totalDocuments', 'totalTemplates', 'templates'));
+    }
+
     /**
      * AdminLogout
      * Logs the authenticated admin user out of the application.
@@ -30,7 +56,6 @@ class AdminController extends Controller
             'alert-type' => 'success'
         ];
 
-        // return redirect('/login');
         return redirect('/login')->with($notification);
     }
 

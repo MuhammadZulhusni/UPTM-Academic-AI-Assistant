@@ -1,106 +1,139 @@
 @extends('admin.dashboard')
 
 @section('admin')
-{{-- jQuery from a CDN for AJAX functionality --}}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <div class="nk-content-inner">
     <div class="nk-content-body">
-        <div class="nk-block-head nk-page-head">
-            <div class="nk-block-head-between">
+        <div class="nk-block-head nk-page-head mb-4">
+            <div class="nk-block-head-between align-items-center">
                 <div class="nk-block-head-content">
-                    <h2 class="display-6">Personal Profile</h2>
+                    <h2 class="display-6 fw-bold mb-1">Personal Profile</h2>
+                    <p class="text-muted">Manage and update your personal details and image.</p>
                 </div>
             </div>
-        </div><!-- .nk-page-head -->
-        <div class="nk-block">
-            <div class="nk-block-head nk-block-head-sm">
-                <div class="nk-block-head-content">
-                </div>
-            </div><!-- .nk-block-head -->
-            <div class="card shadown-none">
-                <div class="card-body">
-                    {{-- Form to update the admin's profile, including file upload --}}
-                    <form action="{{ route('admin.profile.store') }}" method="post" enctype="multipart/form-data">
-                        @csrf
-                        <div class="row g-3 gx-gs">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Name </label>
-                                    <div class="form-control-wrap">
-                                        <input type="text" name="name" class="form-control" value="{{ $profileData->name }}"  >
-                                    </div>
+        </div>
+
+        <div class="card shadow-sm border-0 rounded-3 profile-card">
+            <div class="card-body p-4 p-md-5">
+                <!-- MOVE THE FORM TO WRAP EVERYTHING -->
+                <form id="profileForm" action="{{ route('admin.profile.store') }}" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <div class="row g-5">
+                        <div class="col-lg-3 d-flex flex-column align-items-center justify-content-center border-end">
+                            <div class="mb-4 text-center">
+                                <div class="position-relative">
+                                    <img id="showImage" 
+                                         src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
+                                         alt="Profile Image" 
+                                         class="rounded-circle border border-3 border-light shadow"
+                                         style="width: 150px; height: 150px; object-fit: cover;">
+                                </div>
+                                <div class="mt-3">
+                                    <h4 class="fw-bold mb-0">{{ $profileData->name }}</h4>
+                                    <p class="text-muted small">{{ $profileData->email }}</p>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Email </label>
-                                    <div class="form-control-wrap">
-                                        <input type="email" name="email" class="form-control" value="{{ $profileData->email }}"  >
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Phone </label>
-                                    <div class="form-control-wrap">
-                                        <input type="text" name="phone" class="form-control" value="{{ $profileData->phone }}"  >
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Address </label>
-                                    <div class="form-control-wrap">
-                                        <input type="text" name="address" class="form-control" value="{{ $profileData->address }}"  >
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Profile Image </label>
-                                    <div class="form-control-wrap">
-                                        <input type="file" name="photo" class="form-control" id="image" >
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">  </label>
-                                    <div class="form-control-wrap">
-                                        {{-- Display the current profile photo, or a default image if none exists --}}
-                                        <img id="showImage" src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" class="rounded-circle avatar-xl img-thumbnail float-start" style="width: 80px; height:80px;">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-12 col-xl-12">
-                                <button type="submit" class="btn btn-primary mt-1">Save Changes</button> 
+                            <div class="d-flex flex-column align-items-center w-100">
+                                <label for="image" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                                    <em class="icon ni ni-upload-cloud"></em>
+                                    <span>Upload New Photo</span>
+                                </label>
+                                <!-- FILE INPUT NOW INSIDE THE FORM -->
+                                <input type="file" name="photo" class="form-control d-none" id="image" accept="image/jpeg,image/jpg,image/png">
+                                <small class="text-muted text-center mt-2">Allowed JPG, JPEG, PNG.</small>
                             </div>
                         </div>
-                    </form> 
-                </div><!-- .card-body -->
-            </div><!-- .card -->
-        </div><!-- .nk-block -->
+
+                        <div class="col-lg-9">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="name" class="form-control" id="name" 
+                                               value="{{ $profileData->name }}" placeholder="Enter full name" required>
+                                        <label for="name">Full Name</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="email" name="email" class="form-control" id="email" 
+                                               value="{{ $profileData->email }}" placeholder="Enter email address" required>
+                                        <label for="email">Email Address</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="phone" class="form-control" id="phone" 
+                                               value="{{ $profileData->phone }}" placeholder="Enter phone number">
+                                        <label for="phone">Phone Number</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="text" name="address" class="form-control" id="address" 
+                                               value="{{ $profileData->address }}" placeholder="Enter address">
+                                        <label for="address">Address</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-outline-secondary px-4" onclick="resetForm()">
+                                        <em class="icon ni ni-redo me-1"></em> Reset
+                                    </button>
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <em class="icon ni ni-save me-1"></em> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
-{{-- JavaScript section to handle image preview functionality --}}
+<style>
+    .profile-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.08) !important;
+    }
+    .form-floating label {
+        color: #6c757d;
+        font-weight: 500;
+    }
+    .form-floating .form-control:focus ~ label,
+    .form-floating .form-control:not(:placeholder-shown) ~ label {
+        opacity: 0.65;
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+</style>
+
 <script type="text/javascript">
-    // Use jQuery to listen for changes on the file input field
+    const originalImageSrc = "{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}";
+
     $(document).ready(function(){
         $('#image').change(function(e){
-            // Create a new FileReader object to read the selected file
-            var reader = new FileReader();
-            // Set up the onload event handler for the reader
+            let reader = new FileReader();
             reader.onload = function(e){
-                // Set the 'src' attribute of the image element to the loaded file's data URL
-                $('#showImage').attr('src',e.target.result);
+                $('#showImage').attr('src', e.target.result);
             }
-            // Read the selected file as a data URL
-            reader.readAsDataURL(e.target.files['0']);
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        // Add form submission handler for debugging
+        $('#profileForm').on('submit', function(e) {
+            console.log('Form submitted');
+            // You can add validation here if needed
         });
     });
+
+    function resetForm() {
+        document.getElementById("profileForm").reset();
+        $('#showImage').attr('src', originalImageSrc);
+    }
 </script>
 
 @endsection
-

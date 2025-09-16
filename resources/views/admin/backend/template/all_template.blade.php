@@ -299,10 +299,6 @@
     margin-bottom: 4px;
 }
 
-/* ================================
-   Responsive Styles
-================================ */
-
 /* Transition for filter container */
 .filters-container {
     transition: all 0.3s ease;
