@@ -8,7 +8,7 @@
     }
 
     .logo-wrap {
-        width: 120px; /* Set a fixed width for the logo container */
+        width: 150px; /* Set a fixed width for the logo container */
         height: auto; /* Allow the height to adjust automatically */
         overflow: visible; /* Ensure nothing is hidden */
     }
@@ -144,7 +144,7 @@
     </div><!-- .nk-sidebar-element -->
     <div class="nk-sidebar-element nk-sidebar-footer">
         <div class="nk-sidebar-footer-extended pt-3">
-            <div class="border border-light rounded-3">
+            <!-- <div class="border border-light rounded-3"> -->
                 {{-- <div class="px-3 py-2 bg-white border-bottom border-light rounded-top-3">
                     <div class="d-flex flex-wrap align-items-center justify-content-between">
                         <h6 class="lead-text">Free Plan</h6>
@@ -160,7 +160,7 @@
                 </div> --}}
 
                 {{-- Retrieve authenticated user's profile data --}}
-                @php
+                <!-- @php
                     $id = Auth::user()->id;
                     $profileData = App\Models\User::find($id);
                 @endphp
@@ -177,8 +177,8 @@
                             <span class="text-light fs-7">{{ $profileData->email }}</span>
                         </div>
                     </div>
-                </a>
-            </div>
+                </a> -->
+            <!-- </div> -->
         </div>
     </div><!-- .nk-sidebar-element -->
 </div><!-- .nk-sidebar -->

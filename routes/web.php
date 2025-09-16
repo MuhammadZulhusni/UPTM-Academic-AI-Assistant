@@ -42,6 +42,8 @@ Route::controller(AdminController::class)->group(function () {
     Route::get('/admin/logout', 'AdminLogout')->name('admin.logout');
     // Admin delete user
     Route::delete('/admin/users/delete/{id}', 'AdminDeleteUser')->name('admin.user.delete');
+    // Admin Dashboard For Display Counts
+    Route::get('/admin/dashboard', [AdminController::class, 'AdminDashboard'])->name('admin.dashboard');
 });
 
 // Route for Template Management
@@ -60,12 +62,8 @@ Route::controller(DocumentController::class)->group(function(){
     Route::get('/admin/document', 'AdminDocument')->name('admin.document'); 
     Route::get('/edit/admin/document/{id}', 'EditAdminDocument')->name('edit.admin.document'); 
     Route::post('/admin/update/document/{id}', 'AdminUpdateDocument')->name('admin.update.document'); 
-    Route::get('/delete/admin/document/{id}', 'DeleteAdminDocument')->name('delete.admin.document');
+    Route::delete('/delete/admin/document/{id}', 'DeleteAdminDocument')->name('delete.admin.document');
 });
-
-
-
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
