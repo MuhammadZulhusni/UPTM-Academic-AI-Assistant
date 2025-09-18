@@ -5,8 +5,11 @@ use App\Http\Middleware\IsAdmin;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Backend\Admin\AdminController;
+use App\Http\Controllers\Backend\Client\UserController;
 use App\Http\Controllers\Backend\Admin\DocumentController;
 use App\Http\Controllers\Backend\Admin\TemplateController;
+use App\Http\Controllers\Backend\Client\UserTemplateController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,9 +18,31 @@ Route::get('/', function () {
 /// User Routes 
 // Group of routes for authenticated users only, protected by the IsUser middleware.
 Route::middleware(['auth', IsUser::class])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
+    Route::get('/user/dashboard', function () {
+        return view('client.index');
     })->name('dashboard');
+
+    // Logout route for user
+    Route::get('/user/logout', [UserController::class, 'UserLogout'])->name('user.logout');
+    // User Profile Route
+    Route::get('/user/profile', [UserController::class, 'UserProfile'])->name('user.profile');
+    Route::post('/user/profile/store', [UserController::class, 'UserProfileStore'])->name('user.profile.store');
+
+    // User Change Password Routes
+    Route::get('/user/change/password', [UserController::class, 'UserChangePassword'])->name('user.change.password');
+    Route::post('/user/password/update', [UserController::class, 'UserPasswordUpdate'])->name('user.password.update'); 
+
+    Route::controller(UserTemplateController::class)->group(function(){
+        Route::get('/user/template', 'UserTemplate')->name('user.template'); 
+        Route::get('/user/details/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
+        Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
+
+        Route::get('/user/document', 'UserDocument')->name('user.document'); 
+        Route::get('/edit/user/document/{id}', 'EditUserDocument')->name('edit.user.document'); 
+        Route::post('/user/update/document/{id}', 'UserUpdateDocument')->name('user.update.document');
+        Route::delete('/delete/user/document/{id}', 'DeleteUserDocument')->name('delete.user.document');
+    });
+
 });
 
 /// Admin Routes 
