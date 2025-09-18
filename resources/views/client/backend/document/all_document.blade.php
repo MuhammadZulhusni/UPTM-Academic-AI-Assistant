@@ -1,5 +1,6 @@
-@extends('admin.dashboard')
-@section('admin') 
+@extends('client.client_dashboard')
+@section('client') 
+
 
 <div class="nk-content-inner">
     <div class="nk-content-body">
@@ -8,9 +9,9 @@
             <div class="nk-block-head-between flex-wrap gap g-2">
                 <div class="nk-block-head-content">
                     <h2 class="display-6">
-                        All Admin Document
+                        All My Document
                     </h2>
-                    <p class="text-muted mb-0 d-none d-md-block">Manage and monitor all document</p>
+                    <p class="text-muted mb-0 d-none d-md-block">Manage and monitor document</p>
                 </div>
             </div>
         </div>
@@ -89,7 +90,7 @@
                                                 $profileData = App\Models\User::find($id);
                                             @endphp
                                             <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                                <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
+                                                <img src="{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
                                                      class="w-100 h-100 object-fit-cover" alt="User"/>
                                             </div>
                                             <div class="min-width-0">
@@ -120,7 +121,7 @@
                                     </td>
                                     <td class="tb-col">
                                         <div class="d-flex justify-content-center gap-1">
-                                            <a href="{{ route('edit.admin.document', $item->id) }}" 
+                                            <a href="{{ route('edit.user.document', $item->id) }}" 
                                                class="btn btn-outline-primary btn-sm" 
                                                title="Edit Document"
                                                data-bs-toggle="tooltip">
@@ -703,7 +704,7 @@ function refreshData() {
         // Get the form element (note the updated ID)
         const form = document.getElementById('deleteDocumentForm');
         // Update the form's action URL
-        form.action = `/delete/admin/document/${documentId}`;
+        form.action = `/delete/user/document/${documentId}`;
     });
 </script>
 
