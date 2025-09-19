@@ -121,8 +121,6 @@
 
             <div class="row g-3 g-md-4" id="templates-container">
                 @foreach ($templates as $item)
-                <!-- Individual template card column with responsive sizing -->
-                <!-- Store template metadata for filtering/searching via JavaScript -->
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
                     data-category="{{ strtolower($item->category) }}"
                     data-title="{{ strtolower($item->title) }}"
@@ -130,44 +128,38 @@
                     data-created="{{ $item->created_at->timestamp }}">
 
                     <div class="card h-100 border-0 shadow-sm template-card">
-                        <div class="card-body p-3 p-md-4 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-
-                                <!-- Link to template details page -->
-                                <a href="{{ route('details.template',$item->id) }}" class="text-decoration-none">
-                                    <!-- Icon with dynamic background and text color based on category -->
-                                    <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                        <em class="{{ $item->icon ?? 'ni ni-template' }}"></em>
-                                    </div>
-                                </a>
-
-                                <!-- Category badge with dynamic color -->
+                        <div class="card-body p-3 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
+                                    <em class="{{ $item->icon ?? 'ni ni-template' }}"></em>
+                                </div>
                                 <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
                                     {{ $item->category }}
                                 </span>
                             </div>
-
-                            <!-- Main content: title and description -->
                             <div class="flex-grow-1">
-                                <a href="{{ route('edit.template',$item->id) }}" class="text-decoration-none">
-                                    <h5 class="card-title fs-6 fs-md-5 fw-medium mb-2 text-dark">{{ $item->title }}</h5>
-                                    <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-3">{{ $item->description }}</p>
+                                <h5 class="card-title fs-6 fw-medium mb-1">{{ $item->title }}</h5>
+                                <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-2">{{ $item->description }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 py-2 px-3 d-flex justify-content-between align-items-center">
+                            <small class="text-muted d-flex align-items-center">
+                                <em class="icon ni ni-calendar me-1"></em>
+                                <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
+                                <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
+                            </small>
+
+                            <div class="d-flex gap-1">
+                                <a href="{{ route('details.template', $item->id) }}" class="btn btn-sm btn-icon btn-light">
+                                    <em class="icon ni ni-eye"></em>
+                                </a>
+                                <a href="{{ route('edit.template', $item->id) }}" class="btn btn-sm btn-icon btn-primary">
+                                    <em class="icon ni ni-edit"></em>
                                 </a>
                             </div>
-                            <!-- Footer section: creation date -->
-                            <div class="template-footer mt-auto">
-                                <small class="text-muted d-flex align-items-center">
-                                    <em class="icon ni ni-calendar me-1"></em>
-                                    <!-- Full date for larger screens, short date for small screens -->
-                                    <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
-                                    <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
-                                </small>
-                            </div>
-
-                        </div> 
-                    </div> 
+                        </div>
+                    </div>
                 </div> 
-
                 @endforeach
             </div> 
 
@@ -185,9 +177,6 @@
  </div>
 
 <style>
-/* ================================
-   General Styles & Animations
-================================ */
 
 /* Template card default appearance */
 .template-item {

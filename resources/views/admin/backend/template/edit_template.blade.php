@@ -64,13 +64,13 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" {{ $template->is_active ? 'checked' : '' }} >
                                     <label class="form-check-label" for="flexCheckChecked">Activate Template</label>
                                     <input type="hidden" name="is_active" value="{{ $template->is_active ? 1 : 0 }}">
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="form-group">
                                 <div id="input-fields">

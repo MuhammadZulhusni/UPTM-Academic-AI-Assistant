@@ -18,9 +18,7 @@ Route::get('/', function () {
 /// User Routes 
 // Group of routes for authenticated users only, protected by the IsUser middleware.
 Route::middleware(['auth', IsUser::class])->group(function () {
-    Route::get('/user/dashboard', function () {
-        return view('client.index');
-    })->name('dashboard');
+   Route::get('/user/dashboard', [UserController::class, 'UserDashboard'])->name('user.dashboard');
 
     // Logout route for user
     Route::get('/user/logout', [UserController::class, 'UserLogout'])->name('user.logout');

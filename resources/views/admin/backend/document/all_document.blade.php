@@ -62,7 +62,7 @@
                                 @foreach ($document as $key => $item)  
                                 <tr class="document-row">
                                     <td class="tb-col d-none d-md-table-cell">
-                                        <div class="caption-text fw-medium">{{ $key + 1 }}</div>
+                                        <div class="caption-text fw-medium">{{ $document->firstItem() + $loop->index }}</div>
                                     </td>
                                     <td class="tb-col">
                                         <div class="d-flex align-items-start gap-2">
@@ -245,12 +245,6 @@
                                         <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-1" id="modalCategory">-</span>
                                     </p>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-muted small">WORD COUNT</label>
-                                    <p class="mb-0 d-flex align-items-center gap-2">
-                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1" id="modalWordCount">-</span>
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -399,7 +393,6 @@ function loadDocumentContent(id, title, userName, category, wordCount, outputDat
     document.getElementById('modalDocTitle').textContent = title;
     document.getElementById('modalUserName').textContent = userName;
     document.getElementById('modalCategory').textContent = category;
-    document.getElementById('modalWordCount').textContent = wordCount.toLocaleString();
     document.getElementById('documentTitle').textContent = title;
     document.getElementById('documentMeta').textContent = `By ${userName}`;
 

@@ -49,7 +49,7 @@
         <div class="nk-block-head nk-page-head">
             <div class="nk-block-head-content">
                 <h2 class="display-6">Add Template</h2>
-                <p class="text-muted">Create a new template for your content generation tool.</p>
+                <p class="text-muted">Create a new template for content generation tool.</p>
             </div>
         </div>
         
@@ -90,7 +90,7 @@
                                 <input type="text" name="icon" id="template_icon" class="form-control form-control-lg" placeholder="e.g., fa-solid fa-book" required>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <!-- <div class="col-12">
                             <div class="form-group">
                                 <div class="form-check form-switch fs-5">
                                     <input class="form-check-input" type="checkbox" id="flexCheckChecked" checked>
@@ -100,7 +100,7 @@
                                     <input type="hidden" name="is_active" value="1">
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     
                     <div class="card bg-light border-0 p-4 mb-4">

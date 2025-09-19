@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backend\Admin;
 use Illuminate\Http\Request;
 use App\Models\GeneratedContent;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentController extends Controller
 {
@@ -15,8 +16,8 @@ class DocumentController extends Controller
      */
     public function AdminDocument()
     {
-        // Retrieve generated content with pagination (10 per page), newest first
-        $document = GeneratedContent::orderBy('id', 'desc')->paginate(10);
+        $id = Auth::user()->id;
+        $document = GeneratedContent::where('user_id', $id)->orderBy('id', 'desc')->paginate(10);
         return view('admin.backend.document.all_document', compact('document'));
     }
 

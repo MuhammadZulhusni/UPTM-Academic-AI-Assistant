@@ -2,6 +2,80 @@
 
 @section('admin')
 
+<style>
+.templates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.template-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.15);
+    border-color: #3b82f6;
+}
+
+.template-icon {
+    width: 48px;
+    height: 48px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+    color: #3b82f6;
+}
+
+.template-card:hover .template-icon {
+    background: #eff6ff;
+}
+
+.template-content h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: #1e293b;
+}
+
+.template-content p {
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .welcome-hero {
+        text-align: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        text-align: left;
+    }
+}
+</style>
+
 <div class="nk-content-inner">
     <div class="nk-content-body">
         <div class="nk-block-head nk-page-head">
@@ -77,19 +151,17 @@
             </div>
         </div>
         <div class="nk-block">
-            <div class="row g-gs">
+            <div class="templates-grid">
                 @foreach ($templates as $template)
-                <div class="col-sm-6 col-xxl-3">
-                    <a href="{{ route('details.template',$template->id) }}" class="card card-full border-0 shadow-sm transition text-decoration-none template-card">
-                        <div class="card-body">
-                            <div class="media media-rg media-middle media-circle text-muted bg-light mb-3 template-icon">
-                                <em class="icon ni {{ $template->icon }}"></em>
-                            </div>
-                            <h5 class="fs-4 fw-medium text-dark">{{ $template->title }}</h5>
-                            <p class="small text-muted">{{ $template->description }}</p>
-                        </div>
-                    </a>
-                </div>
+                <a href="{{ route('details.template',$template->id) }}" class="template-card">
+                    <div class="template-icon">
+                        <em class="icon ni {{ $template->icon }}"></em>
+                    </div>
+                    <div class="template-content">
+                        <h3>{{ $template->title }}</h3>
+                        <p>{{ $template->description }}</p>
+                    </div>
+                </a>
                 @endforeach
             </div>
         </div>
