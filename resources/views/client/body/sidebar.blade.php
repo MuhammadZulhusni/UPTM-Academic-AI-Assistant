@@ -52,19 +52,9 @@
             <div class="nk-sidebar-menu">
                 <ul class="nk-menu">
                     <li class="nk-menu-item">
-                        <a href="{{ route('admin.dashboard') }}" class="nk-menu-link">
+                        <a href="{{ route('user.dashboard') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
-                                @php
-                                    // Assuming a variable to check the user's role exists
-                                    $role = Auth::user()->role;
-                                @endphp
-                                @if($role === 'admin')
-                                    <!-- Replaced ni ni-layers-fill with bi-stack -->
-                                    <em class="icon bi bi-houses-fill icon-outline-blue"></em>
-                                @else
-                                    <!-- Replaced ni ni-home-fill with bi-house-fill -->
-                                    <em class="icon bi bi-house-fill icon-outline-blue"></em> 
-                                @endif
+                                <em class="icon bi bi-houses-fill icon-outline-blue"></em>
                             </span>
                             <span class="nk-menu-text">Dashboard</span>
                         </a>
@@ -72,13 +62,7 @@
                     <li class="nk-menu-item has-sub">
                         <a href="#" class="nk-menu-link nk-menu-toggle"> 
                             <span class="nk-menu-icon">
-                                @if($role === 'admin')
-                                    <!-- Replaced ni ni-users-fill with bi-people-fill -->
-                                    <em class="icon bi bi-person-fill-check icon-outline-blue"></em>
-                                @else
-                                    <!-- Replaced ni ni-user-circle-fill with bi-person-circle -->
-                                    <em class="icon bi bi-person-fill-check icon-outline-blue"></em>
-                                @endif
+                                <em class="icon bi bi-person-fill-check icon-outline-blue"></em>
                             </span>
                             <span class="nk-menu-text">Account</span>
                         </a>

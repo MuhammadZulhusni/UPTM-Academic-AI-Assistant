@@ -11,6 +11,8 @@ use App\Models\TemplateInputFields;
 use App\Models\GeneratedContent;
 use OpenAI\Laravel\Facades\OpenAI;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
 
 class TemplateController extends Controller
 {
@@ -28,53 +30,57 @@ class TemplateController extends Controller
     // Handles the creation and storage of a new template
     public function StoreTemplate(Request $request){
 
-        /// Validates the incoming request data
+        // Validate the incoming request data
         $validateData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
             'icon' => 'required|string',
             'prompt' => 'required|string',
-            'is_active' => 'required|in:0,1',
-            'input_fields' => 'required|array|size:1',
-            'input_fields.*.title' => 'required|string|max:255', // Validates that the 'title' for each input field is a required string with a max length of 255 characters.
-            'input_fields.*.description' => 'required|string', // Validates that the 'description' for each input field is a required string.
-            'input_fields.*.type' => 'required|in:text,textarea', // Validates that the 'type' for each input field is a required string and its value must be either 'text' or 'textarea'.
+            // Update this rule to use 'is_active_checkbox' from the form
+            'is_active_checkbox' => 'nullable|in:on', // "on" is the value for checked checkboxes
+            'input_fields' => 'required|array', // Allow for one or more fields
+            'input_fields.*.title' => 'required|string|max:255',
+            'input_fields.*.description' => 'required|string',
+            'input_fields.*.type' => 'required|in:text,textarea',
         ]);
 
-    // Creates a new Template model instance
-    $template = new Template();
-    // Assigns validated data to the template properties
-    $template->title = $validateData['title'];
-    $template->description = $validateData['description'];
-    $template->category = $validateData['category'];
-    $template->icon = $validateData['icon'];
-    $template->prompt = $validateData['prompt'];
-    $template->is_active = $validateData['is_active'];
-    // Sets the creator to the current authenticated user's ID
-    $template->created_by = Auth::id();
-    $template->save();
+        // Creates a new Template model instance
+        $template = new Template();
 
+        // Assigns validated data to the template properties
+        $template->title = $validateData['title'];
+        $template->description = $validateData['description'];
+        $template->category = $validateData['category'];
+        $template->icon = $validateData['icon'];
+        $template->prompt = $validateData['prompt'];
 
-    // Extracts the input field data
-    $inputField = $validateData['input_fields'][0];
-    // Creates a new entry in the TemplateInputFields table
-    TemplateInputFields::create([
-        'template_id' => $template->id,
-        'title' => $inputField['title'],
-        'description' => $inputField['description'],
-        'type' => $inputField['type'],
-        'is_required' => true,
-    ]);
+        // Convert the checkbox value to 1 or 0
+        $template->is_active = isset($validateData['is_active_checkbox']) ? 1 : 0;
 
-    // Prepares a success notification message
-    $notification = array(
-        'message' => 'Template Created Successfully',
-        'alert-type' => 'success'
-     );
+        // Sets the creator to the current authenticated user's ID
+        $template->created_by = Auth::id();
+        $template->save();
 
-    // Redirects the user to the template list page with the success message
-     return redirect()->route('admin.template')->with($notification);
+        // Extracts and saves all input fields
+        foreach ($validateData['input_fields'] as $inputField) {
+            TemplateInputFields::create([
+                'template_id' => $template->id,
+                'title' => $inputField['title'],
+                'description' => $inputField['description'],
+                'type' => $inputField['type'],
+                'is_required' => true, // Assuming all fields are required
+            ]);
+        }
+        
+        // Prepares a success notification message
+        $notification = array(
+            'message' => 'Template Created Successfully',
+            'alert-type' => 'success'
+        );
+
+        // Redirects the user to the template list page with the success message
+        return redirect()->route('admin.template')->with($notification);
     }
 
 
@@ -99,7 +105,6 @@ class TemplateController extends Controller
             'category' => 'required|string',
             'icon' => 'required|string',
             'prompt' => 'required|string',
-            'is_active' => 'required|in:0,1',
             'input_fields' => 'required|array|size:1',
             'input_fields.*.title' => 'required|string|max:255',
             'input_fields.*.description' => 'required|string',
@@ -115,7 +120,6 @@ class TemplateController extends Controller
     $template->category = $validateData['category'];
     $template->icon = $validateData['icon'];
     $template->prompt = $validateData['prompt'];
-    $template->is_active = $validateData['is_active']; 
     $template->save();
 
     // The code below handles updating the related input fields.
@@ -154,112 +158,124 @@ class TemplateController extends Controller
 
     public function AdminContentGenerate(Request $request, $id)
     {
-        // Fetches the template and its associated input fields from the database.
-        $template = Template::with('inputFields')->findOrFail($id);
-
-        // Retrieves a fresh instance of the authenticated user from the database.
-        $user = User::find(Auth::id());
-        
-        // Verifies that a user was successfully found. Returns an error if not.
+        // Get authenticated user once and cache it
+        $user = Auth::user();
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found',
+                'message' => 'User not authenticated.',
             ], 401);
         }
 
-        // Validates static form inputs for language, AI model, and desired length.
-        $validateData = $request->validate([
+        // Validate static inputs first (fastest validation)
+        $validatedData = $request->validate([
             'language' => 'required|string|in:English,Malay',
             'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
             'result_length' => 'required|integer|min:1|max:1000',
         ]);
 
-        // Dynamically validates each input field based on the template's configuration.
-        foreach($template->inputFields as $field) {
-            // Replaces spaces in the field title with underscores to match the request keys.
+        // Early word limit check to avoid unnecessary processing
+        $estimatedWordCount = $validatedData['result_length'];
+        if ($user->current_word_usage !== null && ($user->words_used + $estimatedWordCount) > $user->current_word_usage) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Word limit exceeded',
+            ], 400);
+        }
+
+        // Fetch template with input fields (optimized query with select)
+        $template = Template::with(['inputFields' => function ($query) {
+            $query->select('id', 'template_id', 'title'); // Only select needed columns
+        }])
+        ->select('id', 'prompt') // Only select needed template columns
+        ->findOrFail($id);
+
+        // Build dynamic validation rules efficiently
+        $dynamicRules = [];
+        $fieldNames = [];
+        foreach ($template->inputFields as $field) {
             $fieldName = str_replace(' ', '_', $field->title);
-            $request->validate([
-                $fieldName => 'required|string',
-            ]);
+            $dynamicRules[$fieldName] = 'required|string|max:1000'; // Add max length for security
+            $fieldNames[] = $fieldName;
         }
 
-        // Gets all user inputs except for the fixed form fields.
-        $inputData = $request->except(['_token', 'language', 'ai_model', 'result_length']);
-        Log::info('Input Data', ['inputData' => $inputData]);
+        // Single validation call for all dynamic fields
+        $request->validate($dynamicRules);
 
-        // Starts with the base prompt from the template.
-        $prompt = $template->prompt;
+        // Get only the dynamic input data we need
+        $inputData = $request->only($fieldNames);
 
-        // Replaces placeholders in the prompt with the user's dynamic input values.
-        foreach($template->inputFields as $field) {
-            $fieldName = str_replace(' ', '_', $field->title);
-            $fieldValue = $inputData[$fieldName] ?? '';
-            // Replaces both underscore-separated and space-separated placeholders.
-            $prompt = str_replace('{' . str_replace(' ', '_', $field->title) . '}', $fieldValue, $prompt);
-            $prompt = str_replace('{' . $field->title . '}', $fieldValue, $prompt);
+        // Build prompt more efficiently using strtr for multiple replacements
+        $replacements = [];
+        foreach ($inputData as $key => $value) {
+            $replacements['{' . $key . '}'] = $value;
+            $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
         }
+        $replacements['{result_length}'] = $validatedData['result_length'];
 
-        // Replaces the placeholder for the desired output length.
-        $prompt = str_replace('{result_length}', $validateData['result_length'], $prompt);
-
-        // Prepends language and length instructions to the final prompt.
-        $prompt = "In {$validateData['language']}, {$prompt} Aim for approximately {$validateData['result_length']} words.";
-
-        Log::info('Final Prompt', ['prompt' => $prompt]);
-
-        // Estimates word count for the requested generation.
-        $estimatedWordCount = $validateData['result_length'];
-
-        // Checks if the user has a word usage limit and if they would exceed it.
-        if ($user->current_word_usage !== null) {
-            if ($user->words_used + $estimatedWordCount > $user->current_word_usage) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Word limit exceeded',
-                ], 400);
-            }
-        }
+        // Single string replacement operation
+        $prompt = strtr($template->prompt, $replacements);
+        
+        // Prepend language and length instructions
+        $finalPrompt = "In {$validatedData['language']}, {$prompt} Aim for approximately {$validatedData['result_length']} words.";
 
         try {
-            // Sends the final prompt to the OpenAI API to generate content.
+            // OpenAI API call with optimized parameters
             $response = OpenAI::chat()->create([
-                'model' => $validateData['ai_model'],
-                'messages' => [
-                    ['role' => 'user', 'content' => $prompt],
-                ],
+                'model' => $validatedData['ai_model'],
+                'messages' => [['role' => 'user', 'content' => $finalPrompt]],
+                'max_tokens' => min(4000, $validatedData['result_length'] * 2), // Limit tokens for faster response
+                'temperature' => 0.7, // Slightly lower for faster, more consistent responses
             ]);
 
-            // Extracts the generated text from the AI's response.
             $output = $response->choices[0]->message->content;
             $wordCount = str_word_count($output);
 
-            // Updates the user's word count in the database.
-            $user->words_used += $wordCount;
-            $user->save();
+            // Optimized database transaction
+            DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
+                // Use update instead of save for better performance
+                User::where('id', $user->id)->increment('words_used', $wordCount);
 
-            // Saves the generation details to the database for historical tracking.
-            GeneratedContent::create([
-                'user_id' => $user->id,
-                'template_id' => $template->id,
-                'input' => json_encode($inputData),
-                'output' => $output,
-                'word_count' => $wordCount,
-            ]);
+                // Bulk insert for generated content
+                GeneratedContent::create([
+                    'user_id' => $user->id,
+                    'template_id' => $template->id,
+                    'input' => json_encode($inputData, JSON_UNESCAPED_UNICODE), // More efficient encoding
+                    'output' => $output,
+                    'word_count' => $wordCount,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            });
 
-            // Returns a successful JSON response with the generated output.
             return response()->json([
                 'success' => true,
                 'output' => $output
             ]);
 
-        } catch (\Exception $e) {
-            // Catches any errors during the generation process and returns a JSON error message.
+        } catch (\OpenAI\Exceptions\ErrorException $e) {
+            // More specific OpenAI error handling
+            Log::error('OpenAI API error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'template_id' => $id,
+                'model' => $validatedData['ai_model']
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to generate content: ' . $e->getMessage(),
+                'message' => 'AI service temporarily unavailable. Please try again.',
+            ], 503);
+            
+        } catch (\Exception $e) {
+            Log::error('Content generation failed: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'template_id' => $id
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate content. Please try again.',
             ], 500);
-        } 
+        }
     }
-
 }

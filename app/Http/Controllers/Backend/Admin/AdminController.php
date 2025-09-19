@@ -15,23 +15,22 @@ class AdminController extends Controller
 {
     public function AdminDashboard()
     {
-        // Fetch the authenticated user and their counts
+        // Fetch the authenticated user and their specific counts
         $user = User::withCount(['generatedContents', 'createdTemplates'])
                     ->find(Auth::id());
 
-        // Count new users registered in the last 7 weeks with the role 'user'
+        // These counts remain global as requested by the user
         $newUsersCount = User::where('created_at', '>=', Carbon::now()->subWeeks(7))
-            ->where('role', 'user') // This line ensures you only count users with the 'user' role
+            ->where('role', 'user')
             ->count();
-
-        // Count the total number of users with the role 'user'
         $totalUsers = User::where('role', 'user')->count();
-
-        $totalDocuments = GeneratedContent::count();
-
         $totalTemplates = Template::count();
 
-        $templates = Template::latest()->limit(4)->get();
+        // This count is now filtered to show documents created by the authenticated user
+        $totalDocuments = GeneratedContent::where('user_id', Auth::id())->count();
+
+        // This query is now filtered to show the latest templates created by the authenticated user
+        $templates = $user->createdTemplates()->latest()->limit(6)->get();
 
         return view('admin.index', compact('user', 'newUsersCount', 'totalUsers', 'totalDocuments', 'totalTemplates', 'templates'));
     }

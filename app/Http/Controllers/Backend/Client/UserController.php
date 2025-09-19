@@ -2,20 +2,46 @@
 
 namespace App\Http\Controllers\Backend\Client;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Template;
+use Illuminate\Http\Request;
+use App\Models\GeneratedContent;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
+    public function UserDashboard()
+    {
+        // Fetch the authenticated user and their counts
+        $user = User::withCount(['generatedContents', 'createdTemplates'])
+                    ->find(Auth::id());
+
+        // This count is filtered to show words used by the authenticated user
+        $totalWordsUsed = $user->words_used;
+
+        // This count is now filtered to show documents created by the authenticated user
+        $totalDocuments = GeneratedContent::where('user_id', Auth::id())->count();
+        $totalTemplates = Template::count();
+        $templates = Template::latest()->limit(6)->get();
+        
+        // Pass the new variable to the view
+        return view('client.index', compact('user', 'totalWordsUsed', 'totalDocuments', 'totalTemplates', 'templates'));
+    }
+
     public function UserLogout(Request $request){
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        $notification = array(
+            'message' => 'User Profile Updated Successfully',
+            'alert-type' => 'success'
+        );
+
+        return redirect('/login')->with($notification);
     }
     //End Method 
 

@@ -10,7 +10,8 @@ use App\Models\TemplateInputFields;
 use App\Models\GeneratedContent;
 use OpenAI\Laravel\Facades\OpenAI;
 use App\Models\User;
-use Illuminate\Support\Facades\Log; 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 
 class UserTemplateController extends Controller
@@ -28,115 +29,128 @@ class UserTemplateController extends Controller
 
     }
 
-    public function UserContentGenerate(Request $request, $id)
-        {
-        // Fetches the template and its associated input fields from the database.
-        $template = Template::with('inputFields')->findOrFail($id);
+public function UserContentGenerate(Request $request, $id)
+{
+    // Get authenticated user once and cache it
+    $user = Auth::user();
+    if (!$user) {
+        return response()->json([
+            'success' => false,
+            'message' => 'User not authenticated.',
+        ], 401);
+    }
 
-        // Retrieves a fresh instance of the authenticated user from the database.
-        $user = User::find(Auth::id());
-        
-        // Verifies that a user was successfully found. Returns an error if not.
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found',
-            ], 401);
-        }
+    // Validate static inputs first (fastest validation)
+    $validatedData = $request->validate([
+        'language' => 'required|string|in:English,Malay',
+        'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
+        'result_length' => 'required|integer|min:1|max:1000',
+    ]);
 
-        // Validates static form inputs for language, AI model, and desired length.
-        $validateData = $request->validate([
-            'language' => 'required|string|in:English,Malay',
-            'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
-            'result_length' => 'required|integer|min:1|max:1000',
+    // Early word limit check to avoid unnecessary processing
+    $estimatedWordCount = $validatedData['result_length'];
+    if ($user->current_word_usage !== null && ($user->words_used + $estimatedWordCount) > $user->current_word_usage) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Word limit exceeded',
+        ], 400);
+    }
+
+    // Fetch template with input fields (optimized query with select)
+    $template = Template::with(['inputFields' => function ($query) {
+        $query->select('id', 'template_id', 'title'); // Only select needed columns
+    }])
+    ->select('id', 'prompt') // Only select needed template columns
+    ->findOrFail($id);
+
+    // Build dynamic validation rules efficiently
+    $dynamicRules = [];
+    $fieldNames = [];
+    foreach ($template->inputFields as $field) {
+        $fieldName = str_replace(' ', '_', $field->title);
+        $dynamicRules[$fieldName] = 'required|string|max:1000'; // Add max length for security
+        $fieldNames[] = $fieldName;
+    }
+
+    // Single validation call for all dynamic fields
+    $request->validate($dynamicRules);
+
+    // Get only the dynamic input data we need
+    $inputData = $request->only($fieldNames);
+
+    // Build prompt more efficiently using strtr for multiple replacements
+    $replacements = [];
+    foreach ($inputData as $key => $value) {
+        $replacements['{' . $key . '}'] = $value;
+        $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
+    }
+    $replacements['{result_length}'] = $validatedData['result_length'];
+
+    // Single string replacement operation
+    $prompt = strtr($template->prompt, $replacements);
+    
+    // Prepend language and length instructions
+    $finalPrompt = "In {$validatedData['language']}, {$prompt} Aim for approximately {$validatedData['result_length']} words.";
+
+    try {
+        // OpenAI API call with optimized parameters
+        $response = OpenAI::chat()->create([
+            'model' => $validatedData['ai_model'],
+            'messages' => [['role' => 'user', 'content' => $finalPrompt]],
+            'max_tokens' => min(4000, $validatedData['result_length'] * 2), // Limit tokens for faster response
+            'temperature' => 0.7, // Slightly lower for faster, more consistent responses
         ]);
 
-        // Dynamically validates each input field based on the template's configuration.
-        foreach($template->inputFields as $field) {
-            // Replaces spaces in the field title with underscores to match the request keys.
-            $fieldName = str_replace(' ', '_', $field->title);
-            $request->validate([
-                $fieldName => 'required|string',
-            ]);
-        }
+        $output = $response->choices[0]->message->content;
+        $wordCount = str_word_count($output);
 
-        // Gets all user inputs except for the fixed form fields.
-        $inputData = $request->except(['_token', 'language', 'ai_model', 'result_length']);
-        Log::info('Input Data', ['inputData' => $inputData]);
+        // Optimized database transaction
+        DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
+            // Use update instead of save for better performance
+            User::where('id', $user->id)->increment('words_used', $wordCount);
 
-        // Starts with the base prompt from the template.
-        $prompt = $template->prompt;
-
-        // Replaces placeholders in the prompt with the user's dynamic input values.
-        foreach($template->inputFields as $field) {
-            $fieldName = str_replace(' ', '_', $field->title);
-            $fieldValue = $inputData[$fieldName] ?? '';
-            // Replaces both underscore-separated and space-separated placeholders.
-            $prompt = str_replace('{' . str_replace(' ', '_', $field->title) . '}', $fieldValue, $prompt);
-            $prompt = str_replace('{' . $field->title . '}', $fieldValue, $prompt);
-        }
-
-        // Replaces the placeholder for the desired output length.
-        $prompt = str_replace('{result_length}', $validateData['result_length'], $prompt);
-
-        // Prepends language and length instructions to the final prompt.
-        $prompt = "In {$validateData['language']}, {$prompt} Aim for approximately {$validateData['result_length']} words.";
-
-        Log::info('Final Prompt', ['prompt' => $prompt]);
-
-        // Estimates word count for the requested generation.
-        $estimatedWordCount = $validateData['result_length'];
-
-        // Checks if the user has a word usage limit and if they would exceed it.
-        if ($user->current_word_usage !== null) {
-            if ($user->words_used + $estimatedWordCount > $user->current_word_usage) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Word limit exceeded',
-                ], 400);
-            }
-        }
-
-        try {
-            // Sends the final prompt to the OpenAI API to generate content.
-            $response = OpenAI::chat()->create([
-                'model' => $validateData['ai_model'],
-                'messages' => [
-                    ['role' => 'user', 'content' => $prompt],
-                ],
-            ]);
-
-            // Extracts the generated text from the AI's response.
-            $output = $response->choices[0]->message->content;
-            $wordCount = str_word_count($output);
-
-            // Updates the user's word count in the database.
-            $user->words_used += $wordCount;
-            $user->save();
-
-            // Saves the generation details to the database for historical tracking.
+            // Bulk insert for generated content
             GeneratedContent::create([
                 'user_id' => $user->id,
                 'template_id' => $template->id,
-                'input' => json_encode($inputData),
+                'input' => json_encode($inputData, JSON_UNESCAPED_UNICODE), // More efficient encoding
                 'output' => $output,
                 'word_count' => $wordCount,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
+        });
 
-            // Returns a successful JSON response with the generated output.
-            return response()->json([
-                'success' => true,
-                'output' => $output
-            ]);
+        return response()->json([
+            'success' => true,
+            'output' => $output
+        ]);
 
-        } catch (\Exception $e) {
-            // Catches any errors during the generation process and returns a JSON error message.
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to generate content: ' . $e->getMessage(),
-            ], 500);
-        } 
+    } catch (\OpenAI\Exceptions\ErrorException $e) {
+        // More specific OpenAI error handling
+        Log::error('OpenAI API error: ' . $e->getMessage(), [
+            'user_id' => $user->id,
+            'template_id' => $id,
+            'model' => $validatedData['ai_model']
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'AI service temporarily unavailable. Please try again.',
+        ], 503);
+        
+    } catch (\Exception $e) {
+        Log::error('Content generation failed: ' . $e->getMessage(), [
+            'user_id' => $user->id,
+            'template_id' => $id
+        ]);
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to generate content. Please try again.',
+        ], 500);
     }
+}
 
     public function UserDocument(){
         $id = Auth::user()->id;
