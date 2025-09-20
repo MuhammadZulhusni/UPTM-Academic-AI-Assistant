@@ -156,6 +156,13 @@
                                 <a href="{{ route('edit.template', $item->id) }}" class="btn btn-sm btn-icon btn-primary">
                                     <em class="icon ni ni-edit"></em>
                                 </a>
+                                <button class="btn btn-sm btn-icon btn-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmDeleteModal"
+                                        data-template-id="{{ $item->id }}"
+                                        title="Delete Template">
+                                    <em class="icon ni ni-trash"></em>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -246,9 +253,9 @@
     margin-top: auto;
 }
 
-/* ================================
+/* 
    Stats Cards Hover Effects
-================================ */
+*/
 
 /* Subtle hover effect for colored cards */
 .card.bg-primary.bg-opacity-10:hover,
@@ -259,9 +266,9 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-/* ================================
+/* 
    Badge Animations
-================================ */
+ */
 
 /* Smooth transition for badges */
 .badge {
@@ -273,9 +280,9 @@
     transform: scale(1.05);
 }
 
-/* ================================
+/* 
    Filter Controls Styling
-================================ */
+ */
 
 /* Ensure filter controls don't shrink */
 .nk-block-head-content .d-flex > div {
@@ -692,5 +699,58 @@
      });
  });
  </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the delete confirmation modal element
+        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+
+        // Check if the modal exists on the page
+        if (confirmDeleteModal) {
+            // Add a listener for when the modal is about to be shown
+            confirmDeleteModal.addEventListener('show.bs.modal', function(event) {
+                // Get the button that triggered the modal
+                const button = event.relatedTarget;
+                
+                // Extract the template ID from the button's data attribute
+                const templateId = button.getAttribute('data-template-id');
+                
+                // Get the form element inside the modal
+                const form = document.getElementById('deleteTemplateForm');
+                
+                // Update the form's action URL with the correct template ID
+                // Make sure this route matches your web.php file
+                form.action = `/admin/templates/delete/${templateId}`;
+            });
+        }
+    });
+</script>
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+        <div class="modal-content text-center p-4">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <svg class="mb-3" xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="#dc3545" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                </svg>
+                <h5 class="fw-bold">Are you sure?</h5>
+                <p class="text-muted">Do you really want to delete this template? This process cannot be undone.</p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0 gap-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteTemplateForm" method="POST">
+                    @csrf
+                    {{-- Use GET method for simplicity, or change route to POST/DELETE --}}
+                    {{-- @method('DELETE') --}}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
  @endsection

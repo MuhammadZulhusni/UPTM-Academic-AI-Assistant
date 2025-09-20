@@ -6,7 +6,7 @@
     <meta name="author" content="Softnio">
     <meta name="csrf-token" content="{{ csrf_token() }}"> 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ asset('backend/images/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('upload/uptm.png') }}">
     <title>Client Dashboard </title>
     <link rel="stylesheet" href="{{ asset('backend/assets/css/style.css?v1.0.0') }}">
      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" >

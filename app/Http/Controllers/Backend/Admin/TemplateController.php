@@ -278,4 +278,18 @@ class TemplateController extends Controller
             ], 500);
         }
     }
+
+    public function DeleteTemplate($id)
+    {
+        // Find the template by its ID and delete it
+        $template = Template::findOrFail($id);
+        $template->delete();
+        
+        $notification = [
+            'message' => 'Template Deleted Successfully',
+            'alert-type' => 'success'
+        ];
+
+        return redirect()->back()->with($notification);
+    }
 }
