@@ -78,6 +78,7 @@ Route::controller(TemplateController::class)->group(function(){
     Route::post('/update/template/{id}', 'UpdateTemplate')->name('update.template'); 
     Route::get('/details/template/{id}', 'DetailsTemplate')->name('details.template');
     Route::post('/content/generate/{id}', 'AdminContentGenerate')->name('content.generate');
+    Route::post('/admin/templates/delete/{id}',  'DeleteTemplate')->name('delete.template');
 });
 
 // Route for Document Management
