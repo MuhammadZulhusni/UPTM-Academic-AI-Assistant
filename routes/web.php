@@ -10,6 +10,7 @@ use App\Http\Controllers\Backend\Admin\DocumentController;
 use App\Http\Controllers\Backend\Admin\TemplateController;
 use App\Http\Controllers\Backend\Client\UserTemplateController;
 
+
 // Public Routes
 Route::get('/', function () {
     return view('auth.login');
@@ -32,6 +33,7 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
         Route::get('/user/template', 'UserTemplate')->name('user.template');
         Route::get('/user/details/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
         Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
+        
         Route::get('/user/document', 'UserDocument')->name('user.document');
         Route::get('/edit/user/document/{id}', 'EditUserDocument')->name('edit.user.document');
         Route::post('/user/update/document/{id}', 'UserUpdateDocument')->name('user.update.document');

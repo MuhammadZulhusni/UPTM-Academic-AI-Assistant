@@ -169,7 +169,7 @@ class TemplateController extends Controller
 
         // Validate static inputs first (fastest validation)
         $validatedData = $request->validate([
-            'language' => 'required|string|in:English,Malay',
+            'language' => 'required|string|in:English,Bahasa Melayu',
             'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
             'result_length' => 'required|integer|min:1|max:1000',
         ]);
@@ -185,9 +185,9 @@ class TemplateController extends Controller
 
         // Fetch template with input fields (optimized query with select)
         $template = Template::with(['inputFields' => function ($query) {
-            $query->select('id', 'template_id', 'title'); // Only select needed columns
+            $query->select('id', 'template_id', 'title');
         }])
-        ->select('id', 'prompt') // Only select needed template columns
+        ->select('id', 'prompt')
         ->findOrFail($id);
 
         // Build dynamic validation rules efficiently
@@ -195,7 +195,7 @@ class TemplateController extends Controller
         $fieldNames = [];
         foreach ($template->inputFields as $field) {
             $fieldName = str_replace(' ', '_', $field->title);
-            $dynamicRules[$fieldName] = 'required|string|max:1000'; // Add max length for security
+            $dynamicRules[$fieldName] = 'required|string|max:1000';
             $fieldNames[] = $fieldName;
         }
 
@@ -215,32 +215,41 @@ class TemplateController extends Controller
 
         // Single string replacement operation
         $prompt = strtr($template->prompt, $replacements);
-        
-        // Prepend language and length instructions
-        $finalPrompt = "In {$validatedData['language']}, {$prompt} Aim for approximately {$validatedData['result_length']} words.";
+
+        // Enhanced language-specific prompt generation
+        $messages = $this->buildLanguageSpecificMessages($validatedData, $prompt);
 
         try {
             // OpenAI API call with optimized parameters
             $response = OpenAI::chat()->create([
                 'model' => $validatedData['ai_model'],
-                'messages' => [['role' => 'user', 'content' => $finalPrompt]],
-                'max_tokens' => min(4000, $validatedData['result_length'] * 2), // Limit tokens for faster response
-                'temperature' => 0.7, // Slightly lower for faster, more consistent responses
+                'messages' => $messages,
+                'max_tokens' => min(4000, $validatedData['result_length'] * 2),
+                'temperature' => 0.7,
             ]);
 
             $output = $response->choices[0]->message->content;
+            
+            // Language validation check
+            $languageCheck = $this->validateOutputLanguage($output, $validatedData['language']);
+            if (!$languageCheck['valid']) {
+                Log::warning('Generated content language mismatch', [
+                    'user_id' => $user->id,
+                    'requested_language' => $validatedData['language'],
+                    'confidence' => $languageCheck['confidence']
+                ]);
+            }
+
             $wordCount = str_word_count($output);
 
             // Optimized database transaction
             DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
-                // Use update instead of save for better performance
                 User::where('id', $user->id)->increment('words_used', $wordCount);
 
-                // Bulk insert for generated content
                 GeneratedContent::create([
                     'user_id' => $user->id,
                     'template_id' => $template->id,
-                    'input' => json_encode($inputData, JSON_UNESCAPED_UNICODE), // More efficient encoding
+                    'input' => json_encode($inputData, JSON_UNESCAPED_UNICODE),
                     'output' => $output,
                     'word_count' => $wordCount,
                     'created_at' => now(),
@@ -250,11 +259,11 @@ class TemplateController extends Controller
 
             return response()->json([
                 'success' => true,
-                'output' => $output
+                'output' => $output,
+                'language_confidence' => $languageCheck['confidence'] ?? null
             ]);
 
         } catch (\OpenAI\Exceptions\ErrorException $e) {
-            // More specific OpenAI error handling
             Log::error('OpenAI API error: ' . $e->getMessage(), [
                 'user_id' => $user->id,
                 'template_id' => $id,
@@ -277,6 +286,89 @@ class TemplateController extends Controller
                 'message' => 'Failed to generate content. Please try again.',
             ], 500);
         }
+    }
+
+    /**
+     * Build language-specific messages for OpenAI API
+     */
+    private function buildLanguageSpecificMessages($validatedData, $prompt)
+    {
+        $messages = [];
+        $isMalay = $validatedData['language'] === 'Bahasa Melayu';
+        $isGPT4 = $validatedData['ai_model'] === 'gpt-4';
+
+        // Add system message for better language control
+        if ($isMalay) {
+            $systemMessage = $isGPT4 
+                ? 'Anda adalah pembantu AI yang MESTI menjawab dalam Bahasa Melayu sahaja. Jangan sekali-kali menggunakan bahasa Inggeris dalam jawapan anda.'
+                : 'WAJIB: Anda MESTI menulis dalam Bahasa Melayu SAHAJA. Jangan campur atau guna bahasa Inggeris langsung. Ini sangat penting.';
+                
+            $messages[] = ['role' => 'system', 'content' => $systemMessage];
+        }
+
+        // Build user prompt with strong language instructions
+        if ($isMalay) {
+            $lengthInstruction = $isGPT4 
+                ? "Sasaran kira-kira {$validatedData['result_length']} patah perkataan dalam Bahasa Melayu."
+                : "PENTING: Tulis tepat {$validatedData['result_length']} patah perkataan dalam Bahasa Melayu sahaja.";
+                
+            $finalPrompt = "ARAHAN UTAMA: Jawab dalam Bahasa Melayu sahaja. {$prompt} {$lengthInstruction}";
+        } else {
+            $finalPrompt = "INSTRUCTION: Respond in English only. {$prompt} Aim for approximately {$validatedData['result_length']} words.";
+        }
+
+        $messages[] = ['role' => 'user', 'content' => $finalPrompt];
+
+        return $messages;
+    }
+
+    /**
+     * Validate if the output matches the requested language
+     */
+    private function validateOutputLanguage($output, $requestedLanguage)
+    {
+        if ($requestedLanguage === 'English') {
+            return ['valid' => true, 'confidence' => 100]; // Skip validation for English
+        }
+
+        // Simple Malay language detection
+        $malayWords = ['dan', 'atau', 'ini', 'itu', 'dengan', 'untuk', 'dari', 'ke', 'pada', 'di', 'yang', 'adalah', 'akan', 'telah', 'boleh', 'tidak', 'dalam', 'kepada', 'sebagai', 'juga'];
+        $englishWords = ['the', 'and', 'or', 'this', 'that', 'with', 'for', 'from', 'to', 'in', 'of', 'is', 'are', 'was', 'were', 'will', 'would', 'can', 'could', 'not'];
+
+        $outputLower = strtolower($output);
+        $totalWords = str_word_count($outputLower);
+        
+        if ($totalWords === 0) {
+            return ['valid' => false, 'confidence' => 0];
+        }
+
+        $malayCount = 0;
+        $englishCount = 0;
+
+        foreach ($malayWords as $word) {
+            $malayCount += substr_count($outputLower, ' ' . $word . ' ') + 
+                        (strpos($outputLower, $word . ' ') === 0 ? 1 : 0) +
+                        (substr($outputLower, -strlen(' ' . $word)) === ' ' . $word ? 1 : 0);
+        }
+
+        foreach ($englishWords as $word) {
+            $englishCount += substr_count($outputLower, ' ' . $word . ' ') + 
+                            (strpos($outputLower, $word . ' ') === 0 ? 1 : 0) +
+                            (substr($outputLower, -strlen(' ' . $word)) === ' ' . $word ? 1 : 0);
+        }
+
+        $malayConfidence = ($malayCount / $totalWords) * 100;
+        $englishConfidence = ($englishCount / $totalWords) * 100;
+
+        // Consider it valid Malay if Malay confidence > English confidence and Malay confidence > 10%
+        $isValidMalay = $malayConfidence > $englishConfidence && $malayConfidence > 10;
+
+        return [
+            'valid' => $isValidMalay,
+            'confidence' => round($malayConfidence, 2),
+            'malay_words' => $malayCount,
+            'english_words' => $englishCount
+        ];
     }
 
     public function DeleteTemplate($id)
