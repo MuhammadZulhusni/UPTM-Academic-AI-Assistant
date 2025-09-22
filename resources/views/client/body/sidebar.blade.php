@@ -35,7 +35,7 @@
     </div>
     <div class="nk-sidebar-element nk-sidebar-head">
         <div class="nk-sidebar-brand">
-            <a href="{{ route('admin.dashboard') }}" class="logo-link">
+            <a href="{{ route('user.dashboard') }}" class="logo-link">
                 <div class="logo-wrap">
                     <img class="logo-img logo-light" src="{{ asset('upload/uptm.png') }}"
                         srcset="{{ asset('upload/uptm.png') }}" alt="">

@@ -87,19 +87,6 @@
         </div>
         <div class="nk-block">
             <div class="row g-gs">
-                {{-- New Users Card --}}
-                <div class="col-sm-6 col-xxl-3">
-                    <div class="card card-full border shadow-sm transition">
-                        <div class="card-body text-center">
-                            <em class="icon ni ni-users fs-2 text-purple mb-3"></em>
-                            <h5 class="display-4 fw-bold text-dark mb-1">
-                                <span id="newUsersCount" data-count="{{ $newUsersCount }}">0</span>
-                            </h5>
-                            <div class="text-muted fw-medium small">New Users (7 weeks)</div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- All Users Card --}}
                 <div class="col-sm-6 col-xxl-3">
                     <div class="card card-full border shadow-sm transition">
@@ -112,6 +99,19 @@
                         </div>
                     </div>
                 </div>
+                
+                {{-- New Users Card --}}
+                <div class="col-sm-6 col-xxl-3">
+                    <div class="card card-full border shadow-sm transition">
+                        <div class="card-body text-center">
+                            <em class="icon ni ni-book-read fs-2 text-cyan mb-3"></em>
+                            <h5 class="display-4 fw-bold text-dark mb-1">
+                                <span id="newUsersCount" data-count="{{ $studentTemplateCount }}">0</span>
+                            </h5>
+                            <div class="text-muted fw-medium small">Student Template</div>
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Generated Output Card --}}
                 <div class="col-sm-6 col-xxl-3">
@@ -119,9 +119,9 @@
                         <div class="card-body text-center">
                             <em class="icon ni ni-file-docs fs-2 text-indigo mb-3"></em>
                             <h5 class="display-4 fw-bold text-dark mb-1">
-                                <span id="totalDocuments" data-count="{{ $totalDocuments }}">0</span>
+                                <span id="totalDocuments" data-count="{{ $lecturerTemplateCount }}">0</span>
                             </h5>
-                            <div class="text-muted fw-medium small">Total Generated Output</div>
+                            <div class="text-muted fw-medium small">Lecturer Template</div>
                         </div>
                     </div>
                 </div>
