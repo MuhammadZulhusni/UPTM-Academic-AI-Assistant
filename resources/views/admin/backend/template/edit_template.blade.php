@@ -4,50 +4,50 @@
 
 <div class="nk-content-inner">
     <div class="nk-content-body">
-        <div class="nk-block-head nk-page-head">
+        <div class="nk-block-head nk-block-head-sm">
             <div class="nk-block-head-between">
                 <div class="nk-block-head-content">
-                    <h2 class="display-6">Edit Template</h2>
+                    <h3 class="nk-block-title page-title">Edit Template</h3>
+                    <div class="nk-block-des text-soft">
+                        <p>Update the details and settings for your custom template.</p>
+                    </div>
                 </div>
             </div>
-        </div><!-- .nk-page-head -->
-        
-        <div class="nk-block">
-            <div class="nk-block-head nk-block-head-sm">
-                <div class="nk-block-head-content">
-                </div>
-            </div><!-- .nk-block-head -->
-            
-            <div class="card shadown-none">
-                <div class="card-body">
+        </div><div class="nk-block">
+            <div class="card card-bordered shadow-sm">
+                <div class="card-body p-4 p-md-5">
                     <form action="{{ route('update.template',$template->id) }}" method="post" enctype="multipart/form-data">
                         @csrf   
 
-                        <div class="row g-3 gx-gs">
-                            <div class="col-md-6">
+                        <div class="nk-block-head nk-block-head-sm">
+                            <h5 class="nk-block-title">Template Details</h5>
+                            <p class="mb-4">Basic information about your template.</p>
+                        </div>
+                        <div class="row g-4 gx-5 mb-5">
+                            <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Template Name</label>
+                                    <label for="templateName" class="form-label">Template Name</label>
                                     <div class="form-control-wrap">
-                                        <input type="text" name="title" class="form-control" value="{{ $template->title }}" >
+                                        <input type="text" name="title" id="templateName" class="form-control form-control-lg" value="{{ $template->title }}">
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Template Description</label>
+                                    <label for="templateDescription" class="form-label">Template Description</label>
                                     <div class="form-control-wrap">
-                                        <input type="text" name="description" class="form-control" value="{{ $template->description }}" >
+                                        <input type="text" name="description" id="templateDescription" class="form-control form-control-lg" value="{{ $template->description }}">
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label for="category" class="form-label">Template Category</label>
+                                    <label for="templateCategory" class="form-label">Template Category</label>
                                     <div class="form-control-wrap">
-                                        <select name="category" class="form-select" id="category" aria-label="Default select example">
-                                            <option selected="">Select Category</option>
+                                        <select name="category" class="form-select form-control-lg" id="templateCategory" data-search="true">
+                                            <option value="">Select Category</option>
                                             <option value="Student" {{ $template->category == 'Student' ? 'selected' : '' }}>Student</option>
                                             <option value="Lecturer" {{ $template->category == 'Lecturer' ? 'selected' : '' }}>Lecturer</option>
                                         </select>
@@ -55,84 +55,76 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-6">
+                            <div class="col-lg-6">
                                 <div class="form-group">
-                                    <label for="exampleFormControlInputText1" class="form-label">Templates Icon</label>
+                                    <label for="templateIcon" class="form-label">Templates Icon</label>
                                     <div class="form-control-wrap">
-                                        <input type="text" name="icon" class="form-control" placeholder="(e.g., &lt;i class=&quot;fa-solid fa-book&quot;&gt;&lt;/i&gt;)" value="{{ $template->icon }}" >
+                                        <input type="text" name="icon" id="templateIcon" class="form-control form-control-lg" placeholder="e.g., <i class='fa-solid fa-book'></i>" value="{{ $template->icon }}">
                                     </div>
+                                    <div class="form-text text-soft small">Use a Nioicon Font icon code.</div>
                                 </div>
-                            </div>
-
-                            <!-- <div class="form-group">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" {{ $template->is_active ? 'checked' : '' }} >
-                                    <label class="form-check-label" for="flexCheckChecked">Activate Template</label>
-                                    <input type="hidden" name="is_active" value="{{ $template->is_active ? 1 : 0 }}">
-                                </div>
-                            </div> -->
-
-                            <div class="form-group">
-                                <div id="input-fields">
-                                    <div class="row input-field-row">
-                                        @foreach ($template->inputFields as $field)
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="input_fields_0_title" class="form-label">Input Field Title *</label>
-                                                    <div class="form-control-wrap">
-                                                        <input type="text" name="input_fields[0][title]" id="input_fields_0_title" class="form-control" value="{{ $field->title }}" required >
-                                                    </div>
-                                                </div> 
-                                            </div>
-
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="input_fields_0_description" class="form-label">Input Field Description *</label>
-                                                    <div class="form-control-wrap">
-                                                        <input type="text" name="input_fields[0][description]" id="input_fields_0_description" class="form-control" value="{{ $field->description }}" required >
-                                                    </div>
-                                                </div> 
-                                            </div>
-
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label for="input_fields_0_type" class="form-label">Field Type *</label>
-                                                    <div class="form-control-wrap">
-                                                        <select name="input_fields[0][type]" class="form-control" id="input_fields_0_type"> 
-                                                            <option value="text" {{ $field->type == 'text' ? 'selected' : '' }}>Input Field</option>
-                                                            <option value="textarea" {{ $field->type == 'textarea' ? 'selected' : '' }}>Textarea Field</option> 
-                                                        </select>
-                                                    </div>
-                                                </div> 
-                                            </div>
-
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label class="form-label"></label>
-                                                    <div class="form-control-wrap">
-                                                        <input type="hidden" name="input_fields[0][is_required]" value="1">
-                                                    </div>
-                                                </div> 
-                                            </div> 
-                                        @endforeach     
-                                    </div> 
-                                </div>
-
-                                <div class="form-group mt-2">
-                                    <label for="prompt">Custom Prompt</label>
-                                    <textarea name="prompt" placeholder="Add Your Prompt Code" class="form-control" rows="3">{{ $template->prompt }}</textarea>
-                                    <small>Write a 400 word about {topic} with an introduction</small> 
-                                </div> 
-                            </div>
- 
-                            <div class="col-lg-12 col-xl-12">
-                                <button type="submit" class="btn btn-primary">Save Changes</button> 
                             </div>
                         </div>
+
+                        <div class="nk-block-head nk-block-head-sm">
+                            <h5 class="nk-block-title">Input Fields</h5>
+                            <p class="mb-4">Configure the custom fields for this template.</p>
+                        </div>
+                        <div id="input-fields" class="mb-5">
+                            @foreach ($template->inputFields as $field)
+                                <div class="card card-bordered mb-3">
+                                    <div class="card-body p-4">
+                                        <div class="row g-3 gx-4">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="input_fields_{{ $loop->index }}_title" class="form-label">Input Title</label>
+                                                    <input type="text" name="input_fields[{{ $loop->index }}][title]" id="input_fields_{{ $loop->index }}_title" class="form-control" value="{{ $field->title }}" required>
+                                                </div> 
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="input_fields_{{ $loop->index }}_description" class="form-label">Description</label>
+                                                    <input type="text" name="input_fields[{{ $loop->index }}][description]" id="input_fields_{{ $loop->index }}_description" class="form-control" value="{{ $field->description }}" required>
+                                                </div> 
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label for="input_fields_{{ $loop->index }}_type" class="form-label">Field Type</label>
+                                                    <select name="input_fields[{{ $loop->index }}][type]" class="form-select" id="input_fields_{{ $loop->index }}_type"> 
+                                                        <option value="text" {{ $field->type == 'text' ? 'selected' : '' }}>Input Field</option>
+                                                        <option value="textarea" {{ $field->type == 'textarea' ? 'selected' : '' }}>Textarea Field</option> 
+                                                    </select>
+                                                </div> 
+                                            </div>
+                                            <input type="hidden" name="input_fields[{{ $loop->index }}][is_required]" value="1">
+                                        </div> 
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="nk-block-head nk-block-head-sm">
+                            <h5 class="nk-block-title">Custom Prompt</h5>
+                            <p class="mb-4">The core instruction code for your template.</p>
+                        </div>
+                        <div class="form-group mb-5">
+                            <div class="form-control-wrap">
+                                <textarea name="prompt" id="promptCode" placeholder="Add your prompt code here..." class="form-control form-control-lg" rows="5">{{ $template->prompt }}</textarea>
+                            </div>
+                            <div class="form-text text-soft small mt-1">Example: "Write a 400-word article about {topic} with an introduction."</div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <span>Save Changes</span>
+                            </button> 
+                        </div>
                     </form> 
-                </div><!-- .card-body -->
-            </div><!-- .card -->
-        </div><!-- .nk-block -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
