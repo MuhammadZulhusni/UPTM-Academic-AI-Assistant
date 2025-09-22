@@ -26,13 +26,17 @@ class AdminController extends Controller
         $totalUsers = User::where('role', 'user')->count();
         $totalTemplates = Template::count();
 
+        // Get the counts for 'Student Template' and 'Lecturer Template'
+        $studentTemplateCount = Template::where('category', 'Student')->count();
+        $lecturerTemplateCount = Template::where('category', 'Lecturer')->count();
+
         // This count is now filtered to show documents created by the authenticated user
         $totalDocuments = GeneratedContent::where('user_id', Auth::id())->count();
 
         // This query is now filtered to show the latest templates created by the authenticated user
         $templates = $user->createdTemplates()->latest()->limit(6)->get();
 
-        return view('admin.index', compact('user', 'newUsersCount', 'totalUsers', 'totalDocuments', 'totalTemplates', 'templates'));
+        return view('admin.index', compact('user', 'newUsersCount', 'totalUsers', 'totalDocuments', 'totalTemplates', 'templates', 'studentTemplateCount', 'lecturerTemplateCount'));
     }
 
     /**

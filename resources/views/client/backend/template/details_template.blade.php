@@ -224,15 +224,16 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <form id="generateForm" action="{{ route('content.generate', $template->id) }}" method="post">
+                        <form id="generateForm" action="{{ route('user.content.generate', $template->id) }}" method="post">
                             @csrf  
 
                             <div class="form-group">
                                 <label for="language" class="form-label">Language</label>
                                 <div class="form-control-wrap">
-                                    <select name="language" class="form-select" id="language">
+                                    <select name="language" class="form-select" id="language" required>
+                                        <option value="">Select Language</option>
                                         <option value="English">English</option>
-                                        <option value="Malay">Malay</option>
+                                        <option value="Bahasa Melayu">Bahasa Melayu</option>
                                     </select>
                                 </div>
                             </div>  
@@ -277,8 +278,8 @@
                                         <label for="result_length" class="form-label">Result Length (words)</label>
                                         <div class="form-control-wrap">
                                             <input type="number" name="result_length" class="form-control" 
-                                                   id="result_length" value="50" min="50" max="500" required>
-                                            <small class="text-muted">Lower values generate faster</small>
+                                                   id="result_length" value="100" min="50" max="1000" required>
+                                            <small class="text-muted">Refer to the description template for best results.</small>
                                         </div>
                                     </div> 
                                 </div> 
