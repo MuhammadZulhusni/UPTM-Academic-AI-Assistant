@@ -91,7 +91,7 @@
                 <div class="col-sm-6 col-xxl-3">
                     <div class="card card-full border shadow-sm transition">
                         <div class="card-body text-center">
-                            <em class="icon ni ni-user-alt fs-2 text-blue mb-3"></em>
+                            <em class="icon ni ni-user-alt fs-2 text-indigo mb-3"></em>
                             <h5 class="display-4 fw-bold text-dark mb-1">
                                 <span id="totalUsers" data-count="{{ $totalUsers }}">0</span>
                             </h5>
@@ -100,11 +100,11 @@
                     </div>
                 </div>
                 
-                {{-- New Users Card --}}
+                {{-- Users Card --}}
                 <div class="col-sm-6 col-xxl-3">
                     <div class="card card-full border shadow-sm transition">
                         <div class="card-body text-center">
-                            <em class="icon ni ni-book-read fs-2 text-cyan mb-3"></em>
+                            <em class="icon ni ni-book-read fs-2 text-indigo mb-3"></em>
                             <h5 class="display-4 fw-bold text-dark mb-1">
                                 <span id="newUsersCount" data-count="{{ $studentTemplateCount }}">0</span>
                             </h5>
@@ -130,7 +130,7 @@
                 <div class="col-sm-6 col-xxl-3">
                     <div class="card card-full border shadow-sm transition">
                         <div class="card-body text-center">
-                            <em class="icon ni ni-grid-plus fs-2 text-cyan mb-3"></em>
+                            <em class="icon ni ni-grid-plus fs-2 text-indigo mb-3"></em>
                             <h5 class="display-4 fw-bold text-dark mb-1">
                                 <span id="totalTemplates" data-count="{{ $totalTemplates }}">0</span>
                             </h5>
