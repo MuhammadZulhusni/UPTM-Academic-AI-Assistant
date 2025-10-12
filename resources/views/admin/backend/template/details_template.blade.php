@@ -247,7 +247,7 @@
                                     name="{{ str_replace(' ', '_', $field->title) }}" 
                                     id="{{ $field->title }}" 
                                     class="form-control" 
-                                    maxlength="500"
+                                    maxlength="100"
                                     required>
                                 
                                 @elseif ($field->type === 'textarea')
@@ -255,7 +255,7 @@
                                     id="{{ $field->title }}" 
                                     rows="5" 
                                     class="form-control" 
-                                    maxlength="1000"
+                                    maxlength="10000"
                                     required></textarea> 
                                 @endif
                                 <small>{{ $field->description }}</small>
@@ -278,7 +278,7 @@
                                         <label for="result_length" class="form-label">Result Length (words)</label>
                                         <div class="form-control-wrap">
                                             <input type="number" name="result_length" class="form-control" 
-                                                   id="result_length" value="100" min="50" max="1000" required>
+                                                   id="result_length" value="100" min="1" max="1000" required>
                                             <small class="text-muted">Refer to the description template for best results.</small>
                                         </div>
                                     </div> 

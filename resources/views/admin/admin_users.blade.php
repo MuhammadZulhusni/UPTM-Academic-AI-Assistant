@@ -14,7 +14,6 @@
 
         {{--
             Search bar and section header.
-            This part provides a clean interface for searching users and visually separates the header from the table.
         --}}
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between border-bottom border-light mt-3 mt-md-5 mb-4 pb-2 gap-3">
             <div class="d-flex align-items-center gap-3">

@@ -49,6 +49,7 @@ class User extends Authenticatable
      * Get the generated contents for the user.
      * The foreign key is `user_id` on the `generated_contents` table.
      */
+    // User (1:M) GeneratedContents 
     public function generatedContents(): HasMany
     {
         return $this->hasMany(GeneratedContent::class);
@@ -58,6 +59,7 @@ class User extends Authenticatable
      * Get the templates created by the user.
      * The foreign key is `created_by` on the `templates` table.
      */
+    // User (1:M) Templates 
     public function createdTemplates(): HasMany
     {
         return $this->hasMany(Template::class, 'created_by');
