@@ -158,39 +158,41 @@ class TemplateController extends Controller
 
     public function AdminContentGenerate(Request $request, $id)
     {
-        // Get authenticated user once and cache it
+        // Step 1: Authenticate user and validate static inputs
         $user = Auth::user();
         if (!$user) {
+            // If user not logged in, return error
             return response()->json([
                 'success' => false,
                 'message' => 'User not authenticated.',
             ], 401);
         }
 
-        // Validate static inputs first (fastest validation)
+        // Validate basic request inputs
         $validatedData = $request->validate([
-            'language' => 'required|string|in:English,Bahasa Melayu',
-            'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
-            'result_length' => 'required|integer|min:1|max:1000',
+            'language' => 'required|string|in:English,Bahasa Melayu', // must be one of these two
+            'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',   // must be valid OpenAI model
+            'result_length' => 'required|integer|min:1|max:1000',     // limit between 1–1000 words
         ]);
 
-        // Early word limit check to avoid unnecessary processing
+        // Step 2: Check user word usage limit
         $estimatedWordCount = $validatedData['result_length'];
         if ($user->current_word_usage !== null && ($user->words_used + $estimatedWordCount) > $user->current_word_usage) {
+            // If word usage exceeds limit, stop and return error
             return response()->json([
                 'success' => false,
                 'message' => 'Word limit exceeded',
             ], 400);
         }
 
-        // Fetch template with input fields (optimized query with select)
+        // Step 3: Fetch template and validate dynamic input fields
         $template = Template::with(['inputFields' => function ($query) {
-            $query->select('id', 'template_id', 'title');
+            $query->select('id', 'template_id', 'title'); // load only needed columns
         }])
-        ->select('id', 'prompt')
-        ->findOrFail($id);
+        ->select('id', 'prompt') // select only necessary template columns
+        ->findOrFail($id); // find template by ID or fail if not found
 
-        // Build dynamic validation rules efficiently
+        // Build dynamic validation rules based on template input fields
         $dynamicRules = [];
         $fieldNames = [];
         foreach ($template->inputFields as $field) {
@@ -199,28 +201,29 @@ class TemplateController extends Controller
             $fieldNames[] = $fieldName;
         }
 
-        // Single validation call for all dynamic fields
+        // Validate all dynamic fields together
         $request->validate($dynamicRules);
 
-        // Get only the dynamic input data we need
+        // Get only dynamic data that was validated
         $inputData = $request->only($fieldNames);
 
-        // Build prompt more efficiently using strtr for multiple replacements
+        // Step 4: Build AI prompt with input replacements
         $replacements = [];
         foreach ($inputData as $key => $value) {
+            // Replace placeholders like {field_name} and {field name}
             $replacements['{' . $key . '}'] = $value;
             $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
         }
         $replacements['{result_length}'] = $validatedData['result_length'];
 
-        // Single string replacement operation
+        // Replace all placeholders in template prompt
         $prompt = strtr($template->prompt, $replacements);
 
-        // Enhanced language-specific prompt generation
+        // Build final messages with language-specific rules
         $messages = $this->buildLanguageSpecificMessages($validatedData, $prompt);
 
+        // Step 5: Send request to OpenAI API and get generated output
         try {
-            // OpenAI API call with optimized parameters
             $response = OpenAI::chat()->create([
                 'model' => $validatedData['ai_model'],
                 'messages' => $messages,
@@ -229,8 +232,8 @@ class TemplateController extends Controller
             ]);
 
             $output = $response->choices[0]->message->content;
-            
-            // Language validation check
+
+            // Step 6: Validate output language to match user selection
             $languageCheck = $this->validateOutputLanguage($output, $validatedData['language']);
             if (!$languageCheck['valid']) {
                 Log::warning('Generated content language mismatch', [
@@ -240,12 +243,15 @@ class TemplateController extends Controller
                 ]);
             }
 
+            // Count words in generated content
             $wordCount = str_word_count($output);
 
-            // Optimized database transaction
+            // Step 7: Save generated content and update user usage (word) in database
             DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
+                // Increase user’s used words
                 User::where('id', $user->id)->increment('words_used', $wordCount);
 
+                // Save the generated content record
                 GeneratedContent::create([
                     'user_id' => $user->id,
                     'template_id' => $template->id,
@@ -257,12 +263,14 @@ class TemplateController extends Controller
                 ]);
             });
 
+            // Return successful response with generated output
             return response()->json([
                 'success' => true,
                 'output' => $output,
                 'language_confidence' => $languageCheck['confidence'] ?? null
             ]);
 
+        // Step 8: Error handling for OpenAI and general exceptions
         } catch (\OpenAI\Exceptions\ErrorException $e) {
             Log::error('OpenAI API error: ' . $e->getMessage(), [
                 'user_id' => $user->id,
@@ -287,6 +295,7 @@ class TemplateController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * Build language-specific messages for OpenAI API

@@ -147,6 +147,7 @@
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#confirmDeleteModal" 
                                                     data-document-id="{{ $item->id }}"
+                                                    data-delete-url="{{ route('delete.admin.document', $item->id) }}"
                                                     title="Delete Document">
                                                 <i class="bi bi-trash"></i>
                                                 <span class="d-none d-xl-inline ms-1">Delete</span>
@@ -689,14 +690,10 @@ function refreshData() {
 <script>
     const confirmDeleteModal = document.getElementById('confirmDeleteModal');
     confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
         const button = event.relatedTarget;
-        // Extract the document ID from the data-document-id attribute
-        const documentId = button.getAttribute('data-document-id');
-        // Get the form element (note the updated ID)
+        const deleteUrl = button.getAttribute('data-delete-url'); 
         const form = document.getElementById('deleteDocumentForm');
-        // Update the form's action URL
-        form.action = `/delete/admin/document/${documentId}`;
+        form.action = deleteUrl; 
     });
 </script>
 
