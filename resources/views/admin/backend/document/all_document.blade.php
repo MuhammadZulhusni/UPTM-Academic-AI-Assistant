@@ -687,7 +687,7 @@ function refreshData() {
     </div>
 </div>
 
-<script>
+<!-- <script>
     const confirmDeleteModal = document.getElementById('confirmDeleteModal');
     confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
@@ -695,6 +695,27 @@ function refreshData() {
         const form = document.getElementById('deleteDocumentForm');
         form.action = deleteUrl; 
     });
+</script> -->
+
+<script>
+    // Get the delete confirmation modal element by its ID
+    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+
+    // Add an event listener that triggers when the modal is about to be shown
+    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that opened the modal
+        const button = event.relatedTarget;
+
+        // Retrieve the delete URL from the button's data attribute
+        const deleteUrl = button.getAttribute('data-delete-url'); 
+
+        // Find the delete form inside the modal
+        const form = document.getElementById('deleteDocumentForm');
+
+        // Set the form's action attribute to the specific delete URL
+        form.action = deleteUrl; 
+    });
 </script>
+
 
 @endsection
