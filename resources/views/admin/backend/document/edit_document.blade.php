@@ -209,6 +209,12 @@
 
 <div class="nk-editor"> 
 <div class="nk-editor-header">
+    {{-- 
+    Displays the document title in an <h4> heading.
+    It first tries to show 'Article_Title' from the JSON-decoded 'input' field.
+    If 'Article_Title' is not available, it will use 'Topic'.
+    If neither exists, it will display the default text 'Document'.
+    --}}
     <div class="nk-editor-title">
         <h4 class="me-3 mb-0 line-clamp-1">
             {{ json_decode($document->input,true)['Article_Title'] ?? json_decode($document->input,true)['Topic'] ?? 'Document' }}
