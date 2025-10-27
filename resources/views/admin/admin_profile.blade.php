@@ -16,7 +16,6 @@
 
         <div class="card shadow-sm border-0 rounded-3 profile-card">
             <div class="card-body p-4 p-md-5">
-                <!-- MOVE THE FORM TO WRAP EVERYTHING -->
                 <form id="profileForm" action="{{ route('admin.profile.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row g-5">
@@ -24,6 +23,7 @@
                             <div class="mb-4 text-center">
                                 <div class="position-relative">
                                     <img id="showImage" 
+                                        {{-- Display admin profile photo if available; otherwise show default image --}}
                                          src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
                                          alt="Profile Image" 
                                          class="rounded-circle border border-3 border-light shadow"
