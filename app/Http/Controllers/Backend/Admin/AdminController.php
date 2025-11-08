@@ -48,7 +48,6 @@ class AdminController extends Controller
      */
     public function AdminLogout(Request $request)
     {
-        // Log out the user from the 'web' guard
         Auth::guard('web')->logout();
         // Invalidate the current session
         $request->session()->invalidate();
@@ -207,6 +206,7 @@ class AdminController extends Controller
         // Find the user by ID and delete them.
         User::findOrFail($id)->delete();
 
+        // Prepare a success notification message.
         $notification = [
             'message' => 'User Deleted Successfully',
             'alert-type' => 'success'
