@@ -85,7 +85,9 @@
                                     <td class="tb-col d-none d-lg-table-cell">
                                         <div class="d-flex align-items-center gap-2">
                                             @php
+                                                // Get the currently authenticated user's ID
                                                 $id = Auth::user()->id;
+                                                // Retrieve the user's profile data from the database using the User model
                                                 $profileData = App\Models\User::find($id);
                                             @endphp
                                             <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
