@@ -29,7 +29,7 @@
         
         <div class="card shadow-sm">
             <div class="card-body p-0">
-                @if(count($document) > 0)
+                @if(count($document) > 0) {{-- Check if there are any documents --}}
                 <div id="document-table-container">
                     <div class="table-responsive">
                         <table class="table table-middle table-hover mb-0" id="documentsTable">
