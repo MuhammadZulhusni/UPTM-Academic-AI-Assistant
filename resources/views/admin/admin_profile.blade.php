@@ -1,6 +1,7 @@
 @extends('admin.dashboard')
 
 @section('admin')
+<!-- Load jQuery 3.7.1 from Google CDN -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <div class="nk-content-inner">
