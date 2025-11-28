@@ -116,8 +116,8 @@
                             <div class="form-text text-soft small mt-1">Example: "Write a 400-word article about {topic} with an introduction."</div>
                         </div>
 
-                        <div class="d-flex align-items-center justify-content-between">
-                            <button type="submit" class="btn btn-primary btn-lg">
+                        <div class="d-flex align-items-center justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg end">
                                 <span>Save Changes</span>
                             </button> 
                         </div>
