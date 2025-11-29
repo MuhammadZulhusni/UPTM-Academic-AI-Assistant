@@ -35,7 +35,7 @@ class TemplateController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
-            'icon' => 'required|string',
+            'icon' => 'required|in:writing.png,teaching.png,learning.png',
             'prompt' => 'required|string',
             // Update this rule to use 'is_active_checkbox' from the form
             'is_active_checkbox' => 'nullable|in:on', // "on" is the value for checked checkboxes

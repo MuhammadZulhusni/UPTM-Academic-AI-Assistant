@@ -55,13 +55,16 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-6">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="templateIcon" class="form-label">Templates Icon</label>
-                                    <div class="form-control-wrap">
-                                        <input type="text" name="icon" id="templateIcon" class="form-control form-control-lg" placeholder="e.g., <i class='fa-solid fa-book'></i>" value="{{ $template->icon }}">
-                                    </div>
-                                    <div class="form-text text-soft small">Use a Nioicon Font icon code.</div>
+                                    <label for="template_icon" class="form-label form-label-custom">Template Icon</label>
+
+                                    <select name="icon" id="template_icon" class="form-control form-control-lg" required>
+                                        <option value="" selected disabled>-- Select Template Icon --</option>
+                                        <option value="writing.png">Writing</option>
+                                        <option value="teaching.png">Teaching</option>
+                                        <option value="learning.png">Learning</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>

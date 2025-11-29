@@ -87,7 +87,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="template_icon" class="form-label form-label-custom">Template Icon</label>
-                                <input type="text" name="icon" id="template_icon" class="form-control form-control-lg" placeholder="e.g., fa-solid fa-book" required>
+
+                                <select name="icon" id="template_icon" class="form-control form-control-lg" required>
+                                    <option value="" selected disabled>-- Select Template Icon --</option>
+                                    <option value="writing.png">Writing</option>
+                                    <option value="teaching.png">Teaching</option>
+                                    <option value="learning.png">Learning</option>
+                                </select>
                             </div>
                         </div>
                         <!-- <div class="col-12">
