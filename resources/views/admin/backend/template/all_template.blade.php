@@ -131,7 +131,10 @@
                         <div class="card-body p-3 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                    <em class="{{ $item->icon ?? 'ni ni-template' }}"></em>
+                                    <img src="{{ asset('upload/template/' . $item->icon) }}"
+                                        alt="Icon"
+                                        class="img-fluid"
+                                        style="width:22px; height:22px; object-fit:contain; border-radius:0;">
                                 </div>
                                 <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
                                     {{ $item->category }}
