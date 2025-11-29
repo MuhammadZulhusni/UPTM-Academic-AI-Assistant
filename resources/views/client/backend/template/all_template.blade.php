@@ -137,7 +137,10 @@
                                 <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
                                     <!-- Icon with dynamic background and text color based on category -->
                                     <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                        <em class="{{ $item->icon ?? 'ni ni-template' }}"></em>
+                                        <img src="{{ asset('upload/template/' . $item->icon) }}"
+                                        alt="Icon"
+                                        class="img-fluid"
+                                        style="width:22px; height:22px; object-fit:contain; border-radius:0;">
                                     </div>
                                 </a>
 
