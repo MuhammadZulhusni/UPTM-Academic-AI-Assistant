@@ -155,7 +155,9 @@
                 @foreach ($templates as $template)
                 <a href="{{ route('details.template',$template->id) }}" class="template-card">
                     <div class="template-icon">
-                        <em class="icon ni {{ $template->icon }}"></em>
+                        <img src="{{ asset('upload/template/' . $template->icon) }}"
+                            alt="Template Icon"
+                            class="template-icon-img">
                     </div>
                     <div class="template-content">
                         <h3>{{ $template->title }}</h3>
