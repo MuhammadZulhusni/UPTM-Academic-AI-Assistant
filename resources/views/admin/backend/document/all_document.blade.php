@@ -1,6 +1,8 @@
 @extends('admin.dashboard')
 @section('admin') 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <div class="nk-content-inner">
     <div class="nk-content-body">
     
@@ -8,9 +10,9 @@
             <div class="nk-block-head-between flex-wrap gap g-2">
                 <div class="nk-block-head-content">
                     <h2 class="display-6">
-                        All Admin Document
+                        My Generated Documents
                     </h2>
-                    <p class="text-muted mb-0 d-none d-md-block">Manage and monitor all document</p>
+                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you’ve created.</p>
                 </div>
             </div>
         </div>
@@ -41,15 +43,15 @@
                                     <th class="tb-col">
                                         <div class="fs-13px text-base fw-semibold">Document</div>
                                     </th>
-                                    <th class="tb-col d-none d-lg-table-cell">
+                                    <!-- <th class="tb-col d-none d-lg-table-cell">
                                         <div class="fs-13px text-base fw-semibold">User</div>
-                                    </th>
-                                    <th class="tb-col d-none d-md-table-cell">
+                                    </th> -->
+                                    <!-- <th class="tb-col d-none d-md-table-cell">
                                         <div class="fs-13px text-base fw-semibold">Category</div>
-                                    </th>
-                                    <th class="tb-col d-none d-sm-table-cell">
+                                    </th> -->
+                                    <!-- <th class="tb-col d-none d-sm-table-cell">
                                         <div class="fs-13px text-base fw-semibold">Words</div>
-                                    </th>
+                                    </th> -->
                                     <th class="tb-col d-none d-lg-table-cell">
                                         <div class="fs-13px text-base fw-semibold">Created</div>
                                     </th>
@@ -82,7 +84,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="tb-col d-none d-lg-table-cell">
+                                    <!-- <td class="tb-col d-none d-lg-table-cell">
                                         <div class="d-flex align-items-center gap-2">
                                             @php
                                                 // Get the currently authenticated user's ID
@@ -99,13 +101,13 @@
                                                 <small class="text-muted text-truncate d-block">{{ $item->user->email ?? 'No email' }}</small>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td class="tb-col d-none d-md-table-cell">
+                                    </td> -->
+                                    <!-- <td class="tb-col d-none d-md-table-cell">
                                         <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
                                             {{ $item->template->category }}
                                         </span>
-                                    </td>
-                                    <td class="tb-col d-none d-sm-table-cell">
+                                    </td> -->
+                                    <!-- <td class="tb-col d-none d-sm-table-cell">
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="badge text-bg-success-soft rounded-pill px-3 py-2 fs-6 lh-sm fw-medium">
                                                 {{ number_format($item->word_count) }}
@@ -114,7 +116,7 @@
                                                 <i class="bi bi-star-fill text-warning d-none d-md-inline" title="High word count"></i>
                                             @endif
                                         </div>
-                                    </td>
+                                    </td> -->
                                     <td class="tb-col d-none d-lg-table-cell">
                                         <div class="fs-7 text-muted">
                                             {{ $item->created_at ? $item->created_at->format('M d, Y') : 'N/A' }}
@@ -122,13 +124,6 @@
                                     </td>
                                     <td class="tb-col">
                                         <div class="d-flex justify-content-center gap-1">
-                                            <a href="{{ route('edit.admin.document', $item->id) }}" 
-                                               class="btn btn-outline-primary btn-sm" 
-                                               title="Edit Document"
-                                               data-bs-toggle="tooltip">
-                                                <i class="bi bi-pencil-square"></i>
-                                                <span class="d-none d-xl-inline ms-1">Edit</span>
-                                            </a>
                                             <button class="btn btn-outline-info btn-sm" 
                                                     title="View Document"
                                                     data-bs-toggle="modal" 
@@ -144,6 +139,13 @@
                                                 <i class="bi bi-eye"></i>
                                                 <span class="d-none d-xl-inline ms-1">View</span>
                                             </button>
+                                            <a href="{{ route('edit.admin.document', $item->id) }}" 
+                                               class="btn btn-outline-primary btn-sm" 
+                                               title="Edit Document"
+                                               data-bs-toggle="tooltip">
+                                                <i class="bi bi-pencil-square"></i>
+                                                <span class="d-none d-xl-inline ms-1">Edit</span>
+                                            </a>
                                             <button type="button" 
                                                     class="btn btn-outline-danger btn-sm" 
                                                     data-bs-toggle="modal" 
@@ -212,84 +214,62 @@
 </div>
 
 <div class="modal fade" id="viewDocumentModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header bg-light">
-                <div>
-                    <h5 class="modal-title" id="documentTitle">Document Details</h5>
-                    <small class="text-muted" id="documentMeta">Document information</small>
-                </div>
+
+            <!-- Header -->
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title" id="documentTitle">Document Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <div class="row g-4">
-                    <div class="col-lg-4 col-md-12">
-                        <div class="card border-0 bg-light h-100">
-                            <div class="card-body">
-                                <h6 class="card-title d-flex align-items-center gap-2">
-                                    <i class="bi bi-info-circle text-primary"></i>
-                                    Document Information
-                                </h6>
-                                <hr class="my-3">
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-muted small">DOCUMENT TITLE</label>
-                                    <p class="mb-0" id="modalDocTitle">-</p>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-muted small">USER</label>
-                                    <p class="mb-0 d-flex align-items-center gap-2">
-                                        <i class="bi bi-person-circle text-info"></i>
-                                        <span id="modalUserName">-</span>
-                                    </p>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold text-muted small">CATEGORY</label>
-                                    <p class="mb-0">
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-1" id="modalCategory">-</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-8 col-md-12">
-                        <div class="card border-0 bg-light h-100">
-                            <div class="card-body">
-                                <h6 class="card-title d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-2">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-file-text text-primary"></i>
-                                        Document Content
-                                    </span>
-                                    <div class="btn-group btn-group-sm">
-                                        <button type="button" class="btn btn-outline-secondary" onclick="copyContent()">
-                                            <i class="bi bi-copy me-1"></i> <span class="d-none d-sm-inline">Copy</span>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary" onclick="downloadContent()">
-                                            <i class="bi bi-download me-1"></i> <span class="d-none d-sm-inline">Download</span>
-                                        </button>
-                                    </div>
-                                </h6>
-                                <hr class="my-3">
-                                <div class="bg-white border rounded p-3 p-md-4" style="height: 350px; overflow-y: auto;">
-                                    <div id="documentContent" class="text-muted">
-                                        <div class="text-center py-5">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                            <p class="mt-3 text-muted">Loading document content...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-light">
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-file-text text-primary"></i>
+                        Document Content
+                    </h6>
+
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary" onclick="copyContent()">
+                            <i class="bi bi-copy me-1"></i>Copy
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="downloadContent()">
+                            <i class="bi bi-download me-1"></i>Download TXT
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="downloadPDF()">
+                            <i class="bi bi-file-earmark-pdf me-1"></i>Download PDF
+                        </button>
                     </div>
                 </div>
+
+                <!-- Cleaner Content Viewer -->
+                <div class="document-viewer border rounded shadow-sm"
+                     style="background:white; padding:20px; border-radius:10px; height:420px; overflow-y:auto;">
+
+                    <div id="documentContent" class="document-text">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-3 text-muted">Loading document content...</p>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="modal-footer bg-light d-flex flex-column flex-sm-row gap-2">
-                <button type="button" class="btn btn-secondary order-2 order-sm-1" data-bs-dismiss="modal">Close</button>
+
+            <!-- Footer -->
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                </button>
             </div>
+
         </div>
     </div>
 </div>
+
 
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
     <div id="copySuccessToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -390,26 +370,87 @@ function loadDocumentContentFromData(button) {
     loadDocumentContent(id, title, userName, category, wordCount, outputData);
 }
 
-// This function takes document data and populates the view modal with it.
 function loadDocumentContent(id, title, userName, category, wordCount, outputData) {
-    // Update static modal information immediately
-    document.getElementById('modalDocTitle').textContent = title;
-    document.getElementById('modalUserName').textContent = userName;
-    document.getElementById('modalCategory').textContent = category;
-    document.getElementById('documentTitle').textContent = title;
-    document.getElementById('documentMeta').textContent = `By ${userName}`;
+    // Only update the elements that still exist
+    const docTitleEl = document.getElementById('documentTitle');
+    if (docTitleEl) docTitleEl.textContent = title;
+
+    const docMetaEl = document.getElementById('documentMeta');
+    if (docMetaEl) docMetaEl.textContent = `By ${userName}`;
 
     const contentDiv = document.getElementById('documentContent');
 
-    // Corrected Code:
-    // Instead of escaping the output, we use it directly.
+    // Loader first
     contentDiv.innerHTML = `
-        <div class="document-content">
-            <h6 class="mb-3">Generated Output</h6>
-            <div id="documentContentText" class="text-dark bg-white p-3 border rounded" style="white-space: pre-wrap; word-wrap: break-word; overflow-x: auto;">${outputData}</div>
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2 text-muted">Loading...</p>
         </div>
     `;
+
+    // Load content smoothly
+    setTimeout(() => {
+        contentDiv.innerHTML = `
+            <div class="document-content">
+                <div class="bg-white p-4 border rounded shadow-sm" 
+                    style="max-height: 350px; overflow-y: auto;">
+
+                    <div id="documentContentText"
+                        style="
+                            font-size: 0.95rem;
+                            line-height: 1.7;
+                            white-space: pre-wrap;
+                            word-break: break-word;
+                            font-family: 'Inter', sans-serif;
+                        ">
+                        ${formatDocument(outputData)}
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 50);
 }
+
+function formatDocument(text) {
+    if (!text) return "";
+
+    // Clean unnecessary whitespace
+    text = text.trim();
+    text = text.replace(/\r\n/g, "\n");
+
+    // Remove extra blank lines, max 1
+    text = text.replace(/\n{3,}/g, "\n\n");
+
+    // Convert markdown-style headings
+    text = text.replace(/^#\s?(.*)$/gm, "<h2 class='doc-h2'>$1</h2>");
+    text = text.replace(/^##\s?(.*)$/gm, "<h3 class='doc-h3'>$1</h3>");
+    text = text.replace(/^###\s?(.*)$/gm, "<h4 class='doc-h4'>$1</h4>");
+
+    // Bullet points
+    text = text.replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>");
+    text = text.replace(/^\s*\d+\.\s+(.*)$/gm, "<li>$1</li>");
+
+    // Wrap list items
+    text = text.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul class='doc-list'>$1</ul>");
+
+    // Bold + italic
+    text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+    // Split paragraphs
+    let parts = text.split(/\n{2,}/);
+
+    // Remove empty paragraphs + trim
+    parts = parts
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+
+    // Wrap in <p>
+    return parts
+        .map(p => `<p class="doc-paragraph">${p}</p>`)
+        .join("");
+}
+
 
 // This function handles the logic for copying the document content to the clipboard.
 function copyContent() {
@@ -449,47 +490,39 @@ function copyContent() {
 
 // This function handles the logic for downloading the document content as a text file.
 function downloadContent() {
-    const titleElement = document.getElementById('modalDocTitle');
+    const titleElement = document.getElementById('documentTitle'); // Correct ID
     const contentElement = document.getElementById('documentContentText');
-    
+
     if (!contentElement || !titleElement) {
         showToast('No content available to download', 'error');
         return;
     }
-    
+
     const title = titleElement.textContent || 'document';
     const content = contentElement.innerText || contentElement.textContent;
-    
-    // Shows a loading state on the button.
+
     const btn = event.target.closest('button');
     const originalHTML = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span><span class="d-none d-sm-inline">Downloading...</span>';
-    
+
     try {
-        // Creates a Blob (binary large object) from the text content.
         const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        // Creates a URL for the Blob.
         const url = window.URL.createObjectURL(blob);
-        // Creates a temporary anchor element to trigger the download.
         const a = document.createElement('a');
         a.href = url;
-        // Sets the download file name by sanitizing the document title.
         a.download = `${title.replace(/[^a-z0-9\s\-_.]/gi, '_').replace(/\s+/g, '_').toLowerCase()}.txt`;
-        a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
-        // Cleans up the temporary elements and URL.
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
+
         showToast('Document downloaded successfully!', 'success');
-        
     } catch (error) {
         console.error('Download failed:', error);
         showToast('Failed to download content', 'error');
     }
-    
+
     resetButton(btn, originalHTML);
 }
 
@@ -615,9 +648,62 @@ document.head.appendChild(style);
 function refreshData() {
     location.reload();
 }
+
+
+function downloadPDF() {
+    const titleElement = document.getElementById('documentTitle');
+    const contentElement = document.getElementById('documentContentText');
+
+    if (!contentElement || !titleElement) {
+        showToast('No content available to download', 'error');
+        return;
+    }
+
+    const title = titleElement.textContent || 'document';
+    const content = contentElement.innerText || contentElement.textContent;
+
+    const btn = event.target.closest('button');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span><span class="d-none d-sm-inline">Generating PDF...</span>';
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const margin = 15;
+        const maxLineWidth = pageWidth - margin * 2;
+
+        const lines = doc.splitTextToSize(content, maxLineWidth);
+        doc.text(lines, margin, 20);
+
+        doc.save(`${title.replace(/[^a-z0-9\s\-_.]/gi, '_').replace(/\s+/g, '_').toLowerCase()}.pdf`);
+        showToast('PDF downloaded successfully!', 'success');
+    } catch (error) {
+        console.error('PDF download failed:', error);
+        showToast('Failed to download PDF', 'error');
+    }
+
+    resetButton(btn, originalHTML);
+}
+
 </script>
 
 <style>
+.document-text p {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.document-text p:last-child {
+    margin-bottom: 0 !important;
+}
+
+.document-viewer {
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
 .min-width-0 {
     /* Prevents the element from having a minimum width, allowing it to shrink as needed in a flexible layout. */
     min-width: 0;
@@ -718,6 +804,7 @@ function refreshData() {
         form.action = deleteUrl; 
     });
 </script>
+
 
 
 @endsection
