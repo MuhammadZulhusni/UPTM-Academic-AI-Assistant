@@ -130,15 +130,10 @@
                                         <input type="text" name="input_fields[0][description]" id="input_fields_0_description" class="form-control form-control-sm" placeholder="e.g., What is your topic?" required>
                                     </div> 
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label for="input_fields_0_type" class="form-label small">Field Type *</label>
-                                        <select name="input_fields[0][type]" class="form-select form-select-sm" id="input_fields_0_type" required> 
-                                            <option value="text">Input Field</option>
-                                            <option value="textarea">Textarea Field</option> 
-                                        </select>
-                                    </div> 
-                                </div>
+
+                                <!-- Default to Textarea Field -->
+                                <input type="hidden" name="input_fields[0][type]" value="textarea">
+
                                 <div class="col-md-1 d-flex align-items-end">
                                     <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-field visually-hidden">
                                         <i class="bi bi-trash"></i>
@@ -169,52 +164,37 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<script>
-$(document).ready(function() {
-    let fieldIndex = 1;
-    
-    // Add new input field (In testing)
-    $('#add-field').click(function() {
-        const newFieldHtml = `
-            <div class="row input-field-row g-3 mt-3">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="input_fields_${fieldIndex}_title" class="form-label small">Field Title *</label>
-                        <input type="text" name="input_fields[${fieldIndex}][title]" id="input_fields_${fieldIndex}_title" class="form-control form-control-sm" placeholder="e.g., Topic" required>
-                    </div> 
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="input_fields_${fieldIndex}_description" class="form-label small">Field Description *</label>
-                        <input type="text" name="input_fields[${fieldIndex}][description]" id="input_fields_${fieldIndex}_description" class="form-control form-control-sm" placeholder="e.g., What is your topic?" required>
-                    </div> 
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label for="input_fields_${fieldIndex}_type" class="form-label small">Field Type *</label>
-                        <select name="input_fields[${fieldIndex}][type]" class="form-select form-select-sm" id="input_fields_${fieldIndex}_type" required> 
-                            <option value="text">Input Field</option>
-                            <option value="textarea">Textarea Field</option> 
-                        </select>
-                    </div> 
-                </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-field">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-                <input type="hidden" name="input_fields[${fieldIndex}][is_required]" value="1">
+<script>   
+$('#add-field').click(function() {
+    const newFieldHtml = `
+        <div class="row input-field-row g-3 mt-3">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label small">Field Title *</label>
+                    <input type="text" name="input_fields[${fieldIndex}][title]" class="form-control form-control-sm" required>
+                </div> 
             </div>
-        `;
-        
-        $('#input-fields').append(newFieldHtml);
-        fieldIndex++;
-    });
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="form-label small">Field Description *</label>
+                    <input type="text" name="input_fields[${fieldIndex}][description]" class="form-control form-control-sm" required>
+                </div> 
+            </div>
+
+            <input type="hidden" name="input_fields[${fieldIndex}][type]" value="textarea">
+
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger btn-sm w-100 remove-field">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+
+            <input type="hidden" name="input_fields[${fieldIndex}][is_required]" value="1">
+        </div>
+    `;
     
-    // Remove input field
-    $(document).on('click', '.remove-field', function() {
-        $(this).closest('.input-field-row').remove();
-    });
+    $('#input-fields').append(newFieldHtml);
+    fieldIndex++;
 });
 </script>
 

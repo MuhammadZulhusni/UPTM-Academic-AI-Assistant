@@ -42,7 +42,7 @@ class TemplateController extends Controller
             'input_fields' => 'required|array', // Allow for one or more fields
             'input_fields.*.title' => 'required|string|max:255',
             'input_fields.*.description' => 'required|string',
-            'input_fields.*.type' => 'required|in:text,textarea',
+            'input_fields.*.type' => 'nullable',
         ]);
 
         // Creates a new Template model instance
@@ -68,7 +68,7 @@ class TemplateController extends Controller
                 'template_id' => $template->id,
                 'title' => $inputField['title'],
                 'description' => $inputField['description'],
-                'type' => $inputField['type'],
+                'type' => 'textarea',
                 'is_required' => true, // Assuming all fields are required
             ]);
         }
@@ -108,7 +108,6 @@ class TemplateController extends Controller
             'input_fields' => 'required|array|size:1',
             'input_fields.*.title' => 'required|string|max:255',
             'input_fields.*.description' => 'required|string',
-            'input_fields.*.type' => 'required|in:text,textarea',  
         ]);
 
     // Finds the existing template by its ID.
@@ -134,7 +133,7 @@ class TemplateController extends Controller
        // If found, update its properties with the new validated data.
        $templateInputField->title = $inputField['title'];
        $templateInputField->description = $inputField['description']; 
-       $templateInputField->type = $inputField['type']; 
+       $templateInputField->type = 'textarea';
        $templateInputField->is_required = true;
        $templateInputField->save();
     } 
