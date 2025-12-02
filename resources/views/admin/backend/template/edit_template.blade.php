@@ -58,13 +58,24 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="template_icon" class="form-label form-label-custom">Template Icon</label>
+                                        <select name="icon" id="template_icon" class="form-control form-control-lg" required>
+                                            <option value="" disabled>-- Select Template Icon --</option>
 
-                                    <select name="icon" id="template_icon" class="form-control form-control-lg" required>
-                                        <option value="" selected disabled>-- Select Template Icon --</option>
-                                        <option value="writing.png">Writing</option>
-                                        <option value="teaching.png">Teaching</option>
-                                        <option value="learning.png">Learning</option>
-                                    </select>
+                                            <option value="writing.png" 
+                                                {{ $template->icon == 'writing.png' ? 'selected' : '' }}>
+                                                Writing
+                                            </option>
+
+                                            <option value="teaching.png" 
+                                                {{ $template->icon == 'teaching.png' ? 'selected' : '' }}>
+                                                Teaching
+                                            </option>
+
+                                            <option value="learning.png" 
+                                                {{ $template->icon == 'learning.png' ? 'selected' : '' }}>
+                                                Learning
+                                            </option>
+                                        </select>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +103,7 @@
                                                 </div> 
                                             </div>
 
-                                            <div class="col-md-4">
+                                            <!-- <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label for="input_fields_{{ $loop->index }}_type" class="form-label">Field Type</label>
                                                     <select name="input_fields[{{ $loop->index }}][type]" class="form-select" id="input_fields_{{ $loop->index }}_type"> 
@@ -100,7 +111,7 @@
                                                         <option value="textarea" {{ $field->type == 'textarea' ? 'selected' : '' }}>Textarea Field</option> 
                                                     </select>
                                                 </div> 
-                                            </div>
+                                            </div> -->
                                             <input type="hidden" name="input_fields[{{ $loop->index }}][is_required]" value="1">
                                         </div> 
                                     </div>
