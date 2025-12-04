@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
@@ -29,10 +28,12 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Validate user input, including role
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', 'in:student,lecturer'], // Only allow student or lecturer
         ]);
 
         // Create user with Diamond plan (ID 1) automatically
@@ -40,16 +41,16 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'plan_id' => 1, // Always assign Diamond plan
+            'plan_id' => 1,           // Always assign Diamond plan
             'current_word_usage' => null, // null = unlimited
             'words_used' => 0,
-            'role' => 'user',
+            'role' => $request->role, // Save selected role
             'status' => '1',
         ]);
 
         event(new Registered($user));
 
-        // Redirect to the login page with a success message
+        // Redirect to login page with success message
         return redirect()->route('login')->with([
             'message' => 'Registration successful! Please log in with your new account.',
             'alert-type' => 'success'

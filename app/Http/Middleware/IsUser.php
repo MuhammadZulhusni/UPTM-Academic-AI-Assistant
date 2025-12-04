@@ -10,12 +10,11 @@ class IsUser
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()?->role !== 'user') {
+        // Allow both student and lecturer
+        if (!in_array($request->user()?->role, ['student', 'lecturer'])) {
             abort(403, 'Access Denied');
         }
 

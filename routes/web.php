@@ -10,7 +10,6 @@ use App\Http\Controllers\Backend\Admin\DocumentController;
 use App\Http\Controllers\Backend\Admin\TemplateController;
 use App\Http\Controllers\Backend\Client\UserTemplateController;
 
-
 // Public Routes
 Route::get('/', function () {
     return view('auth.login');
