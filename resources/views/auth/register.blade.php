@@ -10,28 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
-    <style>
-        /* Custom styles for the password toggle icon */
-        .ni {
-            font-family: "Nioicon" !important;
-            speak: none;
-            font-style: normal;
-            font-weight: 400;
-            font-variant: normal;
-            text-transform: none;
-            line-height: 1;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        .ni-eye:before {
-            content: "";
-        }
-
-        .ni-eye-off:before {
-            content: "";
-        }
-    </style>
 </head>
 
 <body class="bg-[#f0f4f8] min-h-screen flex items-center justify-center relative p-4">
@@ -42,6 +20,7 @@
 
     <div class="relative z-10 w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto my-auto">
         <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 text-center border border-gray-100">
+            
             <div class="mb-4">
                 <img class="w-40 h-auto mx-auto" src="{{ asset('upload/uptm.png') }}" alt="UPTM University Logo">
             </div>
@@ -133,10 +112,27 @@
                 </div>
 
                 <div>
+                    <label for="role" class="block text-sm font-semibold text-gray-700 text-left mb-1">
+                        Register As
+                    </label>
+                    <select id="role" name="role" 
+                        class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0]
+                        focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all"
+                        required>
+                        <option value="student">Student</option>
+                        <option value="lecturer">Lecturer</option>
+                    </select>
+                    @error('role')
+                        <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div>
                     <button class="w-full bg-[#1e40af] text-white py-2.5 font-semibold rounded-lg shadow-md hover:bg-[#1d4ed8] focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:ring-offset-2 transition-colors mt-2" type="submit">
                         Sign Up
                     </button>
                 </div>
+
             </form>
 
             <div class="mt-4 pt-3 border-t border-gray-200">
