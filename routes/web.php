@@ -29,16 +29,30 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
 
     // User Template & Document Management
     Route::controller(UserTemplateController::class)->group(function () {
-        Route::get('/user/template', 'UserTemplate')->name('user.template');
-        Route::get('/user/details/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
+
+        // Display templates filtered by the logged-in user's role
+        Route::get('/user/template', [UserTemplateController::class, 'TemplateRoleFilter'])->name('user.template');
+
+        // View details of a single template (only accessible if user's role matches template category)
+        Route::get('/user/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
+
+        // Generate content for a specific template
         Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
-        
+
+        // List all documents created by the logged-in user
         Route::get('/user/document', 'UserDocument')->name('user.document');
+
+        // Edit a specific user document
         Route::get('/edit/user/document/{id}', 'EditUserDocument')->name('edit.user.document');
+
+        // Update a specific user document
         Route::post('/user/update/document/{id}', 'UserUpdateDocument')->name('user.update.document');
+
+        // Delete a specific user document
         Route::delete('/delete/user/document/{id}', 'DeleteUserDocument')->name('delete.user.document');
     });
 });
+
 
 
 // Admin Routes

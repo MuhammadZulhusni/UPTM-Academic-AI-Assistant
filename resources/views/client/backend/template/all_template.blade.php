@@ -120,9 +120,7 @@
              </div>
 
             <div class="row g-3 g-md-4" id="templates-container">
-                @foreach ($templates as $item)
-                <!-- Individual template card column with responsive sizing -->
-                <!-- Store template metadata for filtering/searching via JavaScript -->
+                @forelse ($templates as $item)
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
                     data-category="{{ strtolower($item->category) }}"
                     data-title="{{ strtolower($item->title) }}"
@@ -132,48 +130,35 @@
                     <div class="card h-100 border-0 shadow-sm template-card">
                         <div class="card-body p-3 p-md-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-3">
-
-                                <!-- Link to template details page -->
                                 <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
-                                    <!-- Icon with dynamic background and text color based on category -->
                                     <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                        <img src="{{ asset('upload/template/' . $item->icon) }}"
-                                        alt="Icon"
-                                        class="img-fluid"
-                                        style="width:22px; height:22px; object-fit:contain; border-radius:0;">
+                                        <img src="{{ asset('upload/template/' . $item->icon) }}" alt="Icon" class="img-fluid" style="width:22px; height:22px; object-fit:contain; border-radius:0;">
                                     </div>
                                 </a>
-
-                                <!-- Category badge with dynamic color -->
                                 <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
                                     {{ $item->category }}
                                 </span>
                             </div>
-
-                            <!-- Main content: title and description -->
                             <div class="flex-grow-1">
                                 <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
                                     <h5 class="card-title fs-6 fs-md-5 fw-medium mb-2 text-dark">{{ $item->title }}</h5>
                                     <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-3">{{ $item->description }}</p>
                                 </a>
                             </div>
-                            <!-- Footer section: creation date -->
                             <div class="template-footer mt-auto">
                                 <small class="text-muted d-flex align-items-center">
                                     <em class="icon ni ni-calendar me-1"></em>
-                                    <!-- Full date for larger screens, short date for small screens -->
                                     <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
                                     <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
                                 </small>
                             </div>
-
-                        </div> 
-                    </div> 
-                </div> 
-
-                @endforeach
-            </div> 
-
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <p class="text-center">No templates available for your role yet.</p>
+                @endforelse
+            </div>
 
              <div class="text-center py-5 d-none" id="no-results">
                  <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">

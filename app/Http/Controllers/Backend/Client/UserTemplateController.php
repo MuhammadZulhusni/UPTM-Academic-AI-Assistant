@@ -286,4 +286,18 @@ class UserTemplateController extends Controller
      return redirect()->back()->with($notification); 
      }
 
+     // Method untuk filter template berdasarkan role user
+    public function TemplateRoleFilter()
+    {
+        $userRole = ucfirst(Auth::user()->role); // 'Student' or 'Lecturer'
+
+        // Fetch templates for the user's role, ignoring is_active
+        $templates = Template::where('category', $userRole)
+                            ->latest()
+                            ->get();
+
+        return view('client.backend.template.all_template', compact('templates'));
+    }
+
+
 }
