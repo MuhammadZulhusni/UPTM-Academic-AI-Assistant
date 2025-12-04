@@ -19,15 +19,25 @@ class UserController extends Controller
         $user = User::withCount(['generatedContents', 'createdTemplates'])
                     ->find(Auth::id());
 
-        // This count is filtered to show words used by the authenticated user
+        // Words used by the authenticated user
         $totalWordsUsed = $user->words_used;
 
-        // This count is now filtered to show documents created by the authenticated user
+        // Documents created by the authenticated user
         $totalDocuments = GeneratedContent::where('user_id', Auth::id())->count();
-        $totalTemplates = Template::count();
-        $templates = Template::latest()->limit(6)->get();
+
+        // Determine the user's role (Student, Lecturer, etc.)
+        $userRole = ucfirst($user->role);
+
+        // Count templates available for the user's role
+        $totalTemplates = Template::where('category', $userRole)->count();
+
+        // Fetch latest 6 templates for the user's role
+        $templates = Template::where('category', $userRole)
+                            ->latest()
+                            ->limit(6)
+                            ->get();
         
-        // Pass the new variable to the view
+        // Pass variables to the view
         return view('client.index', compact('user', 'totalWordsUsed', 'totalDocuments', 'totalTemplates', 'templates'));
     }
 
