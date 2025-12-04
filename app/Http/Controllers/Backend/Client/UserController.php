@@ -134,9 +134,4 @@ class UserController extends Controller
 
         return redirect()->route('login');
     }
-   //End Method 
-
-
-
-
 }
