@@ -12,7 +12,7 @@
                  </div>
                  
                  {{--  MODAL TRIGGER BUTTON  --}}
-                 <div class="nk-block-head-content">
+                 <div class="nk-block-head-content mt-4">
                      <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
                          <em class="icon ni ni-filter me-1"></em>
                          <span>Filter & Search</span>
