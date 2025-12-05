@@ -3,147 +3,23 @@
 
  <div class="nk-content-inner">
      <div class="nk-content-body">
-         <div class="nk-block-head nk-page-head">
+
+        <div class="nk-block-head nk-page-head mb-4">
              <div class="nk-block-head-between flex-wrap g-2">
                  <div class="nk-block-head-content">
                      <h2 class="display-6">Template Library</h2>
                      <p class="text-muted">Simplify your task by using templates provided</p>
                  </div>
+                 
+                 {{-- MODAL TRIGGER BUTTON --}}
                  <div class="nk-block-head-content">
-                     <button class="btn btn-outline-light d-lg-none mb-3" type="button" id="mobileFilterToggle">
-                         <em class="icon ni ni-filter"></em>
-                         <span>Filters & Search</span>
+                     <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
+                         <em class="icon ni ni-filter me-1"></em>
+                         <span>Filter & Search</span>
                      </button>
-                     
-                     <div class="filters-container" id="filtersContainer">
-                         <div class="row g-3">
-                            @if (auth()->user()->role === 'admin')
-                                <div class="col-12 col-md-4 col-lg-auto">
-                                    <div class="form-group mb-0">
-                                        <select class="form-select form-select-sm" id="categoryFilter">
-                                            <option value="all">All Categories</option>
-                                            <option value="student">Student Templates</option>
-                                            <option value="lecturer">Lecturer Templates</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            @endif
-
-                             
-                             <div class="col-12 col-md-4 col-lg-auto">
-                                 <div class="form-group mb-0">
-                                     <select class="form-select form-select-sm" id="sortFilter">
-                                         <option value="newest">Newest First</option>
-                                         <option value="oldest">Oldest First</option>
-                                         <option value="title">Title A-Z</option>
-                                         <option value="title-desc">Title Z-A</option>
-                                     </select>
-                                 </div>
-                             </div>
-
-                             <div class="col-12 col-md-4 col-lg-auto">
-                                 <div class="form-group mb-0">
-                                     <div class="form-control-wrap">
-                                         <div class="form-control-icon start sm text-light">
-                                             <em class="icon ni ni-search"></em>
-                                         </div>
-                                         <input type="text" class="form-control form-control-sm" placeholder="Search templates..." id="searchInput">
-                                     </div>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
                  </div>
              </div>
-         </div>
-          
-        @if (auth()->user()->role === 'admin')
-        <div class="nk-block">
-            <div class="row g-3 mb-4">
-
-                {{-- Total Templates --}}
-                @if (count($templates) > 0)
-                <div class="col-6 col-md-3" id="card-total-templates">
-                    <div class="card border-0 bg-primary bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-primary text-white me-2 me-md-3">
-                                    <em class="icon ni ni-template"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ count($templates) }}</h6>
-                                    <span class="small text-muted d-block">Total Templates</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-
-                {{-- Student Templates --}}
-                @php $studentCount = $templates->where('category', 'Student')->count(); @endphp
-                @if ($studentCount > 0)
-                <div class="col-6 col-md-3" id="card-student-templates">
-                    <div class="card border-0 bg-info bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-info text-white me-2 me-md-3">
-                                    <em class="icon ni ni-user"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ $studentCount }}</h6>
-                                    <span class="small text-muted d-block">Student</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-
-                {{-- Lecturer Templates --}}
-                @php $lecturerCount = $templates->where('category', 'Lecturer')->count(); @endphp
-                @if ($lecturerCount > 0)
-                <div class="col-6 col-md-3" id="card-lecturer-templates">
-                    <div class="card border-0 bg-warning bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-warning text-white me-2 me-md-3">
-                                    <em class="icon ni ni-user-check"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ $lecturerCount }}</h6>
-                                    <span class="small text-muted d-block">Lecturer</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-
-                {{-- Showing --}}
-                @if (count($templates) > 0)
-                <div class="col-6 col-md-3" id="card-showing-templates">
-                    <div class="card border-0 bg-success bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-success text-white me-2 me-md-3">
-                                    <em class="icon ni ni-eye"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6"><span id="showing-count">{{ count($templates) }}</span></h6>
-                                    <span class="small text-muted d-block">Showing</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
-
-            </div>
         </div>
-        @endif
-
-
 
             <div class="row g-3 g-md-4" id="templates-container">
                 @forelse ($templates as $item)
@@ -157,9 +33,12 @@
                         <div class="card-body p-3 p-md-4 d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
-                                    <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                        <img src="{{ asset('upload/template/' . $item->icon) }}" alt="Icon" class="img-fluid" style="width:22px; height:22px; object-fit:contain; border-radius:0;">
-                                    </div>
+                                <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
+                                    <img src="{{ asset('upload/template/' . $item->icon) }}"
+                                        alt="Icon"
+                                        class="img-fluid"
+                                        style="width:22px; height:22px; object-fit:contain; border-radius:0;">
+                                </div>
                                 </a>
                                 <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
                                     {{ $item->category }}
@@ -182,11 +61,20 @@
                     </div>
                 </div>
                 @empty
-                <p class="text-center">No templates available for your role yet.</p>
+                <div class="col-12">
+                     <div class="text-center py-5">
+                        <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
+                            <em class="icon ni ni-search" style="font-size: 2rem;"></em>
+                        </div>
+                        <h4 class="text-muted mb-2">No templates available</h4>
+                        <p class="text-muted">There are currently no templates matched for your filter or none have been created yet.</p>
+                    </div>
+                </div>
                 @endforelse
             </div>
-
-             <div class="text-center py-5 d-none" id="no-results">
+            
+            {{-- Used for JavaScript filter results --}}
+            <div class="text-center py-5 d-none" id="no-results">
                  <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
                      <em class="icon ni ni-search" style="font-size: 2rem;"></em>
                  </div>
@@ -194,61 +82,227 @@
                  <p class="text-muted">Try adjusting your search terms or filter selection.</p>
                  <button class="btn btn-outline-primary btn-sm" onclick="resetFilters()">Reset Filters</button>
              </div>
-         </div>
-     </div>
- </div>
+        </div>
+    </div>
+
+
+{{--  FILTER MODAL  --}}
+<div class="modal fade" id="templateFilterModal" tabindex="-1" aria-labelledby="templateFilterModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="templateFilterModalLabel">Filter Templates</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="mb-4">
+            <h6 class="text-muted mb-2">Search by Title or Description</h6>
+             <div class="form-group mb-0">
+                 <div class="form-control-wrap">
+                     <div class="form-control-icon start text-light">
+                         <em class="icon ni ni-search"></em>
+                     </div>
+                     <input type="text" class="form-control" placeholder="Search templates..." id="searchInput">
+                 </div>
+             </div>
+        </div>
+
+        @if (auth()->user()->role === 'admin')
+        <div class="mb-4">
+            <h6 class="text-muted mb-2">Category</h6>
+            <div class="btn-group category-segment-control w-100" role="group" id="categoryFilter">
+                <button type="button" class="btn btn-outline-primary segment-btn active" data-value="all">
+                    <em class="icon ni ni-grid-sq me-1"></em> All
+                </button>
+                <button type="button" class="btn btn-outline-primary segment-btn" data-value="student">
+                    <em class="icon ni ni-user me-1"></em> Student
+                </button>
+                <button type="button" class="btn btn-outline-primary segment-btn" data-value="lecturer">
+                    <em class="icon ni ni-user-check me-1"></em> Lecturer
+                </button>
+            </div>
+        </div>
+        @endif
+
+        <div class="mb-0">
+             <h6 class="text-muted mb-2">Sort By</h6>
+             <div class="btn-group sort-segment-control w-100" role="group" id="sortFilter">
+                 <button type="button" class="btn btn-outline-info segment-btn active" data-value="newest">
+                     <em class="icon ni ni-clock me-1"></em> Newest
+                 </button>
+                 <button type="button" class="btn btn-outline-info segment-btn" data-value="title">
+                     <em class="icon ni ni-text me-1"></em> Title (A-Z)
+                 </button>
+                 <button type="button" class="btn btn-outline-info segment-btn" data-value="title-desc">
+                     <em class="icon ni ni-text-a me-1"></em> Title (Z-A)
+                 </button>
+             </div>
+        </div>
+
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-outline-light" onclick="resetFilters()">Reset Filters</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Apply & Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{--  END FILTER MODAL  --}}
 
 <style>
-/* 
-   General Styles & Animations
-*/
-
-/* Template card default appearance */
-.template-item {
-    transition: all 0.3s ease;
-    opacity: 1;
-    transform: scale(1);
+.media-circle {
+    border-radius: 50% !important; 
+    /* Centers the content (em icon or img) */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Animation for hiding template cards */
+.media-circle img {
+    border-radius: 50%; /* Make the image itself round */
+}
+
+.media-circle .img-fluid {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 50%;
+}
+
+
+.media-md .icon {
+    font-size: 1.25rem; /* Adjust icon size for media-md */
+}
+
+.media-sm .icon {
+    font-size: 1rem; /* Adjust icon size for media-sm (Stats Cards) */
+}
+
+/* Other Styles */
+.category-segment-control .btn,
+.sort-segment-control .btn {
+    border-radius: 8px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.5rem 0.9rem;
+    flex: 1 1 auto;
+}
+
+.category-segment-control,
+.sort-segment-control {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.category-segment-control .segment-btn.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.sort-segment-control .segment-btn.active {
+    background-color: var(--bs-info);
+    border-color: var(--bs-info);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-group > .btn.segment-btn:not(:last-child):not(.dropdown-toggle),
+.btn-group > .btn.segment-btn:not(:first-child) {
+    border-radius: 0;
+    margin-left: -1px;
+}
+
+.btn-group > .btn.segment-btn:first-child {
+    border-top-left-radius: 8px !important;
+    border-bottom-left-radius: 8px !important;
+}
+.btn-group > .btn.segment-btn:last-child {
+    border-top-right-radius: 8px !important;
+    border-bottom-right-radius: 8px !important;
+}
+
+.modal-content {
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 0 1.5rem;
+}
+
+.modal-footer {
+    border-top: none;
+    padding: 1.5rem;
+}
+
+.template-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 1;
+    transform: translateZ(0) scale(1);
+    will-change: opacity, transform;
+}
+
 .template-item.hiding {
     opacity: 0;
-    transform: scale(0.9);
+    transform: translateZ(0) scale(0.95);
     pointer-events: none;
 }
 
-/* Completely hide template cards */
 .template-item.hidden {
     display: none !important;
 }
 
-/* Card base styling */
-.card {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    overflow: hidden;
+@keyframes sortComplete {
+    0% { transform: translateZ(0) scale(1) translateY(0); }
+    50% { transform: translateZ(0) scale(1.02) translateY(-4px); }
+    100% { transform: translateZ(0) scale(1) translateY(0); }
 }
 
-/* Card hover effect */
+.template-item.sort-complete {
+    animation: sortComplete 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 12px;
+    overflow: hidden;
+    transform: translateZ(0);
+}
+
 .card:hover {
-    transform: translateY(-8px);
+    transform: translateZ(0) translateY(-8px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
 }
 
-/* Form controls default styling */
+.card.bg-primary.bg-opacity-10,
+.card.bg-info.bg-opacity-10,
+.card.bg-warning.bg-opacity-10,
+.card.bg-success.bg-opacity-10 {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
 .form-select, .form-control {
     border-radius: 8px;
     border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Form controls focus effect */
 .form-select:focus, .form-control:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-/* Clamp text to 2 lines */
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -256,301 +310,14 @@
     overflow: hidden;
 }
 
-/* Centered circular media icon */
-.media {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-/* Footer styling for template cards */
-.template-footer {
-    border-top: 1px solid #f1f1f1;
-    padding-top: 12px;
-    margin-top: auto;
-}
-
-/* 
-   Stats Cards Hover Effects
-*/
-
-/* Subtle hover effect for colored cards */
-.card.bg-primary.bg-opacity-10:hover,
-.card.bg-info.bg-opacity-10:hover,
-.card.bg-warning.bg-opacity-10:hover,
-.card.bg-success.bg-opacity-10:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-/* 
-   Badge Animations
- */
-
-/* Smooth transition for badges */
-.badge {
-    transition: all 0.3s ease;
-}
-
-/* Slight scale-up on hover */
-.template-item:hover .badge {
-    transform: scale(1.05);
-}
-
-/* 
-   Filter Controls Styling
- */
-
-/* Ensure filter controls don't shrink */
-.nk-block-head-content .d-flex > div {
-    min-width: fit-content;
-}
-
-/* Label styling */
-.form-label {
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-/* Transition for filter container */
-.filters-container {
-    transition: all 0.3s ease;
-}
-
-/* Hide filters on small screens */
-@media (max-width: 991.98px) {
-    .filters-container {
-        max-height: 0;
-        overflow: hidden;
-        opacity: 0;
-    }
-
-    /* Show filters when toggled */
-    .filters-container.show {
-        max-height: 500px;
-        opacity: 1;
-        margin-bottom: 1rem;
-    }
-
-    /* Mobile filter toggle button */
-    #mobileFilterToggle {
-        width: 100%;
-        border-radius: 8px;
-    }
-}
-
-/* Always show filters on large screens */
-@media (min-width: 992px) {
-    .filters-container {
-        max-height: none !important;
-        opacity: 1 !important;
-    }
-
-    /* Hide toggle button on desktop */
-    #mobileFilterToggle {
-        display: none !important;
-    }
-}
-
-/* Header layout adjustments */
-.nk-block-head-between {
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-/* Stack header items on small screens */
 @media (max-width: 767.98px) {
-    .nk-block-head-between {
-        flex-direction: column;
-        align-items: stretch;
+    .category-segment-control .btn,
+    .sort-segment-control .btn {
+        padding: 0.5rem 0.5rem;
     }
-
-    /* Smaller heading font */
-    .display-6 {
-        font-size: 1.5rem;
-    }
-}
-
-/* Stats card layout tweaks for mobile */
-@media (max-width: 575.98px) {
-    .row.g-3.mb-4 .col-6 {
-        margin-bottom: 0.5rem;
-    }
-
-    .card-body.py-3.px-3 {
-        padding: 0.75rem 0.5rem !important;
-    }
-
-    .media.media-sm {
-        width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
-    }
-
-    .fs-6 {
-        font-size: 0.9rem !important;
-    }
-}
-
-/* Responsive template card visibility */
-.template-item {
-    transition: all 0.3s ease;
-    opacity: 1;
-    transform: scale(1);
-}
-
-.template-item.hiding {
-    opacity: 0;
-    transform: scale(0.9);
-    pointer-events: none;
-}
-
-.template-item.hidden {
-    display: none !important;
-}
-
-/* Grid layout for different screen sizes */
-@media (max-width: 575.98px) {
-    /* 1 column layout */
-    .template-item {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-
-    .template-card {
-        margin-bottom: 1rem;
-    }
-
-    .card-body.p-3 {
-        padding: 1rem !important;
-    }
-}
-
-@media (min-width: 576px) and (max-width: 991.98px) {
-    /* 2 column layout */
-    .template-item {
-        flex: 0 0 50%;
-        max-width: 50%;
-    }
-}
-
-@media (min-width: 992px) and (max-width: 1199.98px) {
-    /* 3 column layout */
-    .template-item {
-        flex: 0 0 33.333333%;
-        max-width: 33.333333%;
-    }
-}
-
-@media (min-width: 1200px) {
-    /* 4 column layout */
-    .template-item {
-        flex: 0 0 25%;
-        max-width: 25%;
-    }
-}
-
-/* Enhanced card styling */
-.template-card {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    overflow: hidden;
-    height: 100%;
-}
-
-/* Card hover effect */
-.template-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
-}
-
-/* Reduced hover effect on mobile */
-@media (max-width: 767.98px) {
-    .template-card:hover {
-        transform: translateY(-4px);
-    }
-}
-
-/* Responsive form controls */
-.form-select, .form-control {
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    transition: all 0.3s ease;
-    width: 100%;
-}
-
-@media (max-width: 767.98px) {
-    .form-select, .form-control {
-        font-size: 0.9rem;
-        padding: 0.5rem 0.75rem;
-    }
-}
-
-/* Clamp text to 3 lines on medium screens */
-@media (min-width: 768px) {
-    .line-clamp-md-3 {
-        -webkit-line-clamp: 3;
-    }
-}
-
-/* Responsive media icon sizing */
-@media (max-width: 575.98px) {
-    .media-md {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-    }
-}
-
-/* No results section styling */
-#no-results {
-    padding: 2rem 1rem;
-}
-
-@media (max-width: 767.98px) {
-    #no-results {
-        padding: 1.5rem 0.5rem;
-    }
-
-    #no-results .media-xl {
-        width: 60px !important;
-        height: 60px !important;
-    }
-
-    #no-results h4 {
-        font-size: 1.1rem;
-    }
-}
-
-/* 
-   Utility Classes
- */
-
-/* Prevent element from growing */
-.min-w-0 {
-    min-width: 0;
-}
-
-/* Truncate overflowing text */
-.text-truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Disable hover effects on touch devices */
-@media (hover: none) and (pointer: coarse) {
-    .template-card:hover {
-        transform: none;
-    }
-
-    .template-card:active {
-        transform: scale(0.98);
-    }
-
-    .btn:hover {
-        transform: none;
+    
+    .modal-dialog {
+        margin: 0.5rem;
     }
 }
 </style>
@@ -558,251 +325,206 @@
 <script>
 (function() {
     'use strict';
+    const authUserRole = "{{ auth()->user()->role }}"; 
+    const raf = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
     
-    const authUserRole = "{{ auth()->user()->role }}";
-    console.log('=== TEMPLATE LIBRARY SCRIPT STARTING ===');
-    console.log('Auth Role:', authUserRole);
-
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('=== DOM CONTENT LOADED ===');
-        
-        // JS: Get all necessary DOM elements.
-        const categoryFilter = document.getElementById('categoryFilter');
-        const sortFilter = document.getElementById('sortFilter');
-        const searchInput = document.getElementById('searchInput');
-        const templateItems = document.querySelectorAll('.template-item');
-        const noResults = document.getElementById('no-results');
-        const showingCount = document.getElementById('showing-count');
-        const mobileFilterToggle = document.getElementById('mobileFilterToggle');
-        const filtersContainer = document.getElementById('filtersContainer');
-        
-        // JS: Get stat card elements
-        const cardTotalTemplates = document.getElementById('card-total-templates');
-        const cardStudentTemplates = document.getElementById('card-student-templates');
-        const cardLecturerTemplates = document.getElementById('card-lecturer-templates');
-        const cardShowingTemplates = document.getElementById('card-showing-templates');
-        
-        // Debug: Check if cards are found
-        console.log('Cards found:', {
-            total: !!cardTotalTemplates,
-            student: !!cardStudentTemplates,
-            lecturer: !!cardLecturerTemplates,
-            showing: !!cardShowingTemplates
-        });
-         
-        // JS: Convert NodeList to an array for easier manipulation.
-        let allTemplates = Array.from(templateItems);
-         
-        // JS: Handles the mobile filter toggle button.
-        if (mobileFilterToggle && filtersContainer) {
-            mobileFilterToggle.addEventListener('click', function() {
-                filtersContainer.classList.toggle('show');
-                this.classList.toggle('active');
-            });
-             
-            // JS: Closes filters when clicking outside on mobile.
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 991 &&
-                    !mobileFilterToggle.contains(e.target) &&
-                    !filtersContainer.contains(e.target)) {
-                    filtersContainer.classList.remove('show');
-                    mobileFilterToggle.classList.remove('active');
-                }
-            });
-        }
+        // Retrieve the modal instance
+        const filterModalElement = document.getElementById('templateFilterModal');
+        const filterModal = filterModalElement ? new bootstrap.Modal(filterModalElement) : null;
 
-        // JS: Helper function to smoothly hide a card
-        function hideCard(card) {
-            if (!card) return;
-            card.style.transition = 'all 0.3s ease';
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                card.style.display = 'none';
-            }, 300);
-        }
-
-        // JS: Helper function to smoothly show a card
-        function showCard(card) {
-            if (!card) return;
-            card.style.display = '';
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                card.style.transition = 'all 0.3s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
-            }, 10);
-        }
-         
-        // JS: The main function to filter and sort the templates.
-        function applyFilters() {
-            console.log('=== APPLY FILTERS CALLED ===');
-            const category = categoryFilter ? categoryFilter.value : 'all';
-            const sortBy = sortFilter.value;
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            
-            console.log('Filter values:', { category, sortBy, searchTerm });
-
-            let visibleTemplates = allTemplates.filter(item => {
-                const itemCategory = item.dataset.category.toLowerCase();
-                const itemTitle = item.dataset.title;
-                const itemDescription = item.dataset.description;
-
-                const matchesCategory = category === 'all' || itemCategory === category;
-                const matchesSearch = !searchTerm || itemTitle.includes(searchTerm) || itemDescription.includes(searchTerm);
-
-                return matchesCategory && matchesSearch;
-            });
-             
-            // JS: Sorts the filtered templates based on the selected sort option.
-            visibleTemplates.sort((a, b) => {
-                switch(sortBy) {
-                    case 'newest':
-                        return parseInt(b.dataset.created) - parseInt(a.dataset.created);
-                    case 'oldest':
-                        return parseInt(a.dataset.created) - parseInt(b.dataset.created);
-                    case 'title':
-                        return a.dataset.title.localeCompare(b.dataset.title);
-                    case 'title-desc':
-                        return b.dataset.title.localeCompare(a.dataset.title);
-                    case 'category':
-                        return a.dataset.category.localeCompare(b.dataset.category);
-                    default:
-                        return 0;
-                }
-            });
-             
-            // JS: Hides all templates with a transition.
-            allTemplates.forEach(item => {
-                item.classList.add('hiding');
-                setTimeout(() => {
-                    item.classList.add('hidden');
-                }, 150);
-            });
-             
-            setTimeout(() => {
-                visibleTemplates.forEach((item, index) => {
-                    item.classList.remove('hidden', 'hiding');
-                    item.style.order = index;
-                    setTimeout(() => {
-                        item.style.opacity = '1';
-                        item.style.transform = 'scale(1)';
-                    }, index * 100);
-                });
-
-                // Update "Showing" count
-                if (showingCount) {
-                    showingCount.textContent = visibleTemplates.length;
-                }
-
-                console.log('Checking admin role:', authUserRole, 'Is admin?', authUserRole === 'admin');
-
-                // Show/hide stats cards based on filter (Admin only)
-                if (authUserRole === 'admin') {
-                    console.log('🎯 Admin detected! Category:', category, 'Visible:', visibleTemplates.length);
-                    
-                    // First, handle the no results case
-                    if (visibleTemplates.length === 0) {
-                        console.log('❌ No results - hiding all cards');
-                        hideCard(cardTotalTemplates);
-                        hideCard(cardStudentTemplates);
-                        hideCard(cardLecturerTemplates);
-                        hideCard(cardShowingTemplates);
-                    } else {
-                        // Then handle category filtering
-                        if (category === 'student') {
-                            console.log('👨‍🎓 Student filter - Hiding lecturer card');
-                            showCard(cardTotalTemplates);
-                            showCard(cardStudentTemplates);
-                            hideCard(cardLecturerTemplates);
-                            showCard(cardShowingTemplates);
-                        } else if (category === 'lecturer') {
-                            console.log('👨‍🏫 Lecturer filter - Hiding student card');
-                            showCard(cardTotalTemplates);
-                            hideCard(cardStudentTemplates);
-                            showCard(cardLecturerTemplates);
-                            showCard(cardShowingTemplates);
-                        } else {
-                            console.log('📚 All categories - Showing all cards');
-                            showCard(cardTotalTemplates);
-                            showCard(cardStudentTemplates);
-                            showCard(cardLecturerTemplates);
-                            showCard(cardShowingTemplates);
-                        }
-                    }
-                } else {
-                    console.log('⚠️ Not admin, role is:', authUserRole);
-                }
-
-                // Toggle "no results" message
-                if (visibleTemplates.length === 0) {
-                    noResults.classList.remove('d-none');
-                } else {
-                    noResults.classList.add('d-none');
-                }
-            }, 200);
-        }
-         
-        // JS: Attaches event listeners to the filter dropdowns to trigger `applyFilters`.
-        if (categoryFilter) {
-            console.log('✅ Category filter found, attaching listener');
-            categoryFilter.addEventListener('change', applyFilters);
-        } else {
-            console.log('❌ Category filter NOT found');
-        }
-        
-        sortFilter.addEventListener('change', applyFilters);
-         
-        // JS: Debounces the search input to avoid running the filter too often while the user is typing.
-        let searchTimeout;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(applyFilters, 300);
-        });
-         
-        // JS: Function to reset all filters to their default values.
-        window.resetFilters = function() {
-            if (categoryFilter) categoryFilter.value = 'all';
-            sortFilter.value = 'newest';
-            searchInput.value = '';
-            applyFilters();
+        const elements = {
+            categoryFilterGroup: document.getElementById('categoryFilter'),
+            sortFilterGroup: document.getElementById('sortFilter'),
+            searchInput: document.getElementById('searchInput'),
+            noResults: document.getElementById('no-results'),
+            showingCount: document.getElementById('showing-count'),
+            cards: {
+                total: document.getElementById('card-total-templates'),
+                student: document.getElementById('card-student-templates'),
+                lecturer: document.getElementById('card-lecturer-templates'),
+                showing: document.getElementById('card-showing-templates')
+            }
         };
-         
-        // JS: Adds keyboard shortcuts for accessibility and quick actions.
-        document.addEventListener('keydown', (e) => {
-            // Alt + 1,2,3 for category filters
-            if (categoryFilter && e.altKey && e.key >= '1' && e.key <= '3') {
-                e.preventDefault();
-                const options = ['all', 'student', 'lecturer'];
-                categoryFilter.value = options[parseInt(e.key) - 1];
+        
+        const templateItems = document.querySelectorAll('.template-item');
+        let allTemplates = Array.from(templateItems);
+        let filterTimeout = null;
+        let isAnimating = false;
+        
+        let currentCategory = 'all';
+        let currentSortBy = 'newest';
+
+        function setupSegmentControl(groupElement, initialValue, callback) {
+            if (!groupElement) return; // Safety check
+            groupElement.querySelectorAll('.segment-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const newValue = this.getAttribute('data-value');
+                    const currentStateVariable = groupElement.id === 'categoryFilter' ? currentCategory : currentSortBy;
+                    if (newValue !== currentStateVariable) {
+                        groupElement.querySelector('.segment-btn.active')?.classList.remove('active');
+                        this.classList.add('active');
+                        callback(newValue);
+                    }
+                });
+            });
+            groupElement.querySelector(`[data-value="${initialValue}"]`)?.classList.add('active');
+        }
+
+        if (elements.categoryFilterGroup) {
+            setupSegmentControl(elements.categoryFilterGroup, 'all', (value) => {
+                currentCategory = value;
+                applyFilters(); 
+            });
+        }
+        
+        if (elements.sortFilterGroup) {
+            setupSegmentControl(elements.sortFilterGroup, 'newest', (value) => {
+                currentSortBy = value;
                 applyFilters();
+            });
+        }
+        
+        function updateCardVisibility(category, hasResults) {
+
+            const cards = elements.cards;
+            const updates = {};
+            
+            // Check if any card element exists on the page (they might be hidden by PHP if count is 0)
+            const totalExists = cards.total && cards.total.style.display !== 'none';
+
+            if (!hasResults || !totalExists) {
+                // If no results, or total card was hidden by PHP, hide all dynamic cards.
+                updates.total = false; updates.student = false; updates.lecturer = false; updates.showing = false;
+            } else {
+                updates.total = true; updates.showing = true;
+                
+                // Only show student/lecturer cards if the filter matches OR if 'all' is selected.
+                if (category === 'student') { 
+                    updates.student = true; updates.lecturer = false; 
+                } 
+                else if (category === 'lecturer') { 
+                    updates.student = false; updates.lecturer = true; 
+                } 
+                else { 
+                    // When 'all' is selected, check the PHP-rendered visibility
+                    updates.student = cards.student && cards.student.getAttribute('data-original-display') !== 'none'; 
+                    updates.lecturer = cards.lecturer && cards.lecturer.getAttribute('data-original-display') !== 'none'; 
+                }
             }
-             
-            // Ctrl + F for search focus
-            if (e.ctrlKey && e.key === 'f') {
-                e.preventDefault();
-                searchInput.focus();
-            }
-             
-            // Escape to reset
-            if (e.key === 'Escape') {
-                resetFilters();
-            }
-        });
-         
-        // JS: Applies an initial staggered animation to all template cards when the page loads.
+
+            raf(() => {
+                Object.keys(updates).forEach(key => {
+                    const card = cards[key];
+                    if (card) { card.style.display = updates[key] ? '' : 'none'; }
+                });
+            });
+        }
+        
+        // Cache original display styles
+        if (elements.cards.student) elements.cards.student.setAttribute('data-original-display', elements.cards.student.style.display);
+        if (elements.cards.lecturer) elements.cards.lecturer.setAttribute('data-original-display', elements.cards.lecturer.style.display);
+
+
+        function applyFilters() {
+            if (isAnimating) return;
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                isAnimating = true;
+                const category = currentCategory;
+                const sortBy = currentSortBy;
+                const searchTerm = elements.searchInput.value.toLowerCase().trim();
+                
+                let visibleTemplates = allTemplates.filter(item => {
+                    const itemCategory = item.dataset.category.toLowerCase();
+                    const matchesCategory = category === 'all' || itemCategory === category;
+                    if (!searchTerm) return matchesCategory;
+                    const itemTitle = item.dataset.title;
+                    const itemDescription = item.dataset.description;
+                    return matchesCategory && (itemTitle.includes(searchTerm) || itemDescription.includes(searchTerm));
+                });
+                
+                visibleTemplates.sort((a, b) => {
+                    switch(sortBy) {
+                        case 'newest': return parseInt(b.dataset.created) - parseInt(a.dataset.created);
+                        case 'oldest': return parseInt(a.dataset.created) - parseInt(b.dataset.created);
+                        case 'title': return a.dataset.title.localeCompare(b.dataset.title);
+                        case 'title-desc': return b.dataset.title.localeCompare(a.dataset.title);
+                        default: return 0;
+                    }
+                });
+                
+                const hasResults = visibleTemplates.length > 0;
+                
+                raf(() => {
+                    allTemplates.forEach(item => { item.classList.add('hiding'); });
+                    setTimeout(() => {
+                        raf(() => {
+                            allTemplates.forEach(item => {
+                                const isVisible = visibleTemplates.includes(item);
+                                if (isVisible) {
+                                    item.classList.remove('hiding', 'hidden');
+                                    item.style.order = visibleTemplates.indexOf(item);
+                                } else {
+                                    item.classList.add('hidden');
+                                }
+                            });
+                            if (elements.showingCount) { elements.showingCount.textContent = visibleTemplates.length; }
+                            
+                            // Only update card visibility based on filters if the cards were present in the first place
+                            updateCardVisibility(category, hasResults);
+                            
+                            elements.noResults.classList.toggle('d-none', hasResults);
+                            if (hasResults) {
+                                visibleTemplates.forEach((item, index) => {
+                                    setTimeout(() => {
+                                        item.classList.add('sort-complete');
+                                        setTimeout(() => { item.classList.remove('sort-complete'); }, 500);
+                                    }, index * 30);
+                                });
+                            }
+                            isAnimating = false;
+                        });
+                    }, 300);
+                });
+            }, 150);
+        }
+        
+        let searchTimeout;
+        if (elements.searchInput) {
+            elements.searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(applyFilters, 300);
+            }, { passive: true });
+        }
+        
+        window.resetFilters = function() {
+            if (elements.categoryFilterGroup) { elements.categoryFilterGroup.querySelector('[data-value="all"]').click(); }
+            if (elements.sortFilterGroup) { elements.sortFilterGroup.querySelector('[data-value="newest"]').click(); }
+            if (elements.searchInput) { elements.searchInput.value = ''; }
+            applyFilters();
+            if (filterModal) { filterModal.hide(); }
+        };
+        
+        // Initial fade-in animation
         templateItems.forEach((item, index) => {
             item.style.opacity = '0';
             item.style.transform = 'translateY(30px)';
-            setTimeout(() => {
-                item.style.opacity = '1';
-                item.style.transform = 'translateY(0)';
-            }, index * 100);
         });
         
-        console.log('=== SCRIPT INITIALIZATION COMPLETE ===');
+        raf(() => {
+            templateItems.forEach((item, index) => {
+                setTimeout(() => {
+                    raf(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateY(0)';
+                    });
+                }, index * 50);
+            });
+        });
     });
 })();
 </script>
+
 @endsection
