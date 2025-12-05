@@ -23,7 +23,7 @@ class AdminController extends Controller
         $newUsersCount = User::where('created_at', '>=', Carbon::now()->subWeeks(7))
             ->where('role', 'user')
             ->count();
-        $totalUsers = User::where('role', 'user')->count();
+        $totalUsers = User::whereIn('role', ['lecturer', 'admin'])->count();
         $totalTemplates = Template::count();
 
         // Get the counts for 'Student Template' and 'Lecturer Template'
@@ -196,10 +196,11 @@ class AdminController extends Controller
 
     public function AdminUsers()
     {
-        // Fetches all users with the role 'user', excluding admins.
-        $users = User::where('role', 'user')->get(); 
+        // Fetch all users with role 'student' or 'lecturer'
+        $users = User::whereIn('role', ['student', 'lecturer'])->get(); 
         return view('admin.admin_users', compact('users'));
     }
+
 
     public function AdminDeleteUser($id)
     {
