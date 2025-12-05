@@ -17,15 +17,18 @@
                      
                      <div class="filters-container" id="filtersContainer">
                          <div class="row g-3">
-                             <div class="col-12 col-md-4 col-lg-auto">
-                                 <div class="form-group mb-0">
-                                     <select class="form-select form-select-sm" id="categoryFilter">
-                                         <option value="all">All Categories</option>
-                                         <option value="student">Student Templates</option>
-                                         <option value="lecturer">Lecturer Templates</option>
-                                     </select>
-                                 </div>
-                             </div>
+                            @if (auth()->user()->role === 'admin')
+                                <div class="col-12 col-md-4 col-lg-auto">
+                                    <div class="form-group mb-0">
+                                        <select class="form-select form-select-sm" id="categoryFilter">
+                                            <option value="all">All Categories</option>
+                                            <option value="student">Student Templates</option>
+                                            <option value="lecturer">Lecturer Templates</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            @endif
+
                              
                              <div class="col-12 col-md-4 col-lg-auto">
                                  <div class="form-group mb-0">
@@ -34,7 +37,6 @@
                                          <option value="oldest">Oldest First</option>
                                          <option value="title">Title A-Z</option>
                                          <option value="title-desc">Title Z-A</option>
-                                         <option value="category">Category</option>
                                      </select>
                                  </div>
                              </div>
@@ -55,69 +57,93 @@
              </div>
          </div>
           
-         <div class="nk-block">
-             <div class="row g-3 mb-4">
-                 <div class="col-6 col-md-3">
-                     <div class="card border-0 bg-primary bg-opacity-10">
-                         <div class="card-body py-3 px-3">
-                             <div class="d-flex align-items-center">
-                                 <div class="media media-sm media-circle bg-primary text-white me-2 me-md-3">
-                                     <em class="icon ni ni-template"></em>
-                                 </div>
-                                 <div class="flex-grow-1 min-w-0">
-                                     <h6 class="mb-0 fs-6" id="total-count">{{ count($templates) }}</h6>
-                                     <span class="small text-muted d-block text-truncate">Total Templates</span>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-                 <div class="col-6 col-md-3">
-                     <div class="card border-0 bg-info bg-opacity-10">
-                         <div class="card-body py-3 px-3">
-                             <div class="d-flex align-items-center">
-                                 <div class="media media-sm media-circle bg-info text-white me-2 me-md-3">
-                                     <em class="icon ni ni-user"></em>
-                                 </div>
-                                 <div class="flex-grow-1 min-w-0">
-                                     <h6 class="mb-0 fs-6" id="student-count">{{ $templates->where('category', 'Student')->count() }}</h6>
-                                     <span class="small text-muted d-block text-truncate">Student</span>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-                 <div class="col-6 col-md-3">
-                     <div class="card border-0 bg-warning bg-opacity-10">
-                         <div class="card-body py-3 px-3">
-                             <div class="d-flex align-items-center">
-                                 <div class="media media-sm media-circle bg-warning text-white me-2 me-md-3">
-                                     <em class="icon ni ni-user-check"></em>
-                                 </div>
-                                 <div class="flex-grow-1 min-w-0">
-                                     <h6 class="mb-0 fs-6" id="lecturer-count">{{ $templates->where('category', 'Lecturer')->count() }}</h6>
-                                     <span class="small text-muted d-block text-truncate">Lecturer</span>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-                 <div class="col-6 col-md-3">
-                     <div class="card border-0 bg-success bg-opacity-10">
-                         <div class="card-body py-3 px-3">
-                             <div class="d-flex align-items-center">
-                                 <div class="media media-sm media-circle bg-success text-white me-2 me-md-3">
-                                     <em class="icon ni ni-eye"></em>
-                                 </div>
-                                 <div class="flex-grow-1 min-w-0">
-                                     <h6 class="mb-0 fs-6" id="showing-count">{{ count($templates) }}</h6>
-                                     <span class="small text-muted d-block text-truncate">Showing</span>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
+        @if (auth()->user()->role === 'admin')
+        <div class="nk-block">
+            <div class="row g-3 mb-4">
+
+                {{-- Total Templates --}}
+                @if (count($templates) > 0)
+                <div class="col-6 col-md-3" id="card-total-templates">
+                    <div class="card border-0 bg-primary bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-primary text-white me-2 me-md-3">
+                                    <em class="icon ni ni-template"></em>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6">{{ count($templates) }}</h6>
+                                    <span class="small text-muted d-block">Total Templates</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                {{-- Student Templates --}}
+                @php $studentCount = $templates->where('category', 'Student')->count(); @endphp
+                @if ($studentCount > 0)
+                <div class="col-6 col-md-3" id="card-student-templates">
+                    <div class="card border-0 bg-info bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-info text-white me-2 me-md-3">
+                                    <em class="icon ni ni-user"></em>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6">{{ $studentCount }}</h6>
+                                    <span class="small text-muted d-block">Student</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                {{-- Lecturer Templates --}}
+                @php $lecturerCount = $templates->where('category', 'Lecturer')->count(); @endphp
+                @if ($lecturerCount > 0)
+                <div class="col-6 col-md-3" id="card-lecturer-templates">
+                    <div class="card border-0 bg-warning bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-warning text-white me-2 me-md-3">
+                                    <em class="icon ni ni-user-check"></em>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6">{{ $lecturerCount }}</h6>
+                                    <span class="small text-muted d-block">Lecturer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+                {{-- Showing --}}
+                @if (count($templates) > 0)
+                <div class="col-6 col-md-3" id="card-showing-templates">
+                    <div class="card border-0 bg-success bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-success text-white me-2 me-md-3">
+                                    <em class="icon ni ni-eye"></em>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6"><span id="showing-count">{{ count($templates) }}</span></h6>
+                                    <span class="small text-muted d-block">Showing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
+            </div>
+        </div>
+        @endif
+
+
 
             <div class="row g-3 g-md-4" id="templates-container">
                 @forelse ($templates as $item)
@@ -173,9 +199,9 @@
  </div>
 
 <style>
-/* ================================
+/* 
    General Styles & Animations
-================================ */
+*/
 
 /* Template card default appearance */
 .template-item {
@@ -245,9 +271,9 @@
     margin-top: auto;
 }
 
-/* ================================
+/* 
    Stats Cards Hover Effects
-================================ */
+*/
 
 /* Subtle hover effect for colored cards */
 .card.bg-primary.bg-opacity-10:hover,
@@ -258,9 +284,9 @@
     box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
-/* ================================
+/* 
    Badge Animations
-================================ */
+ */
 
 /* Smooth transition for badges */
 .badge {
@@ -272,9 +298,9 @@
     transform: scale(1.05);
 }
 
-/* ================================
+/* 
    Filter Controls Styling
-================================ */
+ */
 
 /* Ensure filter controls don't shrink */
 .nk-block-head-content .d-flex > div {
@@ -497,9 +523,9 @@
     }
 }
 
-/* ================================
+/* 
    Utility Classes
-================================ */
+ */
 
 /* Prevent element from growing */
 .min-w-0 {
@@ -529,168 +555,254 @@
 }
 </style>
 
- <script>
- document.addEventListener('DOMContentLoaded', function() {
-     // JS: Get all necessary DOM elements.
-     const categoryFilter = document.getElementById('categoryFilter');
-     const sortFilter = document.getElementById('sortFilter');
-     const searchInput = document.getElementById('searchInput');
-     const templateItems = document.querySelectorAll('.template-item');
-     const noResults = document.getElementById('no-results');
-     const showingCount = document.getElementById('showing-count');
-     const mobileFilterToggle = document.getElementById('mobileFilterToggle');
-     const filtersContainer = document.getElementById('filtersContainer');
-      
-     // JS: Convert NodeList to an array for easier manipulation.
-     let allTemplates = Array.from(templateItems);
-      
-     // JS: Handles the mobile filter toggle button.
-     if (mobileFilterToggle && filtersContainer) {
-         mobileFilterToggle.addEventListener('click', function() {
-             filtersContainer.classList.toggle('show');
-             this.classList.toggle('active');
-         });
-          
-         // JS: Closes filters when clicking outside on mobile.
-         document.addEventListener('click', function(e) {
-             if (window.innerWidth <= 991 &&
-                 !mobileFilterToggle.contains(e.target) &&
-                 !filtersContainer.contains(e.target)) {
-                 filtersContainer.classList.remove('show');
-                 mobileFilterToggle.classList.remove('active');
-             }
-         });
-     }
-      
-     // JS: The main function to filter and sort the templates.
-     function applyFilters() {
-         const category = categoryFilter.value;
-         const sortBy = sortFilter.value;
-         const searchTerm = searchInput.value.toLowerCase().trim();
-          
-         console.log('Applying filters:', { category, sortBy, searchTerm });
-          
-         // JS: Filters templates based on category and search term.
-         let visibleTemplates = allTemplates.filter(item => {
-             const itemCategory = item.dataset.category;
-             const itemTitle = item.dataset.title;
-             const itemDescription = item.dataset.description;
-              
-             const matchesCategory = category === 'all' || itemCategory === category;
-             const matchesSearch = !searchTerm ||
-                                 itemTitle.includes(searchTerm) ||
-                                 itemDescription.includes(searchTerm);
-              
-             return matchesCategory && matchesSearch;
-         });
-          
-         // JS: Sorts the filtered templates based on the selected sort option.
-         visibleTemplates.sort((a, b) => {
-             switch(sortBy) {
-                 case 'newest':
-                     return parseInt(b.dataset.created) - parseInt(a.dataset.created);
-                 case 'oldest':
-                     return parseInt(a.dataset.created) - parseInt(b.dataset.created);
-                 case 'title':
-                     return a.dataset.title.localeCompare(b.dataset.title);
-                 case 'title-desc':
-                     return b.dataset.title.localeCompare(a.dataset.title);
-                 case 'category':
-                     return a.dataset.category.localeCompare(b.dataset.category);
-                 default:
-                     return 0;
-             }
-         });
-          
-         // JS: Hides all templates with a transition.
-         allTemplates.forEach(item => {
-             item.classList.add('hiding');
-             setTimeout(() => {
-                 item.classList.add('hidden');
-             }, 150);
-         });
-          
-         // JS: Shows the filtered and sorted templates with a staggered animation.
-         setTimeout(() => {
-             visibleTemplates.forEach((item, index) => {
-                 item.classList.remove('hidden', 'hiding');
-                 item.style.order = index;
-                  
-                 // JS: Staggers the animation for a ripple effect.
-                 setTimeout(() => {
-                     item.style.opacity = '1';
-                     item.style.transform = 'scale(1)';
-                 }, index * 100);
-             });
-              
-             // JS: Updates the "Showing" count.
-             showingCount.textContent = visibleTemplates.length;
-              
-             // JS: Toggles the "no results" message based on the number of visible templates.
-             if (visibleTemplates.length === 0) {
-                 noResults.classList.remove('d-none');
-             } else {
-                 noResults.classList.add('d-none');
-             }
-         }, 200);
-     }
-      
-     // JS: Attaches event listeners to the filter dropdowns to trigger `applyFilters`.
-     categoryFilter.addEventListener('change', applyFilters);
-     sortFilter.addEventListener('change', applyFilters);
-      
-     // JS: Debounces the search input to avoid running the filter too often while the user is typing.
-     let searchTimeout;
-     searchInput.addEventListener('input', () => {
-         clearTimeout(searchTimeout);
-         searchTimeout = setTimeout(applyFilters, 300);
-     });
-      
-     // JS: Function to reset all filters to their default values.
-     window.resetFilters = function() {
-         categoryFilter.value = 'all';
-         sortFilter.value = 'newest';
-         searchInput.value = '';
-         applyFilters();
-     };
-      
-     // JS: Adds keyboard shortcuts for accessibility and quick actions.
-     document.addEventListener('keydown', (e) => {
-         // Alt + 1,2,3 for category filters
-         if (e.altKey && e.key >= '1' && e.key <= '3') {
-             e.preventDefault();
-             const options = ['all', 'student', 'lecturer'];
-             categoryFilter.value = options[parseInt(e.key) - 1];
-             applyFilters();
-         }
-          
-         // Ctrl + F for search focus
-         if (e.ctrlKey && e.key === 'f') {
-             e.preventDefault();
-             searchInput.focus();
-         }
-          
-         // Escape to reset
-         if (e.key === 'Escape') {
-             resetFilters();
-         }
-     });
-      
-     // JS: Applies an initial staggered animation to all template cards when the page loads.
-     templateItems.forEach((item, index) => {
-         item.style.opacity = '0';
-         item.style.transform = 'translateY(30px)';
-         setTimeout(() => {
-             item.style.opacity = '1';
-             item.style.transform = 'translateY(0)';
-         }, index * 100);
-     });
- });
- </script>
+<script>
+(function() {
+    'use strict';
+    
+    const authUserRole = "{{ auth()->user()->role }}";
+    console.log('=== TEMPLATE LIBRARY SCRIPT STARTING ===');
+    console.log('Auth Role:', authUserRole);
 
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('=== DOM CONTENT LOADED ===');
+        
+        // JS: Get all necessary DOM elements.
+        const categoryFilter = document.getElementById('categoryFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const searchInput = document.getElementById('searchInput');
+        const templateItems = document.querySelectorAll('.template-item');
+        const noResults = document.getElementById('no-results');
+        const showingCount = document.getElementById('showing-count');
+        const mobileFilterToggle = document.getElementById('mobileFilterToggle');
+        const filtersContainer = document.getElementById('filtersContainer');
+        
+        // JS: Get stat card elements
+        const cardTotalTemplates = document.getElementById('card-total-templates');
+        const cardStudentTemplates = document.getElementById('card-student-templates');
+        const cardLecturerTemplates = document.getElementById('card-lecturer-templates');
+        const cardShowingTemplates = document.getElementById('card-showing-templates');
+        
+        // Debug: Check if cards are found
+        console.log('Cards found:', {
+            total: !!cardTotalTemplates,
+            student: !!cardStudentTemplates,
+            lecturer: !!cardLecturerTemplates,
+            showing: !!cardShowingTemplates
+        });
+         
+        // JS: Convert NodeList to an array for easier manipulation.
+        let allTemplates = Array.from(templateItems);
+         
+        // JS: Handles the mobile filter toggle button.
+        if (mobileFilterToggle && filtersContainer) {
+            mobileFilterToggle.addEventListener('click', function() {
+                filtersContainer.classList.toggle('show');
+                this.classList.toggle('active');
+            });
+             
+            // JS: Closes filters when clicking outside on mobile.
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 991 &&
+                    !mobileFilterToggle.contains(e.target) &&
+                    !filtersContainer.contains(e.target)) {
+                    filtersContainer.classList.remove('show');
+                    mobileFilterToggle.classList.remove('active');
+                }
+            });
+        }
 
+        // JS: Helper function to smoothly hide a card
+        function hideCard(card) {
+            if (!card) return;
+            card.style.transition = 'all 0.3s ease';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                card.style.display = 'none';
+            }, 300);
+        }
 
+        // JS: Helper function to smoothly show a card
+        function showCard(card) {
+            if (!card) return;
+            card.style.display = '';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'scale(1)';
+            }, 10);
+        }
+         
+        // JS: The main function to filter and sort the templates.
+        function applyFilters() {
+            console.log('=== APPLY FILTERS CALLED ===');
+            const category = categoryFilter ? categoryFilter.value : 'all';
+            const sortBy = sortFilter.value;
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            console.log('Filter values:', { category, sortBy, searchTerm });
 
+            let visibleTemplates = allTemplates.filter(item => {
+                const itemCategory = item.dataset.category.toLowerCase();
+                const itemTitle = item.dataset.title;
+                const itemDescription = item.dataset.description;
 
+                const matchesCategory = category === 'all' || itemCategory === category;
+                const matchesSearch = !searchTerm || itemTitle.includes(searchTerm) || itemDescription.includes(searchTerm);
 
+                return matchesCategory && matchesSearch;
+            });
+             
+            // JS: Sorts the filtered templates based on the selected sort option.
+            visibleTemplates.sort((a, b) => {
+                switch(sortBy) {
+                    case 'newest':
+                        return parseInt(b.dataset.created) - parseInt(a.dataset.created);
+                    case 'oldest':
+                        return parseInt(a.dataset.created) - parseInt(b.dataset.created);
+                    case 'title':
+                        return a.dataset.title.localeCompare(b.dataset.title);
+                    case 'title-desc':
+                        return b.dataset.title.localeCompare(a.dataset.title);
+                    case 'category':
+                        return a.dataset.category.localeCompare(b.dataset.category);
+                    default:
+                        return 0;
+                }
+            });
+             
+            // JS: Hides all templates with a transition.
+            allTemplates.forEach(item => {
+                item.classList.add('hiding');
+                setTimeout(() => {
+                    item.classList.add('hidden');
+                }, 150);
+            });
+             
+            setTimeout(() => {
+                visibleTemplates.forEach((item, index) => {
+                    item.classList.remove('hidden', 'hiding');
+                    item.style.order = index;
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'scale(1)';
+                    }, index * 100);
+                });
+
+                // Update "Showing" count
+                if (showingCount) {
+                    showingCount.textContent = visibleTemplates.length;
+                }
+
+                console.log('Checking admin role:', authUserRole, 'Is admin?', authUserRole === 'admin');
+
+                // Show/hide stats cards based on filter (Admin only)
+                if (authUserRole === 'admin') {
+                    console.log('🎯 Admin detected! Category:', category, 'Visible:', visibleTemplates.length);
+                    
+                    // First, handle the no results case
+                    if (visibleTemplates.length === 0) {
+                        console.log('❌ No results - hiding all cards');
+                        hideCard(cardTotalTemplates);
+                        hideCard(cardStudentTemplates);
+                        hideCard(cardLecturerTemplates);
+                        hideCard(cardShowingTemplates);
+                    } else {
+                        // Then handle category filtering
+                        if (category === 'student') {
+                            console.log('👨‍🎓 Student filter - Hiding lecturer card');
+                            showCard(cardTotalTemplates);
+                            showCard(cardStudentTemplates);
+                            hideCard(cardLecturerTemplates);
+                            showCard(cardShowingTemplates);
+                        } else if (category === 'lecturer') {
+                            console.log('👨‍🏫 Lecturer filter - Hiding student card');
+                            showCard(cardTotalTemplates);
+                            hideCard(cardStudentTemplates);
+                            showCard(cardLecturerTemplates);
+                            showCard(cardShowingTemplates);
+                        } else {
+                            console.log('📚 All categories - Showing all cards');
+                            showCard(cardTotalTemplates);
+                            showCard(cardStudentTemplates);
+                            showCard(cardLecturerTemplates);
+                            showCard(cardShowingTemplates);
+                        }
+                    }
+                } else {
+                    console.log('⚠️ Not admin, role is:', authUserRole);
+                }
+
+                // Toggle "no results" message
+                if (visibleTemplates.length === 0) {
+                    noResults.classList.remove('d-none');
+                } else {
+                    noResults.classList.add('d-none');
+                }
+            }, 200);
+        }
+         
+        // JS: Attaches event listeners to the filter dropdowns to trigger `applyFilters`.
+        if (categoryFilter) {
+            console.log('✅ Category filter found, attaching listener');
+            categoryFilter.addEventListener('change', applyFilters);
+        } else {
+            console.log('❌ Category filter NOT found');
+        }
+        
+        sortFilter.addEventListener('change', applyFilters);
+         
+        // JS: Debounces the search input to avoid running the filter too often while the user is typing.
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(applyFilters, 300);
+        });
+         
+        // JS: Function to reset all filters to their default values.
+        window.resetFilters = function() {
+            if (categoryFilter) categoryFilter.value = 'all';
+            sortFilter.value = 'newest';
+            searchInput.value = '';
+            applyFilters();
+        };
+         
+        // JS: Adds keyboard shortcuts for accessibility and quick actions.
+        document.addEventListener('keydown', (e) => {
+            // Alt + 1,2,3 for category filters
+            if (categoryFilter && e.altKey && e.key >= '1' && e.key <= '3') {
+                e.preventDefault();
+                const options = ['all', 'student', 'lecturer'];
+                categoryFilter.value = options[parseInt(e.key) - 1];
+                applyFilters();
+            }
+             
+            // Ctrl + F for search focus
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+             
+            // Escape to reset
+            if (e.key === 'Escape') {
+                resetFilters();
+            }
+        });
+         
+        // JS: Applies an initial staggered animation to all template cards when the page loads.
+        templateItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+        
+        console.log('=== SCRIPT INITIALIZATION COMPLETE ===');
+    });
+})();
+</script>
 @endsection
