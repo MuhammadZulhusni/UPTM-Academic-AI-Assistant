@@ -53,8 +53,6 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
     });
 });
 
-
-
 // Admin Routes
 Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () {
     // Admin Dashboard
