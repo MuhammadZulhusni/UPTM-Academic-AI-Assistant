@@ -322,34 +322,75 @@
     </div>
 </div>
 
+{{--
+    ======================================
+    Sort Modal (Minimalist, Soft Color, No Bolding)
+    ======================================
+--}}
 <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="sortModalLabel">Sort Documents</h5>
+        <div class="modal-content border-0 shadow-sm rounded-3">
+            {{-- Modal Header: Minimalist Design --}}
+            <div class="modal-header border-0 pb-0 pt-3 px-4">
+                <h5 class="modal-title fs-5 text-secondary" id="sortModalLabel">Sort Documents</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <form id="sortForm" method="GET" action="{{ route('admin.document') }}">
-                <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="sort" id="sortNewest" value="newest" 
-                        {{ request('sort') == 'newest' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="sortNewest">Show latest documents first</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="sort" id="sortOldest" value="oldest"
-                        {{ request('sort') == 'oldest' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="sortOldest">Show oldest documents first</label>
+                <div class="modal-body px-4 py-3">
+                    <p class="text-muted small mb-3">Choose the order for viewing the document list.</p>
+
+                    {{-- Radio button options --}}
+                    <div class="d-grid gap-2">
+                        <div class="form-check p-0 mb-2">
+                            <input class="form-check-input visually-hidden" type="radio" name="sort" id="sortNewest" value="newest"
+                            {{ request('sort') == 'newest' ? 'checked' : '' }}>
+                            <label class="btn btn-outline-secondary w-100 text-start rounded-2 px-3 py-2 sort-option-btn" for="sortNewest">
+                                <i class="bi bi-clock-fill me-2"></i> Show latest documents first
+                            </label>
+                        </div>
+                        <div class="form-check p-0">
+                            <input class="form-check-input visually-hidden" type="radio" name="sort" id="sortOldest" value="oldest"
+                            {{ request('sort') == 'oldest' ? 'checked' : '' }}>
+                            <label class="btn btn-outline-secondary w-100 text-start rounded-2 px-3 py-2 sort-option-btn" for="sortOldest">
+                                <i class="bi bi-clock me-2"></i> Show oldest documents first
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+
+                {{-- Modal Footer: Soft Background and Outline Buttons --}}
+                <div class="modal-footer justify-content-end bg-light border-0 rounded-bottom-3 px-4 py-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-2">
+                        Apply Sort
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom CSS for the soft, minimalist active state */
+    #sortModal input[type="radio"]:checked + .sort-option-btn {
+        /* Primary-subtle color for a soft, active background */
+        background-color: var(--bs-primary-bg-subtle);
+        border-color: var(--bs-primary) !important;
+        color: var(--bs-primary) !important;
+        /* Remove font-weight: 600 or bolding */
+    }
+
+    /* Ensure icons maintain primary color when active */
+    #sortModal input[type="radio"]:checked + .sort-option-btn i {
+        color: var(--bs-primary) !important;
+    }
+    
+    /* Subtle change for the hover state */
+    #sortModal .sort-option-btn:hover {
+        background-color: var(--bs-light);
+    }
+</style>
 
 <script>
 // This function listens for input in the search bar.

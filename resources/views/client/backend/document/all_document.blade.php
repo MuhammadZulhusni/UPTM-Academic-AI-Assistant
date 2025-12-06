@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Sort Button -->
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#clientSortModal">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sortModal">
                     <i class="bi bi-funnel"></i> Sort
                 </button>
             </div>
@@ -89,6 +89,39 @@
                                             </div>
                                         </div>
                                     </td>
+                                    <!-- <td class="tb-col d-none d-lg-table-cell">
+                                        <div class="d-flex align-items-center gap-2">
+                                            @php
+                                                // Get the currently authenticated user's ID
+                                                $id = Auth::user()->id;
+                                                // Retrieve the user's profile data from the database using the User model
+                                                $profileData = App\Models\User::find($id);
+                                            @endphp
+                                            <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
+                                                     class="w-100 h-100 object-fit-cover" alt="User"/>
+                                            </div>
+                                            <div class="min-width-0">
+                                                <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->user->name }}</div>
+                                                <small class="text-muted text-truncate d-block">{{ $item->user->email ?? 'No email' }}</small>
+                                            </div>
+                                        </div>
+                                    </td> -->
+                                    <!-- <td class="tb-col d-none d-md-table-cell">
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
+                                            {{ $item->template->category }}
+                                        </span>
+                                    </td> -->
+                                    <!-- <td class="tb-col d-none d-sm-table-cell">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge text-bg-success-soft rounded-pill px-3 py-2 fs-6 lh-sm fw-medium">
+                                                {{ number_format($item->word_count) }}
+                                            </span>
+                                            @if($item->word_count > 1000)
+                                                <i class="bi bi-star-fill text-warning d-none d-md-inline" title="High word count"></i>
+                                            @endif
+                                        </div>
+                                    </td> -->
                                     <td class="tb-col d-none d-lg-table-cell">
                                         <div class="fs-7 text-muted">
                                             {{ $item->created_at ? $item->created_at->format('M d, Y') : 'N/A' }}
@@ -123,7 +156,7 @@
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#confirmDeleteModal" 
                                                     data-document-id="{{ $item->id }}"
-                                                    data-delete-url="{{ route('delete.admin.document', $item->id) }}"
+                                                    data-delete-url="{{ route('delete.user.document', $item->id) }}"
                                                     title="Delete Document">
                                                 <i class="bi bi-trash"></i>
                                                 <span class="d-none d-xl-inline ms-1">Delete</span>
@@ -288,6 +321,76 @@
         </div>
     </div>
 </div>
+
+{{--
+    ======================================
+    Sort Modal (Minimalist, Soft Color, No Bolding)
+    ======================================
+--}}
+<div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+            {{-- Modal Header: Minimalist Design --}}
+            <div class="modal-header border-0 pb-0 pt-3 px-4">
+                <h5 class="modal-title fs-5 text-secondary" id="sortModalLabel">Sort Documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form id="sortForm" method="GET" action="{{ route('user.document') }}">
+                <div class="modal-body px-4 py-3">
+                    <p class="text-muted small mb-3">Choose the order for viewing the document list.</p>
+
+                    {{-- Radio button options --}}
+                    <div class="d-grid gap-2">
+                        <div class="form-check p-0 mb-2">
+                            <input class="form-check-input visually-hidden" type="radio" name="sort" id="sortNewest" value="newest"
+                            {{ request('sort') == 'newest' ? 'checked' : '' }}>
+                            <label class="btn btn-outline-secondary w-100 text-start rounded-2 px-3 py-2 sort-option-btn" for="sortNewest">
+                                <i class="bi bi-clock-fill me-2"></i> Show latest documents first
+                            </label>
+                        </div>
+                        <div class="form-check p-0">
+                            <input class="form-check-input visually-hidden" type="radio" name="sort" id="sortOldest" value="oldest"
+                            {{ request('sort') == 'oldest' ? 'checked' : '' }}>
+                            <label class="btn btn-outline-secondary w-100 text-start rounded-2 px-3 py-2 sort-option-btn" for="sortOldest">
+                                <i class="bi bi-clock me-2"></i> Show oldest documents first
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Modal Footer: Soft Background and Outline Buttons --}}
+                <div class="modal-footer justify-content-end bg-light border-0 rounded-bottom-3 px-4 py-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-2" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-2">
+                        Apply Sort
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom CSS for the soft, minimalist active state */
+    #sortModal input[type="radio"]:checked + .sort-option-btn {
+        /* Primary-subtle color for a soft, active background */
+        background-color: var(--bs-primary-bg-subtle);
+        border-color: var(--bs-primary) !important;
+        color: var(--bs-primary) !important;
+        /* Remove font-weight: 600 or bolding */
+    }
+
+    /* Ensure icons maintain primary color when active */
+    #sortModal input[type="radio"]:checked + .sort-option-btn i {
+        color: var(--bs-primary) !important;
+    }
+    
+    /* Subtle change for the hover state */
+    #sortModal .sort-option-btn:hover {
+        background-color: var(--bs-light);
+    }
+</style>
 
 <script>
 // This function listens for input in the search bar.
@@ -746,47 +849,23 @@ function downloadPDF() {
     </div>
 </div>
 
-<!-- Sort Modal for Client Documents -->
-<div class="modal fade" id="clientSortModal" tabindex="-1" aria-labelledby="clientSortModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="clientSortModalLabel">Sort Documents</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form id="clientSortForm" method="GET" action="{{ route('user.document') }}">
-                <div class="modal-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="sort" id="clientSortNewest" value="newest" 
-                        {{ request('sort') == 'newest' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="clientSortNewest">Show latest documents first</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="sort" id="clientSortOldest" value="oldest"
-                        {{ request('sort') == 'oldest' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="clientSortOldest">Show oldest documents first</label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
+    // Get the delete confirmation modal element by its ID
     const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+
+    // Add an event listener that triggers when the modal is about to be shown
     confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
+        // Get the button that opened the modal
         const button = event.relatedTarget;
-        // Extract the document ID from the data-document-id attribute
-        const documentId = button.getAttribute('data-document-id');
-        // Get the form element (note the updated ID)
+
+        // Retrieve the delete URL from the button's data attribute
+        const deleteUrl = button.getAttribute('data-delete-url'); 
+
+        // Find the delete form inside the modal
         const form = document.getElementById('deleteDocumentForm');
-        // Update the form's action URL
-        form.action = `/delete/user/document/${documentId}`;
+
+        // Set the form's action attribute to the specific delete URL
+        form.action = deleteUrl; 
     });
 </script>
 
