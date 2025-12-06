@@ -35,9 +35,10 @@
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 @if(count($users) > 0)
-                <div class="table-responsive">
-                    {{-- The user table. `id="usersTable"` is used by the JavaScript to hide the table if no results are found. --}}
-                    <table class="table table-sm table-hover mb-0" id="usersTable">
+                <div id="user-table-container"> 
+                    {{-- The user table. `id="usersTable"` is used by the JavaScript to hide the table if no results are found. 
+                        Removed 'table-hover' class to prevent highlighting on click/hover. --}}
+                    <table class="table table-sm mb-0" id="usersTable">
                         <thead class="table-light">
                             <tr>
                                 <th class="tb-col d-none d-md-table-cell" style="width: 60px;">
@@ -59,7 +60,7 @@
                                 <th class="tb-col d-none d-md-table-cell">
                                     <div class="fs-13px text-base fw-semibold">Role</div>
                                 </th>
-                                <th class="tb-col text-center">
+                                <th class="tb-col text-center" style="width: 120px;">
                                     <div class="fs-13px text-base fw-semibold">Action</div>
                                 </th>
                             </tr>
@@ -67,34 +68,45 @@
                         <tbody>
                             @foreach ($users as $key => $user)
                             <tr class="user-row">
-                                <td class="tb-col d-none d-md-table-cell">
+                                <td class="tb-col d-none d-md-table-cell" data-label="Sl">
                                     <div class="caption-text fw-medium">{{ $key + 1 }}</div>
                                 </td>
-                                <td class="tb-col">
+                                <td class="tb-col" data-label="Name">
                                     <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->name }}</div>
-                                    <div class="d-block d-lg-none">
-                                        <small class="text-muted d-block">{{ $user->email }}</small>
-                                        <div class="d-flex gap-2 mt-1">
+                                    
+                                    {{-- Mobile Details Block (Visible on small screens) --}}
+                                    <div class="d-block d-md-none mt-1">
+                                        <div class="fs-7 text-muted">
+                                            <i class="bi bi-envelope me-1"></i> {{ $user->email }}
+                                        </div>
+                                        <div class="fs-7 text-muted">
+                                            <i class="bi bi-phone me-1"></i> {{ $user->phone ?? 'N/A' }}
+                                        </div>
+                                        <div class="fs-7 text-muted text-truncate">
+                                            <i class="bi bi-geo-alt me-1"></i> {{ $user->address ?? 'N/A' }}
+                                        </div>
+                                        <div class="mt-1">
                                             <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1 small">
-                                                {{ $user->role }}
+                                                {{ ucfirst($user->role) }}
                                             </span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="tb-col d-none d-lg-table-cell">
+                                
+                                <td class="tb-col d-none d-lg-table-cell" data-label="Email">
                                     <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->email }}</div>
                                 </td>
-                                <td class="tb-col d-none d-md-table-cell">
+                                <td class="tb-col d-none d-md-table-cell" data-label="Phone">
                                     <div class="fs-13px text-muted">{{ $user->phone ?? 'N/A' }}</div>
                                 </td>
-                                <td class="tb-col d-none d-sm-table-cell">
+                                <td class="tb-col d-none d-sm-table-cell" data-label="Address">
                                     <div class="fs-13px text-muted">{{ $user->address ?? 'N/A' }}</div>
                                 </td>
                                 {{-- NEW ROLE DATA --}}
-                                <td class="tb-col d-none d-md-table-cell">
+                                <td class="tb-col d-none d-md-table-cell" data-label="Role">
                                     <div class="fs-13px text-muted">{{ ucfirst($user->role) }}</div>
                                 </td>
-                                <td class="tb-col">
+                                <td class="tb-col" data-label="Action">
                                     <div class="d-flex justify-content-center gap-1">
                                         <button type="button" class="btn btn-outline-danger btn-sm"
                                                 data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
@@ -207,12 +219,13 @@
 
         const usersTable = document.getElementById('usersTable');
         const noResultsMessage = document.getElementById('no-search-results');
+        const tableContainer = document.getElementById('user-table-container'); // Use the ID added for search control
 
         if (foundUsers) {
-            usersTable.closest('.table-responsive').classList.remove('d-none');
+            if (tableContainer) tableContainer.classList.remove('d-none');
             noResultsMessage.classList.add('d-none');
         } else {
-            usersTable.closest('.table-responsive').classList.add('d-none');
+             if (tableContainer) tableContainer.classList.add('d-none');
             noResultsMessage.classList.remove('d-none');
         }
     });
@@ -230,4 +243,100 @@
     });
 </script>
 
-@endsection 
+<style>
+/* --- RESPONSIVE TABLE CSS (Card View) --- */
+@media screen and (max-width: 767px) { /* Applies to screens smaller than the 'md' breakpoint */
+    
+    /* 1. Force table elements to display as block elements */
+    #usersTable, 
+    #usersTable tbody, 
+    #usersTable tr { 
+        display: block; 
+    }
+    
+    /* 2. Hide traditional table headers */
+    #usersTable thead {
+        display: none;
+    }
+    
+    /* 3. Make each row look like a "card" */
+    #usersTable tr { 
+        border: 1px solid #dee2e6; 
+        margin-bottom: 15px; /* Spacing between "cards" */
+        border-radius: 6px;
+    }
+    
+    /* 4. Cells act like block elements with specific styling */
+    #usersTable td { 
+        border: none;
+        border-bottom: 1px solid #eee; /* Light separator between fields */
+        position: relative;
+        padding-left: 50%; /* Give space on the left for the label */
+        text-align: right; /* Align the actual data to the right */
+        min-height: 40px; /* Ensure space even for empty cells */
+        padding-top: 10px;
+        padding-bottom: 10px;
+        white-space: normal; /* Allow text to wrap */
+    }
+
+    /* 5. Create the label using the data-label attribute */
+    #usersTable td::before {
+        content: attr(data-label);
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 45%;
+        font-weight: bold;
+        text-align: left;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+    
+    /* --- HIDE FIELDS THAT ARE ALREADY SHOWN IN THE 'NAME' BLOCK --- */
+    
+    /* Remove the generated label for the Name cell since it holds all the info */
+    #usersTable td:nth-child(2)::before {
+        content: none;
+    }
+    
+    /* Hide the cells (Email, Phone, Address, Role) that are now duplicated inside the Name cell block */
+    #usersTable td:nth-child(3), /* Email */
+    #usersTable td:nth-child(4), /* Phone */
+    #usersTable td:nth-child(5), /* Address */
+    #usersTable td:nth-child(6) { /* Role */
+        display: none !important;
+    }
+    
+    /* Ensure the Name column's content is displayed correctly */
+    #usersTable td:nth-child(2) {
+        text-align: left;
+        padding-left: 10px;
+        border-bottom: none;
+        padding-bottom: 5px; /* Adjust spacing */
+    }
+
+    /* 6. Fix for the action button block */
+    #usersTable td[data-label="Action"] {
+        display: block !important;
+        border-bottom: none;
+        text-align: center;
+        padding: 10px 0;
+        padding-left: 0; 
+    }
+    
+    /* Hide the generated label for the action column */
+    #usersTable td[data-label="Action"]::before {
+        content: none;
+    }
+
+    /* --- REMOVE HOVER/ACTIVE HIGHLIGHT --- */
+    #usersTable .user-row:hover,
+    #usersTable .user-row:focus,
+    #usersTable .user-row:active {
+        background-color: transparent !important;
+        cursor: default;
+    }
+}
+</style>
+
+@endsection
