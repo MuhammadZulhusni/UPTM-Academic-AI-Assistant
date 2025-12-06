@@ -14,10 +14,20 @@ class DocumentController extends Controller
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function AdminDocument()
+    public function AdminDocument(Request $request)
     {
         $id = Auth::user()->id;
-        $document = GeneratedContent::where('user_id', $id)->orderBy('id', 'desc')->paginate(10);
+        $sort = $request->query('sort', 'newest'); // Default to newest
+
+        $document = GeneratedContent::where('user_id', $id)
+            ->when($sort === 'newest', function($query) {
+                $query->orderBy('id', 'desc'); // Newest first
+            })
+            ->when($sort === 'oldest', function($query) {
+                $query->orderBy('id', 'asc'); // Oldest first
+            })
+            ->paginate(10);
+
         return view('admin.backend.document.all_document', compact('document'));
     }
 

@@ -26,8 +26,11 @@
             <ul class="nk-quick-nav ms-2">
                 <li class="dropdown d-inline-flex">
                     <a class="d-inline-flex" href="{{ route('user.profile') }}">
-                        <div class="media media-md media-circle media-middle text-bg-primary">
-                            <img src="{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" />
+                        <div class="media media-md media-circle media-middle text-bg-primary" 
+                            style="border-radius:50%; overflow:hidden; width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
+                            <img src="{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
+                                alt="Profile Image" 
+                                style="width:100%; height:100%; object-fit:cover; display:block;">
                         </div>
                     </a>
                     </li>
@@ -36,6 +39,3 @@
         </div>
     </div>
 </div>
-
-
-                                

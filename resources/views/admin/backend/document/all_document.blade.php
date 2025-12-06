@@ -12,7 +12,7 @@
                     <h2 class="display-6">
                         My Generated Documents
                     </h2>
-                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you’ve created.</p>
+                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you've created.</p>
                 </div>
             </div>
         </div>
@@ -26,7 +26,12 @@
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" placeholder="Search documents..." id="searchInput">
                 </div>
-                </div>
+
+                <!-- Sort Button -->
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sortModal">
+                    <i class="bi bi-funnel"></i> Sort
+                </button>
+            </div>
         </div>
         
         <div class="card shadow-sm">
@@ -317,6 +322,34 @@
     </div>
 </div>
 
+<div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sortModalLabel">Sort Documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="sortForm" method="GET" action="{{ route('admin.document') }}">
+                <div class="modal-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sort" id="sortNewest" value="newest" 
+                        {{ request('sort') == 'newest' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="sortNewest">Show latest documents first</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sort" id="sortOldest" value="oldest"
+                        {{ request('sort') == 'oldest' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="sortOldest">Show oldest documents first</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <script>
 // This function listens for input in the search bar.

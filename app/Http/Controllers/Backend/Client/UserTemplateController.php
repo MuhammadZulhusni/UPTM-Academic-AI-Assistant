@@ -244,10 +244,19 @@ class UserTemplateController extends Controller
         ];
     }
 
-    public function UserDocument(){
+    public function UserDocument(Request $request){
         $id = Auth::user()->id;
-        // Use paginate() instead of get() to enable pagination
-        $document = GeneratedContent::where('user_id', $id)->orderBy('id', 'desc')->paginate(10);
+        $query = GeneratedContent::where('user_id', $id);
+
+        if($request->sort == 'newest') {
+            $query->orderBy('id', 'desc');
+        } elseif($request->sort == 'oldest') {
+            $query->orderBy('id', 'asc');
+        } else {
+            $query->orderBy('id', 'desc'); // default
+        }
+
+        $document = $query->paginate(10);
         return view('client.backend.document.all_document', compact('document'));
     }
 

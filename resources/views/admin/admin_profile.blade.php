@@ -124,16 +124,17 @@
             reader.readAsDataURL(e.target.files[0]);
         });
 
-        // Add form submission handler for debugging
         $('#profileForm').on('submit', function(e) {
             console.log('Form submitted');
-            // You can add validation here if needed
         });
     });
 
     function resetForm() {
         document.getElementById("profileForm").reset();
         $('#showImage').attr('src', originalImageSrc);
+
+        // Toastr message on reset
+        toastr.info("Form has been reset.");
     }
 </script>
 
