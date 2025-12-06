@@ -40,7 +40,6 @@
                     <table class="table table-sm table-hover mb-0" id="usersTable">
                         <thead class="table-light">
                             <tr>
-                                {{-- Table headers. `d-none` and `d-md-table-cell` classes are used for responsive hiding. --}}
                                 <th class="tb-col d-none d-md-table-cell" style="width: 60px;">
                                     <div class="fs-13px text-base fw-semibold">Sl</div>
                                 </th>
@@ -56,24 +55,23 @@
                                 <th class="tb-col d-none d-sm-table-cell">
                                     <div class="fs-13px text-muted">Address</div>
                                 </th>
+                                {{-- NEW ROLE COLUMN --}}
+                                <th class="tb-col d-none d-md-table-cell">
+                                    <div class="fs-13px text-base fw-semibold">Role</div>
+                                </th>
                                 <th class="tb-col text-center">
                                     <div class="fs-13px text-base fw-semibold">Action</div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{--
-                                Loop through each user passed from the controller via the `$users` variable.
-                                This is the core logical part for displaying the data.
-                            --}}
                             @foreach ($users as $key => $user)
-                            <tr class="user-row"> {{-- The `user-row` class is used by the JavaScript search function to target each row. --}}
+                            <tr class="user-row">
                                 <td class="tb-col d-none d-md-table-cell">
-                                    <div class="caption-text fw-medium">{{ $key + 1 }}</div> {{-- Displays the serial number (Sl). --}}
+                                    <div class="caption-text fw-medium">{{ $key + 1 }}</div>
                                 </td>
                                 <td class="tb-col">
-                                    <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->name }}</div> {{-- Displays the user's name. --}}
-                                    {{-- Additional info for smaller screens. --}}
+                                    <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->name }}</div>
                                     <div class="d-block d-lg-none">
                                         <small class="text-muted d-block">{{ $user->email }}</small>
                                         <div class="d-flex gap-2 mt-1">
@@ -84,21 +82,20 @@
                                     </div>
                                 </td>
                                 <td class="tb-col d-none d-lg-table-cell">
-                                    <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->email }}</div> {{-- Displays the user's email. --}}
+                                    <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->email }}</div>
                                 </td>
                                 <td class="tb-col d-none d-md-table-cell">
-                                    <div class="fs-13px text-muted">
-                                        {{ $user->phone ?? 'N/A' }} {{-- Displays phone number. The `?? 'N/A'` is a PHP null coalescing operator, showing 'N/A' if the phone field is null. --}}
-                                    </div>
+                                    <div class="fs-13px text-muted">{{ $user->phone ?? 'N/A' }}</div>
                                 </td>
                                 <td class="tb-col d-none d-sm-table-cell">
-                                    <div class="fs-13px text-muted">
-                                        {{ $user->address ?? 'N/A' }} {{-- Displays address. The `?? 'N/A'` handles null values. --}}
-                                    </div>
+                                    <div class="fs-13px text-muted">{{ $user->address ?? 'N/A' }}</div>
+                                </td>
+                                {{-- NEW ROLE DATA --}}
+                                <td class="tb-col d-none d-md-table-cell">
+                                    <div class="fs-13px text-muted">{{ ucfirst($user->role) }}</div>
                                 </td>
                                 <td class="tb-col">
                                     <div class="d-flex justify-content-center gap-1">
-                                        {{-- Delete button. The `data-bs-target` and `data-user-id` attributes are key for the JavaScript to open the modal and know which user to delete. --}}
                                         <button type="button" class="btn btn-outline-danger btn-sm"
                                                 data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
                                                 data-user-id="{{ $user->id }}"
@@ -111,6 +108,7 @@
                             </tr>
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
                 {{-- No search results message. `d-none` is the initial state, shown by JavaScript if no match is found. --}}

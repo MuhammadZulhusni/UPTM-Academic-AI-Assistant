@@ -233,7 +233,7 @@ body {
         <!-- Templates Section -->
         <div class="templates-section">
             <div class="section-header">
-                <h2>Academic Templates</h2>
+                <h2>Templates Available</h2>
                 <a href="{{ route('user.template') }}" class="explore-link">
                     View All Templates <em class="icon ni ni-arrow-right"></em>
                 </a>

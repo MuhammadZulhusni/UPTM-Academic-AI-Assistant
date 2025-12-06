@@ -53,12 +53,6 @@
                 </p>
             </div>
 
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 border border-red-200 rounded-lg p-3 mb-5 text-left">
-                    <strong class="font-semibold">Login Failed!</strong> Please check your credentials and try again.
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
                 <div>
@@ -149,21 +143,18 @@
         @if(Session::has('message'))
         var type = "{{ Session::get('alert-type','info') }}";
         switch(type) {
-            case 'info':
-                toastr.info(" {{ Session::get('message') }} ");
-                break;
-            case 'success':
-                toastr.success(" {{ Session::get('message') }} ");
-                break;
-            case 'warning':
-                toastr.warning(" {{ Session::get('message') }} ");
-                break;
-            case 'error':
-                toastr.error(" {{ Session::get('message') }} ");
-                break;
+            case 'info': toastr.info("{{ Session::get('message') }}"); break;
+            case 'success': toastr.success("{{ Session::get('message') }}"); break;
+            case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
+            case 'error': toastr.error("{{ Session::get('message') }}"); break;
         }
         @endif
+
+        @if ($errors->any())
+            toastr.error("Invalid email or password.");
+        @endif
     </script>
+
 </body>
 
 </html>
