@@ -32,12 +32,6 @@
                 </p>
             </div>
 
-            @if ($errors->any())
-                <div class="bg-red-100 text-red-700 border border-red-200 rounded-lg p-3 mb-5 text-left">
-                    <strong class="font-semibold">Sign Up Failed!</strong> Please check your information and try again.
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('register') }}" class="space-y-3">
                 @csrf
 
@@ -173,19 +167,15 @@
         @if(Session::has('message'))
         var type = "{{ Session::get('alert-type','info') }}";
         switch(type) {
-            case 'info':
-                toastr.info(" {{ Session::get('message') }} ");
-                break;
-            case 'success':
-                toastr.success(" {{ Session::get('message') }} ");
-                break;
-            case 'warning':
-                toastr.warning(" {{ Session::get('message') }} ");
-                break;
-            case 'error':
-                toastr.error(" {{ Session::get('message') }} ");
-                break;
+            case 'info': toastr.info("{{ Session::get('message') }}"); break;
+            case 'success': toastr.success("{{ Session::get('message') }}"); break;
+            case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
+            case 'error': toastr.error("{{ Session::get('message') }}"); break;
         }
+        @endif
+
+        @if ($errors->any())
+            toastr.error("Please check the form fields and try again.");
         @endif
     </script>
 </body>
