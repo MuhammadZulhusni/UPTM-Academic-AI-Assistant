@@ -1,6 +1,6 @@
 @extends('admin.dashboard')
 
-@section('admin') 
+@section('admin')
 <div class="nk-content-inner">
     <div class="nk-content-body">
         <div class="nk-block-head nk-page-head">
@@ -9,18 +9,31 @@
                     <h2 class="display-6 fw-bold">All Users</h2>
                     <p class="text-muted mb-0 d-none d-md-block">Monitor all regular users</p>
                 </div>
+                {{-- NEW: Filter Button Placement --}}
+                <div class="nk-block-head-content">
+                    <div class="d-flex align-items-center gap-2">
+                        {{-- Filter Button (triggers Modal) --}}
+                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#filterModal" title="Filter Users">
+                            <i class="bi bi-funnel"></i>
+                        </button>
+                        {{-- Filter Status Label --}}
+                        <span class="badge bg-primary-subtle text-primary fw-medium" id="currentFilterLabel">
+                            All Users
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
 
         {{--
-            Search bar and section header.
+            Search bar, section header (Now cleaner as filters moved to header).
         --}}
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between border-bottom border-light mt-3 mt-md-5 mb-4 pb-2 gap-3">
             <div class="d-flex align-items-center gap-3">
-                <h5 class="mb-0">All Users</h5>
+                <h5 class="mb-0">User Table</h5>
             </div>
             <div class="d-flex align-items-center gap-2 w-100 w-md-auto">
-                {{-- Search input field. The 'id="searchInput"' is crucial for the JavaScript search logic. --}}
+                {{-- Search input field --}}
                 <div class="input-group input-group-sm flex-grow-1" style="max-width: 300px;">
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" placeholder="Search users..." id="searchInput">
@@ -28,16 +41,13 @@
             </div>
         </div>
 
-        {{--
-            Main card containing the user table.
-            The `@if` directive checks if there are any users to display.
-        --}}
+        {{-- Main card containing the user table. --}}
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 @if(count($users) > 0)
-                <div class="table-responsive">
-                    {{-- The user table. `id="usersTable"` is used by the JavaScript to hide the table if no results are found. --}}
-                    <table class="table table-sm table-hover mb-0" id="usersTable">
+                <div id="user-table-container">
+                    {{-- The user table --}}
+                    <table class="table table-sm mb-0" id="usersTable">
                         <thead class="table-light">
                             <tr>
                                 <th class="tb-col d-none d-md-table-cell" style="width: 60px;">
@@ -55,46 +65,58 @@
                                 <th class="tb-col d-none d-sm-table-cell">
                                     <div class="fs-13px text-muted">Address</div>
                                 </th>
-                                {{-- NEW ROLE COLUMN --}}
+                                {{-- ROLE COLUMN --}}
                                 <th class="tb-col d-none d-md-table-cell">
                                     <div class="fs-13px text-base fw-semibold">Role</div>
                                 </th>
-                                <th class="tb-col text-center">
+                                <th class="tb-col text-center" style="width: 120px;">
                                     <div class="fs-13px text-base fw-semibold">Action</div>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($users as $key => $user)
-                            <tr class="user-row">
-                                <td class="tb-col d-none d-md-table-cell">
+                            {{-- Added 'data-user-role' for JS filtering --}}
+                            <tr class="user-row" data-user-role="{{ $user->role }}">
+                                <td class="tb-col d-none d-md-table-cell" data-label="Sl">
                                     <div class="caption-text fw-medium">{{ $key + 1 }}</div>
                                 </td>
-                                <td class="tb-col">
+                                <td class="tb-col" data-label="Name">
                                     <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->name }}</div>
-                                    <div class="d-block d-lg-none">
-                                        <small class="text-muted d-block">{{ $user->email }}</small>
-                                        <div class="d-flex gap-2 mt-1">
+
+                                    {{-- Mobile Details Block --}}
+                                    <div class="d-block d-md-none mt-1">
+                                        <div class="fs-7 text-muted">
+                                            <i class="bi bi-envelope me-1"></i> {{ $user->email }}
+                                        </div>
+                                        <div class="fs-7 text-muted">
+                                            <i class="bi bi-phone me-1"></i> {{ $user->phone ?? 'N/A' }}
+                                        </div>
+                                        <div class="fs-7 text-muted text-truncate">
+                                            <i class="bi bi-geo-alt me-1"></i> {{ $user->address ?? 'N/A' }}
+                                        </div>
+                                        <div class="mt-1">
                                             <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1 small">
-                                                {{ $user->role }}
+                                                {{ ucfirst($user->role) }}
                                             </span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="tb-col d-none d-lg-table-cell">
+
+                                <td class="tb-col d-none d-lg-table-cell" data-label="Email">
                                     <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->email }}</div>
                                 </td>
-                                <td class="tb-col d-none d-md-table-cell">
+                                <td class="tb-col d-none d-md-table-cell" data-label="Phone">
                                     <div class="fs-13px text-muted">{{ $user->phone ?? 'N/A' }}</div>
                                 </td>
-                                <td class="tb-col d-none d-sm-table-cell">
+                                <td class="tb-col d-none d-sm-table-cell" data-label="Address">
                                     <div class="fs-13px text-muted">{{ $user->address ?? 'N/A' }}</div>
                                 </td>
-                                {{-- NEW ROLE DATA --}}
-                                <td class="tb-col d-none d-md-table-cell">
+                                {{-- ROLE DATA --}}
+                                <td class="tb-col d-none d-md-table-cell" data-label="Role">
                                     <div class="fs-13px text-muted">{{ ucfirst($user->role) }}</div>
                                 </td>
-                                <td class="tb-col">
+                                <td class="tb-col" data-label="Action">
                                     <div class="d-flex justify-content-center gap-1">
                                         <button type="button" class="btn btn-outline-danger btn-sm"
                                                 data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
@@ -111,16 +133,16 @@
 
                     </table>
                 </div>
-                {{-- No search results message. `d-none` is the initial state, shown by JavaScript if no match is found. --}}
+                {{-- No search results message --}}
                 <div id="no-search-results" class="text-center py-5 d-none">
                     <div class="mb-4">
                         <i class="bi bi-person-slash display-1 text-muted opacity-50"></i>
                     </div>
                     <h5 class="text-muted mb-2">No Users Found</h5>
-                    <p class="text-muted mb-0">There are no users matching your search query.</p>
+                    <p class="text-muted mb-0">There are no users matching your current view or search query.</p>
                 </div>
                 @else
-                {{-- Message shown when the `$users` array is empty from the start (e.g., no users in the database). --}}
+                {{-- Message shown when the $users array is empty --}}
                 <div class="text-center py-5">
                     <div class="mb-4">
                         <i class="bi bi-person-circle display-1 text-muted opacity-50"></i>
@@ -132,10 +154,10 @@
             </div>
         </div>
 
-        {{-- Pagination info. This is a static placeholder for "Showing X of Y entries" and a disabled pagination control. --}}
+        {{-- Pagination info --}}
         @if(count($users) > 0)
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-            <div class="text-muted order-2 order-md-1">
+            <div id="pagination-info" class="text-muted order-2 order-md-1">
                 Showing {{ count($users) }} of {{ count($users) }} entries
             </div>
             <nav class="order-1 order-md-2">
@@ -157,8 +179,49 @@
 </div>
 
 {{--
-    Delete Confirmation Modal.
-    The JavaScript will open it when the "Delete" button is clicked and dynamically update the form's action URL.
+    ======================================
+    Filter Modal (Soft Color & Minimalist Design)
+    ======================================
+--}}
+<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            {{-- Modal Header: Minimalist Design --}}
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fs-5 fw-semibold text-muted" id="filterModalLabel">Filter Users</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body px-4 py-3">
+                <p class="text-secondary small mb-3">Select the role you wish to view.</p>
+
+                {{-- Soft, Minimalist Button Group for Roles --}}
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2 active" data-role-filter="all">
+                        <i class="bi bi-people me-2"></i> All Users
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2" data-role-filter="lecturer">
+                        <i class="bi bi-person-workspace me-2"></i> Lecturers
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2" data-role-filter="student">
+                        <i class="bi bi-person me-2"></i> Students
+                    </button>
+                </div>
+            </div>
+
+            {{-- Modal Footer: Soft Background and Outline Buttons --}}
+            <div class="modal-footer justify-content-end bg-light-subtle border-0 rounded-bottom-4 px-4 py-3">
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-sm btn-primary rounded-pill" id="applyFilterButton" data-bs-dismiss="modal">
+                    Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{--
+    Delete Confirmation Modal
 --}}
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
@@ -176,10 +239,10 @@
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0 gap-2">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                {{-- Form for deleting a user. The action URL is empty initially and will be filled by JavaScript. --}}
+                {{-- Form for deleting a user --}}
                 <form id="deleteUserForm" method="POST">
-                    @csrf 
-                    @method('DELETE') {{-- Specifies the HTTP method as DELETE for the form submission. --}}
+                    @csrf
+                    @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
@@ -188,46 +251,216 @@
 </div>
 
 {{--
-    JavaScript for interactive features.
+    JavaScript for interactive features, UPDATED for the new label design.
 --}}
 <script>
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('.user-row');
-        let foundUsers = false;
-        
-        rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            const isMatch = text.includes(searchTerm);
-            row.style.display = isMatch ? '' : 'none';
-            if (isMatch) {
-                foundUsers = true;
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const modalFilterButtons = document.querySelectorAll('.role-filter-modal-btn');
+        const currentFilterLabel = document.getElementById('currentFilterLabel');
+        const applyFilterButton = document.getElementById('applyFilterButton');
+        const noResultsMessage = document.getElementById('no-search-results');
+        const tableContainer = document.getElementById('user-table-container');
+        const paginationInfo = document.getElementById('pagination-info');
+        const allRows = document.querySelectorAll('.user-row');
+
+        let pendingFilter = 'all'; // Stores the selection inside the modal
+        let activeFilter = 'all'; // Stores the filter currently applied to the table
+
+        // Function to update the visible label on the page
+        function updateLabel(filterValue) {
+            let label = filterValue.charAt(0).toUpperCase() + filterValue.slice(1);
+            if (filterValue === 'all') {
+                label = 'All Users';
+            } else {
+                 label = label + 's Only';
             }
+            currentFilterLabel.textContent = label;
+        }
+
+        // Function to apply both search and role filters
+        function applyFilters() {
+            const currentSearchTerm = searchInput.value.toLowerCase();
+            let visibleRowCount = 0;
+
+            allRows.forEach(row => {
+                const userRole = row.getAttribute('data-user-role');
+                const rowText = row.textContent.toLowerCase();
+                const isRoleMatch = activeFilter === 'all' || userRole === activeFilter;
+                const isSearchMatch = rowText.includes(currentSearchTerm);
+                const isMatch = isRoleMatch && isSearchMatch;
+
+                row.style.display = isMatch ? '' : 'none';
+
+                if (isMatch) {
+                    visibleRowCount++;
+                }
+            });
+
+            // Toggle table visibility and no results message
+            const hasResults = visibleRowCount > 0;
+            if (tableContainer) tableContainer.classList.toggle('d-none', !hasResults);
+            noResultsMessage.classList.toggle('d-none', hasResults);
+
+            // Update pagination info
+            if (paginationInfo) {
+                const totalUsers = allRows.length;
+                paginationInfo.textContent = `Showing ${visibleRowCount} of ${totalUsers} entries`;
+            }
+        }
+
+        // Initialize label on load
+        updateLabel(activeFilter);
+
+
+        // 1. Search Input Handler
+        searchInput.addEventListener('input', applyFilters);
+
+        // 2. Filter Modal Button Handler (updates pendingFilter selection)
+        modalFilterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Clear active state from all buttons
+                modalFilterButtons.forEach(btn => btn.classList.remove('active'));
+
+                // Set active state on the clicked button
+                this.classList.add('active');
+
+                // Update the pending selection
+                pendingFilter = this.getAttribute('data-role-filter');
+            });
         });
 
-        const usersTable = document.getElementById('usersTable');
-        const noResultsMessage = document.getElementById('no-search-results');
+        // 3. Apply Filter Button Handler (applies pending filter and updates label)
+        applyFilterButton.addEventListener('click', function() {
+            activeFilter = pendingFilter;
+            updateLabel(activeFilter); // Update the label on the page
+            applyFilters(); // Run the main filter function
+        });
 
-        if (foundUsers) {
-            usersTable.closest('.table-responsive').classList.remove('d-none');
-            noResultsMessage.classList.add('d-none');
-        } else {
-            usersTable.closest('.table-responsive').classList.add('d-none');
-            noResultsMessage.classList.remove('d-none');
-        }
-    });
+        // 4. Modal Open Handler (syncs pendingFilter with activeFilter)
+        const filterModal = document.getElementById('filterModal');
+        filterModal.addEventListener('show.bs.modal', function() {
+            // Set the pending filter to the currently active filter upon opening
+            pendingFilter = activeFilter;
+            
+            // Sync the visual active state in the modal list
+            modalFilterButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-role-filter') === activeFilter);
+            });
+        });
 
-    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-    confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-        // Get the button that triggered the modal
-        const button = event.relatedTarget;
-        // Extract the user ID from the data-user-id attribute
-        const userId = button.getAttribute('data-user-id');
-        // Get the form element
-        const form = document.getElementById('deleteUserForm');
-        // Update the form's action URL
-        form.action = `/admin/users/delete/${userId}`;
+
+        // 5. Delete Modal Handler (Unchanged)
+        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+        confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-user-id');
+            const form = document.getElementById('deleteUserForm');
+            form.action = `/admin/users/delete/${userId}`;
+        });
     });
 </script>
 
-@endsection 
+<style>
+/* --- RESPONSIVE TABLE CSS (Card View) --- */
+@media screen and (max-width: 767px) { /* Applies to screens smaller than the 'md' breakpoint */
+
+    /* Force table elements to display as block elements */
+    #usersTable,
+    #usersTable tbody,
+    #usersTable tr {
+        display: block;
+    }
+
+    /* Hide traditional table headers */
+    #usersTable thead {
+        display: none;
+    }
+
+    /* Make each row look like a "card" */
+    #usersTable tr {
+        border: 1px solid #dee2e6;
+        margin-bottom: 15px;
+        border-radius: 6px;
+    }
+
+    /* Cells act like block elements with specific styling */
+    #usersTable td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+        min-height: 40px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        white-space: normal;
+    }
+
+    /* Create the label using the data-label attribute */
+    #usersTable td::before {
+        content: attr(data-label);
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 45%;
+        font-weight: bold;
+        text-align: left;
+        color: #495057;
+        font-size: 0.875rem;
+    }
+
+    /* Remove the generated label for the Name cell */
+    #usersTable td:nth-child(2)::before {
+        content: none;
+    }
+
+    /* Hide the duplicated cells (Email, Phone, Address, Role) */
+    #usersTable td:nth-child(3),
+    #usersTable td:nth-child(4),
+    #usersTable td:nth-child(5),
+    #usersTable td:nth-child(6) {
+        display: none !important;
+    }
+
+    /* Ensure the Name column's content is displayed correctly */
+    #usersTable td:nth-child(2) {
+        text-align: left;
+        padding-left: 10px;
+        border-bottom: none;
+        padding-bottom: 5px;
+    }
+
+    /* Fix for the action button block */
+    #usersTable td[data-label="Action"] {
+        display: block !important;
+        border-bottom: none;
+        text-align: center;
+        padding: 10px 0;
+        padding-left: 0;
+    }
+
+    /* Hide the generated label for the action column */
+    #usersTable td[data-label="Action"]::before {
+        content: none;
+    }
+
+    /* Remove hover/active highlight */
+    #usersTable .user-row:hover,
+    #usersTable .user-row:focus,
+    #usersTable .user-row:active {
+        background-color: transparent !important;
+        cursor: default;
+    }
+}
+
+/* Custom style for the minimalist active state */
+#filterModal .role-filter-modal-btn.active {
+    background-color: var(--bs-primary-bg-subtle, #e0f7fa); /* Soft color for active state */
+    border-color: var(--bs-primary, #0d6efd) !important;
+    color: var(--bs-primary, #0d6efd) !important;
+    font-weight: 600;
+}
+</style>
+
+@endsection
