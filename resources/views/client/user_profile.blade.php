@@ -124,11 +124,20 @@
         $('#profileForm').on('submit', function(e) {
             console.log('Form submitted');
         });
+
+        // Optional: Toastr default options
+        toastr.options = {
+            "positionClass": "toast-top-right",
+            "timeOut": "2000",
+        };
     });
 
     function resetForm() {
         document.getElementById("profileForm").reset();
         $('#showImage').attr('src', originalImageSrc);
+
+        // Show toastr message
+        toastr.info('Profile form has been reset!');
     }
 </script>
 
