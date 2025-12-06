@@ -32,22 +32,16 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
 
         // Display templates filtered by the logged-in user's role
         Route::get('/user/template', [UserTemplateController::class, 'TemplateRoleFilter'])->name('user.template');
-
         // View details of a single template (only accessible if user's role matches template category)
         Route::get('/user/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
-
         // Generate content for a specific template
         Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
-
         // List all documents created by the logged-in user
         Route::get('/user/document', 'UserDocument')->name('user.document');
-
         // Edit a specific user document
         Route::get('/edit/user/document/{id}', 'EditUserDocument')->name('edit.user.document');
-
         // Update a specific user document
         Route::post('/user/update/document/{id}', 'UserUpdateDocument')->name('user.update.document');
-
         // Delete a specific user document
         Route::delete('/delete/user/document/{id}', 'DeleteUserDocument')->name('delete.user.document');
     });

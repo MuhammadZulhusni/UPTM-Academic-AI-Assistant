@@ -12,7 +12,7 @@
                     <h2 class="display-6">
                         My Generated Documents
                     </h2>
-                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you’ve created.</p>
+                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you've created.</p>
                 </div>
             </div>
         </div>
@@ -26,7 +26,12 @@
                     <span class="input-group-text"><i class="bi bi-search"></i></span>
                     <input type="text" class="form-control" placeholder="Search documents..." id="searchInput">
                 </div>
-                </div>
+
+                <!-- Sort Button -->
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#clientSortModal">
+                    <i class="bi bi-funnel"></i> Sort
+                </button>
+            </div>
         </div>
         
         <div class="card shadow-sm">
@@ -84,39 +89,6 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <!-- <td class="tb-col d-none d-lg-table-cell">
-                                        <div class="d-flex align-items-center gap-2">
-                                            @php
-                                                // Get the currently authenticated user's ID
-                                                $id = Auth::user()->id;
-                                                // Retrieve the user's profile data from the database using the User model
-                                                $profileData = App\Models\User::find($id);
-                                            @endphp
-                                            <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                                <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
-                                                     class="w-100 h-100 object-fit-cover" alt="User"/>
-                                            </div>
-                                            <div class="min-width-0">
-                                                <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->user->name }}</div>
-                                                <small class="text-muted text-truncate d-block">{{ $item->user->email ?? 'No email' }}</small>
-                                            </div>
-                                        </div>
-                                    </td> -->
-                                    <!-- <td class="tb-col d-none d-md-table-cell">
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
-                                            {{ $item->template->category }}
-                                        </span>
-                                    </td> -->
-                                    <!-- <td class="tb-col d-none d-sm-table-cell">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge text-bg-success-soft rounded-pill px-3 py-2 fs-6 lh-sm fw-medium">
-                                                {{ number_format($item->word_count) }}
-                                            </span>
-                                            @if($item->word_count > 1000)
-                                                <i class="bi bi-star-fill text-warning d-none d-md-inline" title="High word count"></i>
-                                            @endif
-                                        </div>
-                                    </td> -->
                                     <td class="tb-col d-none d-lg-table-cell">
                                         <div class="fs-7 text-muted">
                                             {{ $item->created_at ? $item->created_at->format('M d, Y') : 'N/A' }}
@@ -770,6 +742,36 @@ function downloadPDF() {
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sort Modal for Client Documents -->
+<div class="modal fade" id="clientSortModal" tabindex="-1" aria-labelledby="clientSortModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clientSortModalLabel">Sort Documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="clientSortForm" method="GET" action="{{ route('user.document') }}">
+                <div class="modal-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sort" id="clientSortNewest" value="newest" 
+                        {{ request('sort') == 'newest' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="clientSortNewest">Show latest documents first</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="sort" id="clientSortOldest" value="oldest"
+                        {{ request('sort') == 'oldest' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="clientSortOldest">Show oldest documents first</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

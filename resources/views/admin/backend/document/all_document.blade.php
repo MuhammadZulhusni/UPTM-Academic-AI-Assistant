@@ -12,7 +12,7 @@
                     <h2 class="display-6">
                         My Generated Documents
                     </h2>
-                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you’ve created.</p>
+                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you've created.</p>
                 </div>
             </div>
         </div>
