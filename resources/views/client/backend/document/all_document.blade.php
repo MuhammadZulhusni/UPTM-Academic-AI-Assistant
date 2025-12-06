@@ -12,6 +12,7 @@
                     <h2 class="display-6">
                         My Generated Documents
                     </h2>
+                    {{-- Hidden on mobile, visible on desktop --}}
                     <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you've created.</p>
                 </div>
             </div>
@@ -27,9 +28,8 @@
                     <input type="text" class="form-control" placeholder="Search documents..." id="searchInput">
                 </div>
 
-                <!-- Sort Button -->
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#sortModal">
-                    <i class="bi bi-funnel"></i> Sort
+                    <i class="bi bi-funnel"></i> <span class="d-none d-md-inline ms-1">Sort</span>
                 </button>
             </div>
         </div>
@@ -38,27 +38,21 @@
             <div class="card-body p-0">
                 @if(count($document) > 0) {{-- Check if there are any documents --}}
                 <div id="document-table-container">
-                    <div class="table-responsive">
-                        <table class="table table-middle table-hover mb-0" id="documentsTable">
+
+                    {{-- DESKTOP TABLE VIEW (Visible on medium screens and up) --}}
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-middle table-hover mb-0" id="documentsTableDesktop">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="tb-col d-none d-md-table-cell" style="width: 60px;">
+                                    <th class="tb-col" style="width: 60px;">
                                         <div class="fs-13px text-base fw-semibold">Sl</div>
                                     </th>
                                     <th class="tb-col">
                                         <div class="fs-13px text-base fw-semibold">Document</div>
                                     </th>
-                                    <!-- <th class="tb-col d-none d-lg-table-cell">
-                                        <div class="fs-13px text-base fw-semibold">User</div>
-                                    </th> -->
-                                    <!-- <th class="tb-col d-none d-md-table-cell">
-                                        <div class="fs-13px text-base fw-semibold">Category</div>
-                                    </th> -->
-                                    <!-- <th class="tb-col d-none d-sm-table-cell">
-                                        <div class="fs-13px text-base fw-semibold">Words</div>
-                                    </th> -->
-                                    <th class="tb-col d-none d-lg-table-cell">
-                                        <div class="fs-13px text-base fw-semibold">Created</div>
+                                    <th class="tb-col">
+                                        {{-- Created (Date/Time) --}}
+                                        <div class="fs-13px text-base fw-semibold">Created (Date/Time)</div>
                                     </th>
                                     <th class="tb-col text-center">
                                         <div class="fs-13px text-base fw-semibold">Action</div>
@@ -68,63 +62,18 @@
                             <tbody>
                                 @foreach ($document as $key => $item)  
                                 <tr class="document-row">
-                                    <td class="tb-col d-none d-md-table-cell">
+                                    <td class="tb-col">
                                         <div class="caption-text fw-medium">{{ $document->firstItem() + $loop->index }}</div>
                                     </td>
                                     <td class="tb-col">
-                                        <div class="d-flex align-items-start gap-2">
-                                            <div class="flex-grow-1 min-width-0">
-                                                <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->template->title }}</div>
-                                                <div class="d-block d-lg-none">
-                                                    <small class="text-muted d-block">By {{ $item->user->name }}</small>
-                                                    <div class="d-flex gap-2 mt-1">
-                                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1 small">
-                                                            {{ $item->template->category }}
-                                                        </span>
-                                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1 small d-sm-none">
-                                                            {{ number_format($item->word_count) }}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <div class="fs-6 fw-medium text-dark text-truncate" style="max-width: 350px;">{{ $item->template->title }}</div>
                                     </td>
-                                    <!-- <td class="tb-col d-none d-lg-table-cell">
-                                        <div class="d-flex align-items-center gap-2">
-                                            @php
-                                                // Get the currently authenticated user's ID
-                                                $id = Auth::user()->id;
-                                                // Retrieve the user's profile data from the database using the User model
-                                                $profileData = App\Models\User::find($id);
-                                            @endphp
-                                            <div class="bg-info bg-opacity-10 rounded-circle overflow-hidden" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                                                <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
-                                                     class="w-100 h-100 object-fit-cover" alt="User"/>
-                                            </div>
-                                            <div class="min-width-0">
-                                                <div class="fs-6 fw-medium text-dark text-truncate">{{ $item->user->name }}</div>
-                                                <small class="text-muted text-truncate d-block">{{ $item->user->email ?? 'No email' }}</small>
-                                            </div>
-                                        </div>
-                                    </td> -->
-                                    <!-- <td class="tb-col d-none d-md-table-cell">
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
-                                            {{ $item->template->category }}
-                                        </span>
-                                    </td> -->
-                                    <!-- <td class="tb-col d-none d-sm-table-cell">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge text-bg-success-soft rounded-pill px-3 py-2 fs-6 lh-sm fw-medium">
-                                                {{ number_format($item->word_count) }}
-                                            </span>
-                                            @if($item->word_count > 1000)
-                                                <i class="bi bi-star-fill text-warning d-none d-md-inline" title="High word count"></i>
-                                            @endif
-                                        </div>
-                                    </td> -->
-                                    <td class="tb-col d-none d-lg-table-cell">
+                                    {{-- Removed User/Category and Words Columns --}}
+                                    
+                                    <td class="tb-col">
+                                        {{-- Desktop: Added Time to Format --}}
                                         <div class="fs-7 text-muted">
-                                            {{ $item->created_at ? $item->created_at->format('M d, Y') : 'N/A' }}
+                                            {{ $item->created_at ? $item->created_at->format('M d, Y h:i A') : 'N/A' }}
                                         </div>
                                     </td>
                                     <td class="tb-col">
@@ -168,6 +117,74 @@
                             </tbody>
                         </table>
                     </div>
+
+                    {{-- MOBILE CARD VIEW (Visible on extra-small/small screens) --}}
+                    <div class="d-md-none p-3 pt-0">
+                        @foreach ($document as $key => $item)
+                        <div class="card document-row shadow-sm mb-3 border">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0 text-dark fw-bold text-truncate" title="{{ $item->template->title }}">
+                                            {{ $document->firstItem() + $loop->index }}. {{ $item->template->title }}
+                                        </h6>
+                                    </div>
+                                    {{-- Mobile: Created Date/Time --}}
+                                    <span class="badge bg-light text-muted fw-normal ms-3">
+                                        {{ $item->created_at ? $item->created_at->format('M d, Y h:i A') : 'N/A' }}
+                                    </span>
+                                </div>
+                                
+                                {{-- Removed User, Category, and Words badges from mobile view --}}
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    {{-- Retained User/Category and Words as hidden for search/data reference, or if desired for future features. Uncomment if you want them back: --}}
+                                    {{-- <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill small">
+                                        <i class="bi bi-person-fill me-1"></i> {{ $item->user->name }}
+                                    </span>
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill small">
+                                        <i class="bi bi-tags-fill me-1"></i> {{ $item->template->category }}
+                                    </span>
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill small">
+                                        <i class="bi bi-file-earmark-word-fill me-1"></i> {{ number_format($item->word_count) }} Words
+                                    </span> --}}
+                                </div>
+
+                                {{-- Mobile Action Buttons --}}
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn btn-outline-info btn-sm"
+                                            title="View Document"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#viewDocumentModal"
+                                            data-document-id="{{ $item->id }}"
+                                            data-document-title="{{ $item->template->title }}"
+                                            data-user-name="{{ $item->user->name }}"
+                                            data-category="{{ $item->template->category }}"
+                                            data-word-count="{{ $item->word_count }}"
+                                            data-created-date="{{ $item->created_at ? $item->created_at->format('M d, Y h:i A') : 'N/A' }}"
+                                            data-output="{{ base64_encode($item->output) }}"
+                                            onclick="loadDocumentContentFromData(this)">
+                                        <i class="bi bi-eye"></i> View
+                                    </button>
+                                    <a href="{{ route('edit.user.document', $item->id) }}"
+                                       class="btn btn-outline-primary btn-sm"
+                                       title="Edit Document">
+                                        <i class="bi bi-pencil-square"></i> Edit
+                                    </a>
+                                    <button type="button"
+                                            class="btn btn-outline-danger btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#confirmDeleteModal"
+                                            data-document-id="{{ $item->id }}"
+                                            data-delete-url="{{ route('delete.user.document', $item->id) }}"
+                                            title="Delete Document">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+
                 </div>
                 <div id="no-search-results" class="text-center py-5 d-none">
                     <div class="mb-4">
@@ -222,13 +239,11 @@
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
 
-            <!-- Header -->
             <div class="modal-header bg-white border-bottom">
                 <h5 class="modal-title" id="documentTitle">Document Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <!-- Body -->
             <div class="modal-body bg-light">
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -250,7 +265,6 @@
                     </div>
                 </div>
 
-                <!-- Cleaner Content Viewer -->
                 <div class="document-viewer border rounded shadow-sm"
                      style="background:white; padding:20px; border-radius:10px; height:420px; overflow-y:auto;">
 
@@ -264,7 +278,6 @@
                 </div>
             </div>
 
-            <!-- Footer -->
             <div class="modal-footer bg-white border-top">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     Close
@@ -323,9 +336,7 @@
 </div>
 
 {{--
-    ======================================
     Sort Modal (Minimalist, Soft Color, No Bolding)
-    ======================================
 --}}
 <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -435,16 +446,14 @@ function loadDocumentContentFromData(button) {
     // Get data from button attributes
     const id = button.getAttribute('data-document-id');
     const title = button.getAttribute('data-document-title');
-    const userName = button.getAttribute('data-user-name');
-    const category = button.getAttribute('data-category');
     const wordCount = parseInt(button.getAttribute('data-word-count'));
     const outputData = atob(button.getAttribute('data-output')); // Decodes the base64-encoded output data
     
     // Call the original function
-    loadDocumentContent(id, title, userName, category, wordCount, outputData);
+    loadDocumentContent(id, title, outputData);
 }
 
-function loadDocumentContent(id, title, userName, category, wordCount, outputData) {
+function loadDocumentContent(id, title, outputData) {
     // Only update the elements that still exist
     const docTitleEl = document.getElementById('documentTitle');
     if (docTitleEl) docTitleEl.textContent = title;
@@ -868,5 +877,7 @@ function downloadPDF() {
         form.action = deleteUrl; 
     });
 </script>
+
+
 
 @endsection
