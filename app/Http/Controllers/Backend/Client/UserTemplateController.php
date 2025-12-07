@@ -16,10 +16,52 @@ use Illuminate\Support\Facades\DB;
 
 class UserTemplateController extends Controller
 {
-    public function UserTemplate(){
+
+    // Method untuk filter template berdasarkan role user
+    public function UserTemplate(Request $request)
+    {
         $user = Auth::user();
-        $templates = Template::latest()->get();
-        return view('client.backend.template.all_template',compact('user','templates'));
+        $userRole = ucfirst($user->role); // 'Student' or 'Lecturer'
+
+        // Start query based on user role
+        $query = Template::query();
+        
+        // If admin, allow category filter, otherwise filter by user role
+        if ($user->role === 'admin') {
+            // Admin can see all or filter by category
+            if ($request->filled('category') && $request->category !== 'all') {
+                $query->where('category', ucfirst($request->category));
+            }
+        } else {
+            // Non-admin users only see templates for their role
+            $query->where('category', $userRole);
+        }
+        
+        // Search filter (title or description)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+        
+        // Sort filter - FIX: Use strict comparison and proper order
+        $sort = $request->get('sort', 'newest');
+        
+        if ($sort === 'title') {
+            $query->orderBy('title', 'asc');
+        } elseif ($sort === 'title-desc') {
+            $query->orderBy('title', 'desc');
+        } else {
+            // Default: newest first
+            $query->orderBy('created_at', 'desc');
+        }
+        
+        // Paginate results
+        $templates = $query->paginate(5)->withQueryString();
+
+        return view('client.backend.template.all_template', compact('user', 'templates'));
     }
 
     public function UserDetailsTemplate($id){
@@ -294,19 +336,5 @@ class UserTemplateController extends Controller
 
      return redirect()->back()->with($notification); 
      }
-
-     // Method untuk filter template berdasarkan role user
-    public function TemplateRoleFilter()
-    {
-        $userRole = ucfirst(Auth::user()->role); // 'Student' or 'Lecturer'
-
-        // Fetch templates for the user's role, ignoring is_active
-        $templates = Template::where('category', $userRole)
-                            ->latest()
-                            ->get();
-
-        return view('client.backend.template.all_template', compact('templates'));
-    }
-
 
 }

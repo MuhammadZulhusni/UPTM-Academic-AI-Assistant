@@ -17,9 +17,44 @@ use Illuminate\Support\Facades\DB;
 class TemplateController extends Controller
 {
     // Fetches all templates and displays them in the admin view
-    public function AdminTemplate(){
-        $templates = Template::latest()->get();
-        return view('admin.backend.template.all_template',compact('templates'));
+    public function AdminTemplate(Request $request){
+        // Start the query with the base model
+        $query = Template::query();
+        
+        //  1. Apply Sorting (Order By) 
+        $sort = $request->input('sort', 'newest'); // Default to 'newest'
+        
+        if ($sort === 'title') {
+            $query->orderBy('title', 'asc');
+        } elseif ($sort === 'title-desc') {
+            $query->orderBy('title', 'desc');
+        } else {
+            $query->latest(); // Default: Newest first
+        }
+
+        // 2. Apply Category Filter 
+        $category = $request->input('category');
+        if ($category && $category !== 'all') {
+            // We use ucfirst() because your category data-attributes are lowercase 
+            // in the modal, but the database field likely stores them capitalized.
+            $query->where('category', ucfirst($category));
+        }
+
+        // 3. Apply Search Filter 
+        $search = $request->input('search');
+        if ($search) {
+            $searchTerm = '%' . $search . '%';
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', $searchTerm)
+                ->orWhere('description', 'like', $searchTerm);
+            });
+        }
+
+        //  4. Paginate and Preserve Query String 
+        // The key fix: withQueryString() tells Laravel to include category, search, and sort in pagination links.
+        $templates = $query->paginate(8)->withQueryString(); 
+
+        return view('admin.backend.template.all_template', compact('templates'));
     }
 
     // Displays the form for adding a new template

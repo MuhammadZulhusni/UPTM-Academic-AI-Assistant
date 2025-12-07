@@ -19,7 +19,8 @@ class DocumentController extends Controller
         $id = Auth::user()->id;
         $sort = $request->query('sort', 'newest'); // Default to newest
 
-        $document = GeneratedContent::where('user_id', $id)
+        $document = GeneratedContent::with('template') // Add eager loading
+            ->where('user_id', $id)
             ->when($sort === 'newest', function($query) {
                 $query->orderBy('id', 'desc'); // Newest first
             })
@@ -38,8 +39,8 @@ class DocumentController extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function EditAdminDocument($id){
-        // Find the document by its ID or fail.
-        $document = GeneratedContent::findOrFail($id);
+        // Find the document by its ID with template relationship
+        $document = GeneratedContent::with('template')->findOrFail($id);
         return view('admin.backend.document.edit_document',compact('document'));
     }
 

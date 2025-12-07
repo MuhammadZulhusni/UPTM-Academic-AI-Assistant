@@ -4,7 +4,7 @@
  <div class="nk-content-inner">
      <div class="nk-content-body">
 
-        <div class="nk-block-head nk-page-head mb-4">
+        <div class="nk-block-head nk-page-head">
              <div class="nk-block-head-between flex-wrap g-2">
                  <div class="nk-block-head-content">
                      <h2 class="display-6">Template Library</h2>
@@ -21,80 +21,245 @@
              </div>
         </div>
 
-            <div class="row g-3 g-md-4" id="templates-container">
-                @forelse ($templates as $item)
-                <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
-                    data-category="{{ strtolower($item->category) }}"
-                    data-title="{{ strtolower($item->title) }}"
-                    data-description="{{ strtolower($item->description) }}"
-                    data-created="{{ $item->created_at->timestamp }}">
+        {{-- Use $templates->total() for the Grand Total --}}
+        @php
+            $totalTemplates = $templates->total();
+        @endphp
 
-                    <div class="card h-100 border-0 shadow-sm template-card">
-                        <div class="card-body p-3 p-md-4 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
-                                <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                    <img src="{{ asset('upload/template/' . $item->icon) }}"
-                                        alt="Icon"
-                                        class="img-fluid"
-                                        style="width:22px; height:22px; object-fit:contain; border-radius:0;">
+        {{-- STATS CARD BLOCK - Only for Admin --}}
+        @if (auth()->user()->role === 'admin')
+        <div class="nk-block">
+            <div class="row g-3 mb-4">
+                {{-- Total Templates --}}
+                @if ($totalTemplates > 0)
+                <div class="col-6 col-md-4">
+                    <div class="card border-0 bg-primary bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-primary text-white me-2 me-md-3">
+                                    <em class="icon ni ni-template"></em>
                                 </div>
-                                </a>
-                                <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
-                                    {{ $item->category }}
-                                </span>
-                            </div>
-                            <div class="flex-grow-1">
-                                <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
-                                    <h5 class="card-title fs-6 fs-md-5 fw-medium mb-2 text-dark">{{ $item->title }}</h5>
-                                    <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-3">{{ $item->description }}</p>
-                                </a>
-                            </div>
-                            <div class="template-footer mt-auto">
-                                <small class="text-muted d-flex align-items-center">
-                                    <em class="icon ni ni-calendar me-1"></em>
-                                    <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
-                                    <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
-                                </small>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6">{{ $totalTemplates }}</h6>
+                                    <span class="small text-muted d-block">Total Templates</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                @empty
-                <div class="col-12">
-                     <div class="text-center py-5">
-                        <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
-                            <em class="icon ni ni-search" style="font-size: 2rem;"></em>
+                @endif
+
+                {{-- Student Templates --}}
+                @php
+                    $studentCount = $templates->where('category', 'Student')->count();
+                @endphp
+                @if ($studentCount > 0)
+                <div class="col-6 col-md-4">
+                    <div class="card border-0 bg-info bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-info text-white me-2 me-md-3">
+                                    <em class="icon ni ni-user"></em>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6">{{ $studentCount }}</h6>
+                                    <span class="small text-muted d-block">Student</span>
+                                </div>
+                            </div>
                         </div>
-                        <h4 class="text-muted mb-2">No templates available</h4>
-                        <p class="text-muted">There are currently no templates matched for your filter or none have been created yet.</p>
                     </div>
                 </div>
-                @endforelse
+                @endif
+
+                {{-- Lecturer Templates --}}
+                @php
+                    $lecturerCount = $templates->where('category', 'Lecturer')->count();
+                @endphp
+                @if ($lecturerCount > 0)
+                <div class="col-6 col-md-4">
+                    <div class="card border-0 bg-warning bg-opacity-10">
+                        <div class="card-body py-3 px-3">
+                            <div class="d-flex align-items-center">
+                                <div class="media media-sm media-circle bg-warning text-white me-2 me-md-3">
+                                    <em class="icon ni ni-user-check"></em>
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h6 class="mb-0 fs-6">{{ $lecturerCount }}</h6>
+                                    <span class="small text-muted d-block">Lecturer</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
-            
-            {{-- Used for JavaScript filter results --}}
-            <div class="text-center py-5 d-none" id="no-results">
-                 <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
-                     <em class="icon ni ni-search" style="font-size: 2rem;"></em>
-                 </div>
-                 <h4 class="text-muted mb-2">No templates found</h4>
-                 <p class="text-muted">Try adjusting your search terms or filter selection.</p>
-                 <button class="btn btn-outline-primary btn-sm" onclick="resetFilters()">Reset Filters</button>
-             </div>
         </div>
-    </div>
+        @endif
+        {{-- END STATS CARD BLOCK --}}
+
+        {{-- TEMPLATE CARDS --}}
+        <div class="row g-3 g-md-4 mt-2" id="templates-container">
+            @foreach ($templates as $item)
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item">
+                <div class="card h-100 border-0 shadow-sm template-card">
+                    <div class="card-body p-3 p-md-4 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
+                            <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
+                                <img src="{{ asset('upload/template/' . $item->icon) }}"
+                                    alt="Icon"
+                                    class="img-fluid"
+                                    style="width:22px; height:22px; object-fit:contain; border-radius:0;">
+                            </div>
+                            </a>
+                            <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
+                                {{ $item->category }}
+                            </span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
+                                <h5 class="card-title fs-6 fs-md-5 fw-medium mb-2 text-dark">{{ $item->title }}</h5>
+                                <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-3">{{ $item->description }}</p>
+                            </a>
+                        </div>
+                        <div class="template-footer mt-auto">
+                            <small class="text-muted d-flex align-items-center">
+                                <em class="icon ni ni-calendar me-1"></em>
+                                <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
+                                <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- MODERN MINIMALIST PAGINATION --}}
+        @if ($totalTemplates > 0)
+        <div class="nk-block pt-5">
+            <div class="row g-3 align-items-center">
+                {{-- Pagination Summary --}}
+                <div class="col-12 col-md-6">
+                    <p class="text-muted mb-0 fs-14px">
+                        Showing <span class="fw-medium text-dark">{{ $templates->firstItem() }}</span> to 
+                        <span class="fw-medium text-dark">{{ $templates->lastItem() }}</span> of 
+                        <span class="fw-medium text-dark">{{ $templates->total() }}</span> templates
+                    </p>
+                </div>
+                
+                {{-- Pagination Controls --}}
+                <div class="col-12 col-md-6">
+                    <nav aria-label="Template pagination">
+                        <ul class="pagination pagination-minimal justify-content-md-end mb-0">
+                            {{-- Previous Button --}}
+                            <li class="page-item {{ $templates->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link" 
+                                   href="{{ $templates->previousPageUrl() }}" 
+                                   aria-label="Previous"
+                                   {{ $templates->onFirstPage() ? 'tabindex=-1' : '' }}>
+                                    <em class="icon ni ni-chevron-left"></em>
+                                    <span class="d-none d-sm-inline ms-1">Previous</span>
+                                </a>
+                            </li>
+
+                            {{-- Page Numbers (Smart Display) --}}
+                            @php
+                                $currentPage = $templates->currentPage();
+                                $lastPage = $templates->lastPage();
+                                $start = max(1, $currentPage - 1);
+                                $end = min($lastPage, $currentPage + 1);
+                                
+                                // Adjust if at edges
+                                if ($currentPage <= 2) {
+                                    $end = min(3, $lastPage);
+                                }
+                                if ($currentPage >= $lastPage - 1) {
+                                    $start = max(1, $lastPage - 2);
+                                }
+                            @endphp
+
+                            {{-- First Page --}}
+                            @if ($start > 1)
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $templates->url(1) }}">1</a>
+                                </li>
+                                @if ($start > 2)
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                @endif
+                            @endif
+
+                            {{-- Page Range --}}
+                            @for ($page = $start; $page <= $end; $page++)
+                                <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $templates->url($page) }}">{{ $page }}</a>
+                                </li>
+                            @endfor
+
+                            {{-- Last Page --}}
+                            @if ($end < $lastPage)
+                                @if ($end < $lastPage - 1)
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                @endif
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $templates->url($lastPage) }}">{{ $lastPage }}</a>
+                                </li>
+                            @endif
+
+                            {{-- Next Button --}}
+                            <li class="page-item {{ !$templates->hasMorePages() ? 'disabled' : '' }}">
+                                <a class="page-link" 
+                                   href="{{ $templates->nextPageUrl() }}" 
+                                   aria-label="Next"
+                                   {{ !$templates->hasMorePages() ? 'tabindex=-1' : '' }}>
+                                    <span class="d-none d-sm-inline me-1">Next</span>
+                                    <em class="icon ni ni-chevron-right"></em>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        {{-- NO RESULTS BLOCK --}}
+        @if ($templates->total() === 0)
+        <div class="text-center py-5" id="no-results">
+            <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
+                <em class="icon ni ni-search" style="font-size: 2rem;"></em>
+            </div>
+            <h4 class="text-muted mb-2">No templates found</h4>
+            <p class="text-muted">Try adjusting your search terms or filter selection.</p>
+            <a href="{{ route('user.template') }}" class="btn btn-outline-primary btn-sm">Reset Filters</a>
+        </div>
+        @endif
+
+     </div>
+ </div>
 
 
-{{--  FILTER MODAL  --}}
+{{-- FILTER MODAL --}}
 <div class="modal fade" id="templateFilterModal" tabindex="-1" aria-labelledby="templateFilterModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
+      
+      {{-- WRAP IN GET FORM --}}
+      <form id="templateFilterForm" action="{{ route('user.template') }}" method="GET">
+      
       <div class="modal-header">
         <h5 class="modal-title" id="templateFilterModalLabel">Filter Templates</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      
       <div class="modal-body">
+        
+        {{-- HIDDEN INPUT for Sort --}}
+        <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
         
         <div class="mb-4">
             <h6 class="text-muted mb-2">Search by Title or Description</h6>
@@ -103,22 +268,30 @@
                      <div class="form-control-icon start text-light">
                          <em class="icon ni ni-search"></em>
                      </div>
-                     <input type="text" class="form-control" placeholder="Search templates..." id="searchInput">
+                     <input type="text" 
+                            class="form-control" 
+                            placeholder="Search templates..." 
+                            id="searchInput" 
+                            name="search" 
+                            value="{{ request('search') }}">
                  </div>
              </div>
         </div>
 
+        {{-- CATEGORY FILTER - Only for Admin --}}
         @if (auth()->user()->role === 'admin')
+        <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
+        
         <div class="mb-4">
             <h6 class="text-muted mb-2">Category</h6>
             <div class="btn-group category-segment-control w-100" role="group" id="categoryFilter">
-                <button type="button" class="btn btn-outline-primary segment-btn active" data-value="all">
+                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category', 'all') == 'all' ? 'active' : '' }}" data-value="all">
                     <em class="icon ni ni-grid-sq me-1"></em> All
                 </button>
-                <button type="button" class="btn btn-outline-primary segment-btn" data-value="student">
+                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'student' ? 'active' : '' }}" data-value="student">
                     <em class="icon ni ni-user me-1"></em> Student
                 </button>
-                <button type="button" class="btn btn-outline-primary segment-btn" data-value="lecturer">
+                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'lecturer' ? 'active' : '' }}" data-value="lecturer">
                     <em class="icon ni ni-user-check me-1"></em> Lecturer
                 </button>
             </div>
@@ -128,58 +301,77 @@
         <div class="mb-0">
              <h6 class="text-muted mb-2">Sort By</h6>
              <div class="btn-group sort-segment-control w-100" role="group" id="sortFilter">
-                 <button type="button" class="btn btn-outline-info segment-btn active" data-value="newest">
+                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort', 'newest') == 'newest' ? 'active' : '' }}" data-value="newest">
                      <em class="icon ni ni-clock me-1"></em> Newest
                  </button>
-                 <button type="button" class="btn btn-outline-info segment-btn" data-value="title">
+                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title' ? 'active' : '' }}" data-value="title">
                      <em class="icon ni ni-text me-1"></em> Title (A-Z)
                  </button>
-                 <button type="button" class="btn btn-outline-info segment-btn" data-value="title-desc">
+                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title-desc' ? 'active' : '' }}" data-value="title-desc">
                      <em class="icon ni ni-text-a me-1"></em> Title (Z-A)
                  </button>
              </div>
         </div>
 
       </div>
+      
       <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-outline-light" onclick="resetFilters()">Reset Filters</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Apply & Close</button>
+        <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ route('user.template') }}'">Reset Filters</button>
+        <button type="submit" class="btn btn-primary">Apply & View</button>
       </div>
+      
+      </form>
     </div>
   </div>
 </div>
-{{--  END FILTER MODAL  --}}
+{{-- END FILTER MODAL --}}
+
+{{-- REQUIRED JAVASCRIPT --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to handle segment button clicks and update the hidden input
+        function setupSegmentControls(controlId, hiddenInputId) {
+            const controls = document.getElementById(controlId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+
+            if (!controls || !hiddenInput) return;
+
+            controls.addEventListener('click', function(e) {
+                const target = e.target.closest('.segment-btn');
+                if (target) {
+                    // Remove 'active' from all siblings
+                    controls.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+                    // Add 'active' to the clicked button
+                    target.classList.add('active');
+                    // Update the value of the hidden input
+                    hiddenInput.value = target.dataset.value;
+                }
+            });
+        }
+
+        // Apply setup for category (only if admin) and sort filters
+        setupSegmentControls('categoryFilter', 'category_hidden');
+        setupSegmentControls('sortFilter', 'sort_hidden');
+    });
+</script>
 
 <style>
 .media-circle {
     border-radius: 50% !important; 
-    /* Centers the content (em icon or img) */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.media-circle img {
-    border-radius: 50%; /* Make the image itself round */
-}
-
-.media-circle .img-fluid {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    border-radius: 50%;
-}
-
-
 .media-md .icon {
-    font-size: 1.25rem; /* Adjust icon size for media-md */
+    font-size: 1.25rem; 
 }
 
 .media-sm .icon {
-    font-size: 1rem; /* Adjust icon size for media-sm (Stats Cards) */
+    font-size: 1rem;
 }
 
-/* Other Styles */
+/* --- Other Styles --- */
 .category-segment-control .btn,
 .sort-segment-control .btn {
     border-radius: 8px !important;
@@ -320,211 +512,70 @@
         margin: 0.5rem;
     }
 }
-</style>
 
-<script>
-(function() {
-    'use strict';
-    const authUserRole = "{{ auth()->user()->role }}"; 
-    const raf = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
+/* Modern Minimalist Pagination Styles */
+.pagination-minimal {
+    gap: 0.375rem;
+}
+
+.pagination-minimal .page-link {
+    border: 1px solid #e5e9f2;
+    color: #526484;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    display: flex;
+    align-items-center;
+}
+
+.pagination-minimal .page-link:hover {
+    background-color: #f5f6fa;
+    border-color: #d4dae6;
+    color: #364a63;
+    transform: translateY(-1px);
+}
+
+.pagination-minimal .page-item.active .page-link {
+    background-color: #6576ff;
+    border-color: #6576ff;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(101, 118, 255, 0.3);
+}
+
+.pagination-minimal .page-item.disabled .page-link {
+    background-color: transparent;
+    border-color: #e5e9f2;
+    color: #c4cefe;
+    opacity: 0.6;
+}
+
+.pagination-minimal .page-link em {
+    font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 575.98px) {
+    .pagination-minimal {
+        gap: 0.25rem;
+    }
     
-    document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve the modal instance
-        const filterModalElement = document.getElementById('templateFilterModal');
-        const filterModal = filterModalElement ? new bootstrap.Modal(filterModalElement) : null;
+    .pagination-minimal .page-link {
+        padding: 0.425rem 0.625rem;
+        font-size: 0.8125rem;
+    }
+    
+    .pagination-minimal .page-item:not(:first-child):not(:last-child):not(.active) {
+        display: none;
+    }
+}
 
-        const elements = {
-            categoryFilterGroup: document.getElementById('categoryFilter'),
-            sortFilterGroup: document.getElementById('sortFilter'),
-            searchInput: document.getElementById('searchInput'),
-            noResults: document.getElementById('no-results'),
-            showingCount: document.getElementById('showing-count'),
-            cards: {
-                total: document.getElementById('card-total-templates'),
-                student: document.getElementById('card-student-templates'),
-                lecturer: document.getElementById('card-lecturer-templates'),
-                showing: document.getElementById('card-showing-templates')
-            }
-        };
-        
-        const templateItems = document.querySelectorAll('.template-item');
-        let allTemplates = Array.from(templateItems);
-        let filterTimeout = null;
-        let isAnimating = false;
-        
-        let currentCategory = 'all';
-        let currentSortBy = 'newest';
-
-        function setupSegmentControl(groupElement, initialValue, callback) {
-            if (!groupElement) return; // Safety check
-            groupElement.querySelectorAll('.segment-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const newValue = this.getAttribute('data-value');
-                    const currentStateVariable = groupElement.id === 'categoryFilter' ? currentCategory : currentSortBy;
-                    if (newValue !== currentStateVariable) {
-                        groupElement.querySelector('.segment-btn.active')?.classList.remove('active');
-                        this.classList.add('active');
-                        callback(newValue);
-                    }
-                });
-            });
-            groupElement.querySelector(`[data-value="${initialValue}"]`)?.classList.add('active');
-        }
-
-        if (elements.categoryFilterGroup) {
-            setupSegmentControl(elements.categoryFilterGroup, 'all', (value) => {
-                currentCategory = value;
-                applyFilters(); 
-            });
-        }
-        
-        if (elements.sortFilterGroup) {
-            setupSegmentControl(elements.sortFilterGroup, 'newest', (value) => {
-                currentSortBy = value;
-                applyFilters();
-            });
-        }
-        
-        function updateCardVisibility(category, hasResults) {
-
-            const cards = elements.cards;
-            const updates = {};
-            
-            // Check if any card element exists on the page (they might be hidden by PHP if count is 0)
-            const totalExists = cards.total && cards.total.style.display !== 'none';
-
-            if (!hasResults || !totalExists) {
-                // If no results, or total card was hidden by PHP, hide all dynamic cards.
-                updates.total = false; updates.student = false; updates.lecturer = false; updates.showing = false;
-            } else {
-                updates.total = true; updates.showing = true;
-                
-                // Only show student/lecturer cards if the filter matches OR if 'all' is selected.
-                if (category === 'student') { 
-                    updates.student = true; updates.lecturer = false; 
-                } 
-                else if (category === 'lecturer') { 
-                    updates.student = false; updates.lecturer = true; 
-                } 
-                else { 
-                    // When 'all' is selected, check the PHP-rendered visibility
-                    updates.student = cards.student && cards.student.getAttribute('data-original-display') !== 'none'; 
-                    updates.lecturer = cards.lecturer && cards.lecturer.getAttribute('data-original-display') !== 'none'; 
-                }
-            }
-
-            raf(() => {
-                Object.keys(updates).forEach(key => {
-                    const card = cards[key];
-                    if (card) { card.style.display = updates[key] ? '' : 'none'; }
-                });
-            });
-        }
-        
-        // Cache original display styles
-        if (elements.cards.student) elements.cards.student.setAttribute('data-original-display', elements.cards.student.style.display);
-        if (elements.cards.lecturer) elements.cards.lecturer.setAttribute('data-original-display', elements.cards.lecturer.style.display);
-
-
-        function applyFilters() {
-            if (isAnimating) return;
-            clearTimeout(filterTimeout);
-            filterTimeout = setTimeout(() => {
-                isAnimating = true;
-                const category = currentCategory;
-                const sortBy = currentSortBy;
-                const searchTerm = elements.searchInput.value.toLowerCase().trim();
-                
-                let visibleTemplates = allTemplates.filter(item => {
-                    const itemCategory = item.dataset.category.toLowerCase();
-                    const matchesCategory = category === 'all' || itemCategory === category;
-                    if (!searchTerm) return matchesCategory;
-                    const itemTitle = item.dataset.title;
-                    const itemDescription = item.dataset.description;
-                    return matchesCategory && (itemTitle.includes(searchTerm) || itemDescription.includes(searchTerm));
-                });
-                
-                visibleTemplates.sort((a, b) => {
-                    switch(sortBy) {
-                        case 'newest': return parseInt(b.dataset.created) - parseInt(a.dataset.created);
-                        case 'oldest': return parseInt(a.dataset.created) - parseInt(b.dataset.created);
-                        case 'title': return a.dataset.title.localeCompare(b.dataset.title);
-                        case 'title-desc': return b.dataset.title.localeCompare(a.dataset.title);
-                        default: return 0;
-                    }
-                });
-                
-                const hasResults = visibleTemplates.length > 0;
-                
-                raf(() => {
-                    allTemplates.forEach(item => { item.classList.add('hiding'); });
-                    setTimeout(() => {
-                        raf(() => {
-                            allTemplates.forEach(item => {
-                                const isVisible = visibleTemplates.includes(item);
-                                if (isVisible) {
-                                    item.classList.remove('hiding', 'hidden');
-                                    item.style.order = visibleTemplates.indexOf(item);
-                                } else {
-                                    item.classList.add('hidden');
-                                }
-                            });
-                            if (elements.showingCount) { elements.showingCount.textContent = visibleTemplates.length; }
-                            
-                            // Only update card visibility based on filters if the cards were present in the first place
-                            updateCardVisibility(category, hasResults);
-                            
-                            elements.noResults.classList.toggle('d-none', hasResults);
-                            if (hasResults) {
-                                visibleTemplates.forEach((item, index) => {
-                                    setTimeout(() => {
-                                        item.classList.add('sort-complete');
-                                        setTimeout(() => { item.classList.remove('sort-complete'); }, 500);
-                                    }, index * 30);
-                                });
-                            }
-                            isAnimating = false;
-                        });
-                    }, 300);
-                });
-            }, 150);
-        }
-        
-        let searchTimeout;
-        if (elements.searchInput) {
-            elements.searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(applyFilters, 300);
-            }, { passive: true });
-        }
-        
-        window.resetFilters = function() {
-            if (elements.categoryFilterGroup) { elements.categoryFilterGroup.querySelector('[data-value="all"]').click(); }
-            if (elements.sortFilterGroup) { elements.sortFilterGroup.querySelector('[data-value="newest"]').click(); }
-            if (elements.searchInput) { elements.searchInput.value = ''; }
-            applyFilters();
-            if (filterModal) { filterModal.hide(); }
-        };
-        
-        // Initial fade-in animation
-        templateItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(30px)';
-        });
-        
-        raf(() => {
-            templateItems.forEach((item, index) => {
-                setTimeout(() => {
-                    raf(() => {
-                        item.style.opacity = '1';
-                        item.style.transform = 'translateY(0)';
-                    });
-                }, index * 50);
-            });
-        });
-    });
-})();
-</script>
-
+/* Smooth transitions */
+.pagination-minimal .page-link,
+.pagination-minimal .page-item.active .page-link {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+</style>
 @endsection

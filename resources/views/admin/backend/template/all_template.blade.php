@@ -3,7 +3,6 @@
 
  <div class="nk-content-inner">
      <div class="nk-content-body">
-        
          <div class="nk-block-head nk-page-head">
              <div class="nk-block-head-between flex-wrap g-2">
                  <div class="nk-block-head-content">
@@ -21,12 +20,21 @@
              </div>
          </div>
           
+        {{-- Use $templates->total() for the Grand Total --}}
+        @php
+            $totalTemplates = $templates->total();
+            // Category counts use the current page collection
+            // NOTE: These counts are only for the items visible on the current page.
+            $studentCount = $templates->where('category', 'Student')->count();
+            $lecturerCount = $templates->where('category', 'Lecturer')->count();
+        @endphp
+
         @if (auth()->user()->role === 'admin')
         <div class="nk-block">
             <div class="row g-3 mb-4">
 
-                {{-- Total Templates --}}
-                @if (count($templates) > 0)
+                {{-- Total Templates (uses $templates->total() for the full count) --}}
+                @if ($totalTemplates > 0)
                 <div class="col-6 col-md-3" id="card-total-templates">
                     <div class="card border-0 bg-primary bg-opacity-10">
                         <div class="card-body py-3 px-3">
@@ -35,7 +43,7 @@
                                     <em class="icon ni ni-template"></em>
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ count($templates) }}</h6>
+                                    <h6 class="mb-0 fs-6">{{ $totalTemplates }}</h6>
                                     <span class="small text-muted d-block">Total Templates</span>
                                 </div>
                             </div>
@@ -44,8 +52,7 @@
                 </div>
                 @endif
 
-                {{-- Student Templates --}}
-                @php $studentCount = $templates->where('category', 'Student')->count(); @endphp
+                {{-- Student Templates (Count is for the current page) --}}
                 @if ($studentCount > 0)
                 <div class="col-6 col-md-3" id="card-student-templates">
                     <div class="card border-0 bg-info bg-opacity-10">
@@ -64,8 +71,7 @@
                 </div>
                 @endif
 
-                {{-- Lecturer Templates --}}
-                @php $lecturerCount = $templates->where('category', 'Lecturer')->count(); @endphp
+                {{-- Lecturer Templates (Count is for the current page) --}}
                 @if ($lecturerCount > 0)
                 <div class="col-6 col-md-3" id="card-lecturer-templates">
                     <div class="card border-0 bg-warning bg-opacity-10">
@@ -84,8 +90,8 @@
                 </div>
                 @endif
 
-                {{-- Showing --}}
-                @if (count($templates) > 0)
+                {{-- Showing (uses $templates->count() for items on current page) --}}
+                @if ($templates->count() > 0)
                 <div class="col-6 col-md-3" id="card-showing-templates">
                     <div class="card border-0 bg-success bg-opacity-10">
                         <div class="card-body py-3 px-3">
@@ -94,7 +100,7 @@
                                     <em class="icon ni ni-eye"></em>
                                 </div>
                                 <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6"><span id="showing-count">{{ count($templates) }}</span></h6>
+                                    <h6 class="mb-0 fs-6"><span id="showing-count">{{ $templates->count() }}</span></h6>
                                     <span class="small text-muted d-block">Showing</span>
                                 </div>
                             </div>
@@ -109,7 +115,7 @@
         {{-- END STATS CARD BLOCK --}}
 
         {{-- TEMPLATE CARDS --}}
-            <div class="row g-3 g-md-4" id="templates-container">
+            <div class="row g-3 g-md-4 mt-2" id="templates-container">
                 @foreach ($templates as $item)
                 <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
                     data-category="{{ strtolower($item->category) }}"
@@ -162,29 +168,130 @@
                 </div> 
                 @endforeach
             </div> 
+            {{-- MODERN MINIMALIST PAGINATION --}}
+            @if ($totalTemplates > 0)
+            <div class="nk-block pt-5">
+                <div class="row g-3 align-items-center">
+                    {{-- Pagination Summary --}}
+                    <div class="col-12 col-md-6">
+                        <p class="text-muted mb-0 fs-14px">
+                            Showing <span class="fw-medium text-dark">{{ $templates->firstItem() }}</span> to 
+                            <span class="fw-medium text-dark">{{ $templates->lastItem() }}</span> of 
+                            <span class="fw-medium text-dark">{{ $templates->total() }}</span> templates
+                        </p>
+                    </div>
+                    
+                    {{-- Pagination Controls --}}
+                    <div class="col-12 col-md-6">
+                        <nav aria-label="Template pagination">
+                            <ul class="pagination pagination-minimal justify-content-md-end mb-0">
+                                {{-- Previous Button --}}
+                                <li class="page-item {{ $templates->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" 
+                                    href="{{ $templates->previousPageUrl() }}" 
+                                    aria-label="Previous"
+                                    {{ $templates->onFirstPage() ? 'tabindex=-1' : '' }}>
+                                        <em class="icon ni ni-chevron-left"></em>
+                                        <span class="d-none d-sm-inline ms-1">Previous</span>
+                                    </a>
+                                </li>
 
+                                {{-- Page Numbers (Smart Display) --}}
+                                @php
+                                    $currentPage = $templates->currentPage();
+                                    $lastPage = $templates->lastPage();
+                                    $start = max(1, $currentPage - 1);
+                                    $end = min($lastPage, $currentPage + 1);
+                                    
+                                    // Adjust if at edges
+                                    if ($currentPage <= 2) {
+                                        $end = min(3, $lastPage);
+                                    }
+                                    if ($currentPage >= $lastPage - 1) {
+                                        $start = max(1, $lastPage - 2);
+                                    }
+                                @endphp
 
-        <div class="text-center py-5 d-none" id="no-results">
-             <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
-                 <em class="icon ni ni-search" style="font-size: 2rem;"></em>
-             </div>
-             <h4 class="text-muted mb-2">No templates found</h4>
-             <p class="text-muted">Try adjusting your search terms or filter selection.</p>
-             <button class="btn btn-outline-primary btn-sm" onclick="resetFilters()">Reset Filters</button>
-         </div>
+                                {{-- First Page --}}
+                                @if ($start > 1)
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $templates->url(1) }}">1</a>
+                                    </li>
+                                    @if ($start > 2)
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    @endif
+                                @endif
 
-     </div>
- </div>
+                                {{-- Page Range --}}
+                                @for ($page = $start; $page <= $end; $page++)
+                                    <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $templates->url($page) }}">{{ $page }}</a>
+                                    </li>
+                                @endfor
 
-{{-- FILTER MODAL  --}}
+                                {{-- Last Page --}}
+                                @if ($end < $lastPage)
+                                    @if ($end < $lastPage - 1)
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    @endif
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ $templates->url($lastPage) }}">{{ $lastPage }}</a>
+                                    </li>
+                                @endif
+
+                                {{-- Next Button --}}
+                                <li class="page-item {{ !$templates->hasMorePages() ? 'disabled' : '' }}">
+                                    <a class="page-link" 
+                                    href="{{ $templates->nextPageUrl() }}" 
+                                    aria-label="Next"
+                                    {{ !$templates->hasMorePages() ? 'tabindex=-1' : '' }}>
+                                        <span class="d-none d-sm-inline me-1">Next</span>
+                                        <em class="icon ni ni-chevron-right"></em>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            @endif
+            {{-- NO RESULTS BLOCK (Only show if there are NO results) --}}
+            @if ($templates->total() === 0)
+            <div class="text-center py-5" id="no-results">
+                <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
+                    <em class="icon ni ni-search" style="font-size: 2rem;"></em>
+                </div>
+                <h4 class="text-muted mb-2">No templates found</h4>
+                <p class="text-muted">Try adjusting your search terms or filter selection.</p>
+                {{-- 'resetFilters()' button is now a link/redirect to the clean base route --}}
+                <a href="{{ route('admin.template') }}" class="btn btn-outline-primary btn-sm">Reset Filters</a>
+            </div>
+            @endif
+        </div> 
+    </div> 
+
+{{-- FILTER MODAL (MODIFIED FOR BACKEND PAGINATION/FILTERING) --}}
 <div class="modal fade" id="templateFilterModal" tabindex="-1" aria-labelledby="templateFilterModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
+      
+      {{-- 1. WRAP IN GET FORM: Action points to the base route (replace with your actual route name) --}}
+      <form id="templateFilterForm" action="{{ route('admin.template') }}" method="GET">
       <div class="modal-header">
         <h5 class="modal-title" id="templateFilterModalLabel">Filter Templates</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        
+        {{-- HIDDEN INPUT to hold the selected Category value --}}
+        <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
+
+        {{-- HIDDEN INPUT to hold the selected Sort value --}}
+        <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
         
         <div class="mb-4">
             <h6 class="text-muted mb-2">Search by Title or Description</h6>
@@ -193,7 +300,13 @@
                      <div class="form-control-icon start text-light">
                          <em class="icon ni ni-search"></em>
                      </div>
-                     <input type="text" class="form-control" placeholder="Search templates..." id="searchInput">
+                     {{-- 2. ADD NAME ATTRIBUTE AND SET CURRENT VALUE --}}
+                     <input type="text" 
+                            class="form-control" 
+                            placeholder="Search templates..." 
+                            id="searchInput" 
+                            name="search" 
+                            value="{{ request('search') }}">
                  </div>
              </div>
         </div>
@@ -201,14 +314,16 @@
         @if (auth()->user()->role === 'admin')
         <div class="mb-4">
             <h6 class="text-muted mb-2">Category</h6>
+            {{-- Category Buttons --}}
             <div class="btn-group category-segment-control w-100" role="group" id="categoryFilter">
-                <button type="button" class="btn btn-outline-primary segment-btn active" data-value="all">
+                {{-- 3. APPLY ACTIVE CLASS BASED ON CURRENT REQUEST --}}
+                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category', 'all') == 'all' ? 'active' : '' }}" data-value="all">
                     <em class="icon ni ni-grid-sq me-1"></em> All
                 </button>
-                <button type="button" class="btn btn-outline-primary segment-btn" data-value="student">
+                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'student' ? 'active' : '' }}" data-value="student">
                     <em class="icon ni ni-user me-1"></em> Student
                 </button>
-                <button type="button" class="btn btn-outline-primary segment-btn" data-value="lecturer">
+                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'lecturer' ? 'active' : '' }}" data-value="lecturer">
                     <em class="icon ni ni-user-check me-1"></em> Lecturer
                 </button>
             </div>
@@ -217,14 +332,16 @@
 
         <div class="mb-0">
              <h6 class="text-muted mb-2">Sort By</h6>
+             {{-- Sort Buttons --}}
              <div class="btn-group sort-segment-control w-100" role="group" id="sortFilter">
-                 <button type="button" class="btn btn-outline-info segment-btn active" data-value="newest">
+                 {{-- 3. APPLY ACTIVE CLASS BASED ON CURRENT REQUEST --}}
+                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort', 'newest') == 'newest' ? 'active' : '' }}" data-value="newest">
                      <em class="icon ni ni-clock me-1"></em> Newest
                  </button>
-                 <button type="button" class="btn btn-outline-info segment-btn" data-value="title">
+                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title' ? 'active' : '' }}" data-value="title">
                      <em class="icon ni ni-text me-1"></em> Title (A-Z)
                  </button>
-                 <button type="button" class="btn btn-outline-info segment-btn" data-value="title-desc">
+                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title-desc' ? 'active' : '' }}" data-value="title-desc">
                      <em class="icon ni ni-text-a me-1"></em> Title (Z-A)
                  </button>
              </div>
@@ -232,17 +349,47 @@
 
       </div>
       <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-outline-light" onclick="resetFilters()">Reset Filters</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Apply & Close</button>
+        {{-- Reset button now redirects to the clean base route --}}
+        <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ route('admin.template') }}'">Reset Filters</button>
+        {{-- Changed to submit button to activate the form --}}
+        <button type="submit" class="btn btn-primary">Apply & View</button>
       </div>
+      </form>
     </div>
   </div>
 </div>
-{{-- END FILTER MODAL  --}}
+{{-- END FILTER MODAL --}}
 
+{{-- REQUIRED JAVASCRIPT --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to handle segment button clicks and update the hidden input
+        function setupSegmentControls(controlId, hiddenInputId) {
+            const controls = document.getElementById(controlId);
+            const hiddenInput = document.getElementById(hiddenInputId);
+
+            if (!controls || !hiddenInput) return;
+
+            controls.addEventListener('click', function(e) {
+                const target = e.target.closest('.segment-btn');
+                if (target) {
+                    // Remove 'active' from all siblings
+                    controls.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+                    // Add 'active' to the clicked button
+                    target.classList.add('active');
+                    // Update the value of the hidden input
+                    hiddenInput.value = target.dataset.value;
+                }
+            });
+        }
+
+        // Apply setup to both category and sort filters
+        setupSegmentControls('categoryFilter', 'category_hidden');
+        setupSegmentControls('sortFilter', 'sort_hidden');
+    });
+</script>
 
 <style>
-/* FIX: Ensure perfect circle and center icons for all media elements  */
 .media-circle {
     border-radius: 50% !important; 
     display: flex;
@@ -399,187 +546,74 @@
         margin: 0.5rem;
     }
 }
+
+/* Modern Minimalist Pagination Styles */
+.pagination-minimal {
+    gap: 0.375rem;
+}
+
+.pagination-minimal .page-link {
+    border: 1px solid #e5e9f2;
+    color: #526484;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: #fff;
+    display: flex;
+    align-items-center;
+}
+
+.pagination-minimal .page-link:hover {
+    background-color: #f5f6fa;
+    border-color: #d4dae6;
+    color: #364a63;
+    transform: translateY(-1px);
+}
+
+.pagination-minimal .page-item.active .page-link {
+    background-color: #6576ff;
+    border-color: #6576ff;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(101, 118, 255, 0.3);
+}
+
+.pagination-minimal .page-item.disabled .page-link {
+    background-color: transparent;
+    border-color: #e5e9f2;
+    color: #c4cefe;
+    opacity: 0.6;
+}
+
+.pagination-minimal .page-link em {
+    font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 575.98px) {
+    .pagination-minimal {
+        gap: 0.25rem;
+    }
+    
+    .pagination-minimal .page-link {
+        padding: 0.425rem 0.625rem;
+        font-size: 0.8125rem;
+    }
+    
+    .pagination-minimal .page-item:not(:first-child):not(:last-child):not(.active) {
+        display: none;
+    }
+}
+
+/* Smooth transitions */
+.pagination-minimal .page-link,
+.pagination-minimal .page-item.active .page-link {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 </style>
 
-<script>
-(function() {
-    'use strict';
-    
-    const authUserRole = "{{ auth()->user()->role }}";
-    const raf = window.requestAnimationFrame || ((fn) => setTimeout(fn, 16));
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve the modal instance
-        const filterModalElement = document.getElementById('templateFilterModal');
-        const filterModal = filterModalElement ? new bootstrap.Modal(filterModalElement) : null;
-
-        const elements = {
-            categoryFilterGroup: document.getElementById('categoryFilter'),
-            sortFilterGroup: document.getElementById('sortFilter'),
-            searchInput: document.getElementById('searchInput'),
-            noResults: document.getElementById('no-results'),
-            showingCount: document.getElementById('showing-count'),
-            cards: {
-                total: document.getElementById('card-total-templates'),
-                student: document.getElementById('card-student-templates'),
-                lecturer: document.getElementById('card-lecturer-templates'),
-                showing: document.getElementById('card-showing-templates')
-            }
-        };
-        
-        const templateItems = document.querySelectorAll('.template-item');
-        let allTemplates = Array.from(templateItems);
-        let filterTimeout = null;
-        let isAnimating = false;
-        
-        let currentCategory = 'all';
-        let currentSortBy = 'newest';
-
-        function setupSegmentControl(groupElement, initialValue, callback) {
-            groupElement.querySelectorAll('.segment-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const newValue = this.getAttribute('data-value');
-                    const currentStateVariable = groupElement.id === 'categoryFilter' ? currentCategory : currentSortBy;
-                    if (newValue !== currentStateVariable) {
-                        groupElement.querySelector('.segment-btn.active')?.classList.remove('active');
-                        this.classList.add('active');
-                        callback(newValue);
-                    }
-                });
-            });
-            groupElement.querySelector(`[data-value="${initialValue}"]`)?.classList.add('active');
-        }
-
-        if (elements.categoryFilterGroup) {
-            setupSegmentControl(elements.categoryFilterGroup, 'all', (value) => {
-                currentCategory = value;
-                applyFilters(); 
-            });
-        }
-        
-        if (elements.sortFilterGroup) {
-            setupSegmentControl(elements.sortFilterGroup, 'newest', (value) => {
-                currentSortBy = value;
-                applyFilters();
-            });
-        }
-        
-        function updateCardVisibility(category, hasResults) {
-            if (authUserRole !== 'admin') return;
-            const cards = elements.cards;
-            const updates = {};
-            if (!hasResults) {
-                updates.total = false; updates.student = false; updates.lecturer = false; updates.showing = false;
-            } else {
-                updates.total = true; updates.showing = true;
-                if (category === 'student') { updates.student = true; updates.lecturer = false; } 
-                else if (category === 'lecturer') { updates.student = false; updates.lecturer = true; } 
-                else { updates.student = true; updates.lecturer = true; }
-            }
-            raf(() => {
-                Object.keys(updates).forEach(key => {
-                    const card = cards[key];
-                    if (card) { card.style.display = updates[key] ? '' : 'none'; }
-                });
-            });
-        }
-        
-        function applyFilters() {
-            if (isAnimating) return;
-            clearTimeout(filterTimeout);
-            filterTimeout = setTimeout(() => {
-                isAnimating = true;
-                const category = currentCategory;
-                const sortBy = currentSortBy;
-                const searchTerm = elements.searchInput.value.toLowerCase().trim();
-                
-                let visibleTemplates = allTemplates.filter(item => {
-                    const itemCategory = item.dataset.category.toLowerCase();
-                    const matchesCategory = category === 'all' || itemCategory === category;
-                    if (!searchTerm) return matchesCategory;
-                    const itemTitle = item.dataset.title;
-                    const itemDescription = item.dataset.description;
-                    return matchesCategory && (itemTitle.includes(searchTerm) || itemDescription.includes(searchTerm));
-                });
-                
-                visibleTemplates.sort((a, b) => {
-                    switch(sortBy) {
-                        case 'newest': return parseInt(b.dataset.created) - parseInt(a.dataset.created);
-                        case 'oldest': return parseInt(a.dataset.created) - parseInt(b.dataset.created);
-                        case 'title': return a.dataset.title.localeCompare(b.dataset.title);
-                        case 'title-desc': return b.dataset.title.localeCompare(a.dataset.title);
-                        default: return 0;
-                    }
-                });
-                
-                const hasResults = visibleTemplates.length > 0;
-                
-                raf(() => {
-                    allTemplates.forEach(item => { item.classList.add('hiding'); });
-                    setTimeout(() => {
-                        raf(() => {
-                            allTemplates.forEach(item => {
-                                const isVisible = visibleTemplates.includes(item);
-                                if (isVisible) {
-                                    item.classList.remove('hiding', 'hidden');
-                                    item.style.order = visibleTemplates.indexOf(item);
-                                } else {
-                                    item.classList.add('hidden');
-                                }
-                            });
-                            if (elements.showingCount) { elements.showingCount.textContent = visibleTemplates.length; }
-                            updateCardVisibility(category, hasResults);
-                            elements.noResults.classList.toggle('d-none', hasResults);
-                            if (hasResults) {
-                                visibleTemplates.forEach((item, index) => {
-                                    setTimeout(() => {
-                                        item.classList.add('sort-complete');
-                                        setTimeout(() => { item.classList.remove('sort-complete'); }, 500);
-                                    }, index * 30);
-                                });
-                            }
-                            isAnimating = false;
-                        });
-                    }, 300);
-                });
-            }, 150);
-        }
-        
-        let searchTimeout;
-        if (elements.searchInput) {
-            elements.searchInput.addEventListener('input', () => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(applyFilters, 300);
-            }, { passive: true });
-        }
-        
-        window.resetFilters = function() {
-            if (elements.categoryFilterGroup) { elements.categoryFilterGroup.querySelector('[data-value="all"]').click(); }
-            if (elements.sortFilterGroup) { elements.sortFilterGroup.querySelector('[data-value="newest"]').click(); }
-            if (elements.searchInput) { elements.searchInput.value = ''; }
-            applyFilters();
-            if (filterModal) { filterModal.hide(); }
-        };
-        
-        templateItems.forEach((item, index) => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(30px)';
-        });
-        
-        raf(() => {
-            templateItems.forEach((item, index) => {
-                setTimeout(() => {
-                    raf(() => {
-                        item.style.opacity = '1';
-                        item.style.transform = 'translateY(0)';
-                    });
-                }, index * 50);
-            });
-        });
-    });
-})();
-</script>
+{{-- DELETE CONFIRMATION MODAL --}}
 
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
