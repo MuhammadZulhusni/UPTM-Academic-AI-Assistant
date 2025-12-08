@@ -56,7 +56,7 @@
             <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
                 <div>
-                    <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-1">Email Address</label>
+                    <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-2">Email Address</label>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all" 
                             type="email" 
@@ -72,7 +72,7 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-1">Password</label>
+                    <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-2">Password</label>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
                             type="password" 

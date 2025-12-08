@@ -36,7 +36,7 @@
                 @csrf
 
                 <div>
-                    <label for="name" class="block text-sm font-semibold text-gray-700 text-left mb-1">Name</label>
+                    <label for="name" class="block text-sm font-semibold text-gray-700 text-left mb-2">Name</label>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all" 
                             type="text" 
@@ -52,7 +52,7 @@
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-1">Email Address</label>
+                    <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-2">Email Address</label>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all" 
                             type="email" 
@@ -68,7 +68,7 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-1">Password</label>
+                    <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-2">Password</label>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
                             type="password" 
@@ -87,7 +87,7 @@
                 </div>
 
                 <div>
-                    <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 text-left mb-1">Confirm Password</label>
+                    <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 text-left mb-2">Confirm Password</label>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
                             type="password" 
@@ -106,7 +106,7 @@
                 </div>
 
                 <div>
-                    <label for="role" class="block text-sm font-semibold text-gray-700 text-left mb-1">
+                    <label for="role" class="block text-sm font-semibold text-gray-700 text-left mb-2">
                         Register As
                     </label>
                     <select id="role" name="role" 
