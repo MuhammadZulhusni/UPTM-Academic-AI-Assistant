@@ -18,8 +18,20 @@
                         </button>
                         {{-- Filter Status Label --}}
                         <span class="badge bg-primary-subtle text-primary fw-medium" id="currentFilterLabel">
-                            All Users
+                            @if($roleFilter === 'lecturer')
+                                Lecturers Only
+                            @elseif($roleFilter === 'student')
+                                Students Only
+                            @else
+                                All Users
+                            @endif
                         </span>
+                        {{-- Clear Filters --}}
+                        @if($roleFilter !== 'all' || !empty($search))
+                        <a href="{{ route('admin.users') }}" class="btn btn-outline-secondary btn-sm" title="Clear all filters">
+                            <i class="bi bi-x-circle"></i>
+                        </a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -33,11 +45,15 @@
                 <h5 class="mb-0">User Table</h5>
             </div>
             <div class="d-flex align-items-center gap-2 w-100 w-md-auto">
-                {{-- Search input field --}}
-                <div class="input-group input-group-sm flex-grow-1" style="max-width: 300px;">
-                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                    <input type="text" class="form-control" placeholder="Search users..." id="searchInput">
-                </div>
+                {{-- Search Form --}}
+                <form method="GET" action="{{ route('admin.users') }}" class="d-flex gap-2" id="searchForm">
+                    <input type="hidden" name="role" value="{{ $roleFilter }}" id="hiddenRoleInput">
+                    <div class="input-group input-group-sm flex-grow-1" style="max-width: 300px;">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Search users..." name="search" value="{{ $search }}" id="searchInput">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                </form>
             </div>
         </div>
 
@@ -79,7 +95,7 @@
                             {{-- Added 'data-user-role' for JS filtering --}}
                             <tr class="user-row" data-user-role="{{ $user->role }}">
                                 <td class="tb-col d-none d-md-table-cell" data-label="Sl">
-                                    <div class="caption-text fw-medium">{{ $key + 1 }}</div>
+                                    <div class="caption-text fw-medium">{{ $users->firstItem() + $key }}</div>
                                 </td>
                                 <td class="tb-col" data-label="Name">
                                     <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->name }}</div>
@@ -145,34 +161,112 @@
                 {{-- Message shown when the $users array is empty --}}
                 <div class="text-center py-5">
                     <div class="mb-4">
-                        <i class="bi bi-person-circle display-1 text-muted opacity-50"></i>
+                        <i class="bi bi-person-slash display-1 text-muted opacity-50"></i>
                     </div>
                     <h5 class="text-muted mb-2">No Users Found</h5>
-                    <p class="text-muted mb-0">There are no users to display at the moment.</p>
+                    <p class="text-muted mb-0">
+                        @if(!empty($search) || $roleFilter !== 'all')
+                            No users match your current filters. Try adjusting your search or filter criteria.
+                        @else
+                            There are no users to display at the moment.
+                        @endif
+                    </p>
                 </div>
                 @endif
             </div>
         </div>
+        {{-- MODERN MINIMALIST PAGINATION (USERS) --}}
+        @if ($users->total() > 0)
+        <div class="nk-block pt-5">
+            <div class="row g-3 align-items-center">
 
-        {{-- Pagination info --}}
-        @if(count($users) > 0)
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-            <div id="pagination-info" class="text-muted order-2 order-md-1">
-                Showing {{ count($users) }} of {{ count($users) }} entries
+                {{-- Pagination Summary --}}
+                <div class="col-12 col-md-6">
+                    <p class="text-muted mb-0 fs-14px">
+                        Showing 
+                        <span class="fw-medium text-dark">{{ $users->firstItem() }}</span> to 
+                        <span class="fw-medium text-dark">{{ $users->lastItem() }}</span> of 
+                        <span class="fw-medium text-dark">{{ $users->total() }}</span> users
+                    </p>
+                </div>
+
+                {{-- Pagination Controls --}}
+                <div class="col-12 col-md-6">
+                    <nav aria-label="Users pagination">
+                        <ul class="pagination pagination-minimal justify-content-md-end mb-0">
+
+                            {{-- Previous Button --}}
+                            <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link"
+                                href="{{ $users->previousPageUrl() }}"
+                                aria-label="Previous"
+                                {{ $users->onFirstPage() ? 'tabindex=-1' : '' }}>
+                                    <em class="icon ni ni-chevron-left"></em>
+                                    <span class="d-none d-sm-inline ms-1">Previous</span>
+                                </a>
+                            </li>
+
+                            {{-- Smart Page Number Logic --}}
+                            @php
+                                $currentPage = $users->currentPage();
+                                $lastPage    = $users->lastPage();
+                                $start = max(1, $currentPage - 1);
+                                $end   = min($lastPage, $currentPage + 1);
+
+                                if ($currentPage <= 2) {
+                                    $end = min(3, $lastPage);
+                                }
+                                if ($currentPage >= $lastPage - 1) {
+                                    $start = max(1, $lastPage - 2);
+                                }
+                            @endphp
+
+                            {{-- First Page --}}
+                            @if ($start > 1)
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $users->url(1) }}">1</a>
+                                </li>
+                                @if ($start > 2)
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                @endif
+                            @endif
+
+                            {{-- Page Range --}}
+                            @for ($page = $start; $page <= $end; $page++)
+                                <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $users->url($page) }}">{{ $page }}</a>
+                                </li>
+                            @endfor
+
+                            {{-- Last Page --}}
+                            @if ($end < $lastPage)
+                                @if ($end < $lastPage - 1)
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                @endif
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $users->url($lastPage) }}">{{ $lastPage }}</a>
+                                </li>
+                            @endif
+
+                            {{-- Next Button --}}
+                            <li class="page-item {{ !$users->hasMorePages() ? 'disabled' : '' }}">
+                                <a class="page-link"
+                                href="{{ $users->nextPageUrl() }}"
+                                aria-label="Next"
+                                {{ !$users->hasMorePages() ? 'tabindex=-1' : '' }}>
+                                    <span class="d-none d-sm-inline me-1">Next</span>
+                                    <em class="icon ni ni-chevron-right"></em>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
             </div>
-            <nav class="order-1 order-md-2">
-                <ul class="pagination pagination-sm mb-0">
-                    <li class="page-item disabled">
-                        <span class="page-link">Previous</span>
-                    </li>
-                    <li class="page-item active">
-                        <span class="page-link">1</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Next</span>
-                    </li>
-                </ul>
-            </nav>
         </div>
         @endif
     </div>
@@ -197,13 +291,13 @@
 
                 {{-- Soft, Minimalist Button Group for Roles --}}
                 <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2 active" data-role-filter="all">
+                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2 {{ $roleFilter === 'all' ? 'active' : '' }}" data-role-filter="all">
                         <i class="bi bi-people me-2"></i> All Users
                     </button>
-                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2" data-role-filter="lecturer">
+                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2 {{ $roleFilter === 'lecturer' ? 'active' : '' }}" data-role-filter="lecturer">
                         <i class="bi bi-person-workspace me-2"></i> Lecturers
                     </button>
-                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2" data-role-filter="student">
+                    <button type="button" class="btn btn-outline-secondary role-filter-modal-btn rounded-pill text-start px-3 py-2 {{ $roleFilter === 'student' ? 'active' : '' }}" data-role-filter="student">
                         <i class="bi bi-person me-2"></i> Students
                     </button>
                 </div>
@@ -212,7 +306,7 @@
             {{-- Modal Footer: Soft Background and Outline Buttons --}}
             <div class="modal-footer justify-content-end bg-light-subtle border-0 rounded-bottom-4 px-4 py-3">
                 <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-sm btn-primary rounded-pill" id="applyFilterButton" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill" id="applyFilterButton">
                     Apply Filter
                 </button>
             </div>
@@ -251,106 +345,50 @@
 </div>
 
 {{--
-    JavaScript for interactive features, UPDATED for the new label design.
+    JavaScript for interactive features
 --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
         const modalFilterButtons = document.querySelectorAll('.role-filter-modal-btn');
-        const currentFilterLabel = document.getElementById('currentFilterLabel');
         const applyFilterButton = document.getElementById('applyFilterButton');
-        const noResultsMessage = document.getElementById('no-search-results');
-        const tableContainer = document.getElementById('user-table-container');
-        const paginationInfo = document.getElementById('pagination-info');
-        const allRows = document.querySelectorAll('.user-row');
+        const hiddenRoleInput = document.getElementById('hiddenRoleInput');
+        const filterModal = document.getElementById('filterModal');
+        
+        let selectedRole = '{{ $roleFilter }}';
 
-        let pendingFilter = 'all'; // Stores the selection inside the modal
-        let activeFilter = 'all'; // Stores the filter currently applied to the table
-
-        // Function to update the visible label on the page
-        function updateLabel(filterValue) {
-            let label = filterValue.charAt(0).toUpperCase() + filterValue.slice(1);
-            if (filterValue === 'all') {
-                label = 'All Users';
-            } else {
-                 label = label + 's Only';
-            }
-            currentFilterLabel.textContent = label;
-        }
-
-        // Function to apply both search and role filters
-        function applyFilters() {
-            const currentSearchTerm = searchInput.value.toLowerCase();
-            let visibleRowCount = 0;
-
-            allRows.forEach(row => {
-                const userRole = row.getAttribute('data-user-role');
-                const rowText = row.textContent.toLowerCase();
-                const isRoleMatch = activeFilter === 'all' || userRole === activeFilter;
-                const isSearchMatch = rowText.includes(currentSearchTerm);
-                const isMatch = isRoleMatch && isSearchMatch;
-
-                row.style.display = isMatch ? '' : 'none';
-
-                if (isMatch) {
-                    visibleRowCount++;
-                }
-            });
-
-            // Toggle table visibility and no results message
-            const hasResults = visibleRowCount > 0;
-            if (tableContainer) tableContainer.classList.toggle('d-none', !hasResults);
-            noResultsMessage.classList.toggle('d-none', hasResults);
-
-            // Update pagination info
-            if (paginationInfo) {
-                const totalUsers = allRows.length;
-                paginationInfo.textContent = `Showing ${visibleRowCount} of ${totalUsers} entries`;
-            }
-        }
-
-        // Initialize label on load
-        updateLabel(activeFilter);
-
-
-        // 1. Search Input Handler
-        searchInput.addEventListener('input', applyFilters);
-
-        // 2. Filter Modal Button Handler (updates pendingFilter selection)
+        // 1. Filter Modal Button Handler (updates selected role)
         modalFilterButtons.forEach(button => {
             button.addEventListener('click', function() {
                 // Clear active state from all buttons
                 modalFilterButtons.forEach(btn => btn.classList.remove('active'));
-
+                
                 // Set active state on the clicked button
                 this.classList.add('active');
-
-                // Update the pending selection
-                pendingFilter = this.getAttribute('data-role-filter');
+                
+                // Update the selected role
+                selectedRole = this.getAttribute('data-role-filter');
             });
         });
 
-        // 3. Apply Filter Button Handler (applies pending filter and updates label)
+        // 2. Apply Filter Button Handler (submits form to server)
         applyFilterButton.addEventListener('click', function() {
-            activeFilter = pendingFilter;
-            updateLabel(activeFilter); // Update the label on the page
-            applyFilters(); // Run the main filter function
+            // Update hidden input and redirect to filtered page
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('role', selectedRole);
+            currentUrl.searchParams.delete('page'); // Reset to first page
+            currentUrl.searchParams.delete('search'); // Clear search when filtering
+            window.location.href = currentUrl.toString();
         });
 
-        // 4. Modal Open Handler (syncs pendingFilter with activeFilter)
-        const filterModal = document.getElementById('filterModal');
+        // 3. Modal Open Handler (syncs selected role with current filter)
         filterModal.addEventListener('show.bs.modal', function() {
-            // Set the pending filter to the currently active filter upon opening
-            pendingFilter = activeFilter;
-            
-            // Sync the visual active state in the modal list
+            // Sync the visual active state in the modal
             modalFilterButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-role-filter') === activeFilter);
+                btn.classList.toggle('active', btn.getAttribute('data-role-filter') === selectedRole);
             });
         });
 
-
-        // 5. Delete Modal Handler (Unchanged)
+        // 4. Delete Modal Handler
         const confirmDeleteModal = document.getElementById('confirmDeleteModal');
         confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;

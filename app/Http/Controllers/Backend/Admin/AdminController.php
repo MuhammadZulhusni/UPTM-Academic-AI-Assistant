@@ -23,7 +23,7 @@ class AdminController extends Controller
         $newUsersCount = User::where('created_at', '>=', Carbon::now()->subWeeks(7))
             ->where('role', 'user')
             ->count();
-        $totalUsers = User::whereIn('role', ['lecturer', 'admin'])->count();
+        $totalUsers = User::whereIn('role', ['lecturer', 'student'])->count();
         $totalTemplates = Template::count();
 
         // Get the counts for 'Student Template' and 'Lecturer Template'
@@ -194,13 +194,37 @@ class AdminController extends Controller
         return redirect()->route('login');
     }
 
-    public function AdminUsers()
+    public function AdminUsers(Request $request)
     {
-        // Fetch all users with role 'student' or 'lecturer'
-        $users = User::whereIn('role', ['student', 'lecturer'])->get(); 
-        return view('admin.admin_users', compact('users'));
-    }
+        // Get filter parameters from request
+        $roleFilter = $request->get('role', 'all');
+        $search = $request->get('search', '');
 
+        // Start building the query
+        $query = User::whereIn('role', ['student', 'lecturer']);
+
+        // Apply role filter
+        if ($roleFilter !== 'all' && in_array($roleFilter, ['student', 'lecturer'])) {
+            $query->where('role', $roleFilter);
+        }
+
+        // Apply search filter
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhere('phone', 'like', "%{$search}%")
+                ->orWhere('address', 'like', "%{$search}%");
+            });
+        }
+
+        // Order by latest and paginate with query string preserved
+        $users = $query->latest()
+                    ->paginate(10)
+                    ->withQueryString();
+        
+        return view('admin.admin_users', compact('users', 'roleFilter', 'search'));
+    }
 
     public function AdminDeleteUser($id)
     {
