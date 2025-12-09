@@ -91,7 +91,7 @@
                                                     data-output="{{ base64_encode($item->output) }}"
                                                     onclick="loadDocumentContentFromData(this)">
                                                 <i class="bi bi-eye"></i>
-                                                <span class="d-none d-xl-inline ms-1">View</span>
+                                                <span class="d-none d-xl-inline ms-1" title="View Document" data-bs-toggle="tooltip">View</span>
                                             </button>
                                             <a href="{{ route('edit.admin.document', $item->id) }}" 
                                                class="btn btn-outline-primary btn-sm" 
@@ -108,7 +108,7 @@
                                                     data-delete-url="{{ route('delete.admin.document', $item->id) }}"
                                                     title="Delete Document">
                                                 <i class="bi bi-trash"></i>
-                                                <span class="d-none d-xl-inline ms-1">Delete</span>
+                                                <span class="d-none d-xl-inline ms-1" title="Delete Document" data-bs-toggle="tooltip">Delete</span>
                                             </button>
                                         </div>
                                     </td>
@@ -177,7 +177,7 @@
                                             data-document-id="{{ $item->id }}"
                                             data-delete-url="{{ route('delete.admin.document', $item->id) }}"
                                             title="Delete Document">
-                                        <i class="bi bi-trash"></i>
+                                        <i class="bi bi-trash"></i> Delete
                                     </button>
                                 </div>
                             </div>
