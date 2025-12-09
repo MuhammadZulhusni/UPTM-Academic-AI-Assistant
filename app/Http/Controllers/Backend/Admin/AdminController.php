@@ -33,8 +33,8 @@ class AdminController extends Controller
         // This count is now filtered to show documents created by the authenticated user
         $totalDocuments = GeneratedContent::where('user_id', Auth::id())->count();
 
-        // This query is now filtered to show the latest templates created by the authenticated user
-        $templates = $user->createdTemplates()->latest()->limit(6)->get();
+        // Show latest templates from ALL admins
+        $templates = Template::latest()->limit(6)->get();
 
         return view('admin.index', compact('user', 'newUsersCount', 'totalUsers', 'totalDocuments', 'totalTemplates', 'templates', 'studentTemplateCount', 'lecturerTemplateCount'));
     }
