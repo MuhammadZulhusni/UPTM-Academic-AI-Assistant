@@ -21,7 +21,7 @@ class TemplateController extends Controller
         // Start the query with the base model
         $query = Template::query();
         
-        //  1. Apply Sorting (Order By) 
+        // 1. Apply Sorting (Order By) 
         $sort = $request->input('sort', 'newest'); // Default to 'newest'
         
         if ($sort === 'title') {
@@ -35,8 +35,6 @@ class TemplateController extends Controller
         // 2. Apply Category Filter 
         $category = $request->input('category');
         if ($category && $category !== 'all') {
-            // We use ucfirst() because your category data-attributes are lowercase 
-            // in the modal, but the database field likely stores them capitalized.
             $query->where('category', ucfirst($category));
         }
 
@@ -50,12 +48,22 @@ class TemplateController extends Controller
             });
         }
 
-        //  4. Paginate and Preserve Query String 
-        // The key fix: withQueryString() tells Laravel to include category, search, and sort in pagination links.
+        // 4. Get totals (without pagination)
+        $totalTemplates  = $query->count(); // Total templates with applied filters
+        $studentCount    = (clone $query)->where('category', 'Student')->count();
+        $lecturerCount   = (clone $query)->where('category', 'Lecturer')->count();
+
+        // 5. Paginate and preserve query string 
         $templates = $query->paginate(8)->withQueryString(); 
 
-        return view('admin.backend.template.all_template', compact('templates'));
+        return view('admin.backend.template.all_template', compact(
+            'templates', 
+            'totalTemplates', 
+            'studentCount', 
+            'lecturerCount'
+        ));
     }
+
 
     // Displays the form for adding a new template
     public function AddTemplate(){

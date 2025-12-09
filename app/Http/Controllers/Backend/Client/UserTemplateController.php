@@ -59,7 +59,7 @@ class UserTemplateController extends Controller
         }
         
         // Paginate results
-        $templates = $query->paginate(5)->withQueryString();
+        $templates = $query->paginate(8)->withQueryString();
 
         return view('client.backend.template.all_template', compact('user', 'templates'));
     }
