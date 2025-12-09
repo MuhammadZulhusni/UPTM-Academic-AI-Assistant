@@ -149,10 +149,10 @@
                             </small>
 
                             <div class="d-flex gap-1">
-                                <a href="{{ route('details.template', $item->id) }}" class="btn btn-sm btn-icon btn-light">
+                                <a href="{{ route('details.template', $item->id) }}" class="btn btn-sm btn-icon btn-light" title="View" data-bs-toggle="tooltip">
                                     <em class="icon ni ni-eye"></em>
                                 </a>
-                                <a href="{{ route('edit.template', $item->id) }}" class="btn btn-sm btn-icon btn-primary">
+                                <a href="{{ route('edit.template', $item->id) }}" class="btn btn-sm btn-icon btn-primary" title="Edit" data-bs-toggle="tooltip">
                                     <em class="icon ni ni-edit"></em>
                                 </a>
                                 <button class="btn btn-sm btn-icon btn-danger"
@@ -160,7 +160,7 @@
                                         data-bs-target="#confirmDeleteModal"
                                         data-template-id="{{ $item->id }}"
                                         title="Delete Template">
-                                    <em class="icon ni ni-trash"></em>
+                                    <em class="icon ni ni-trash" title="Delete" data-bs-toggle="tooltip"></em>
                                 </button>
                             </div>
                         </div>
