@@ -39,7 +39,10 @@
                                     <span>Upload New Photo</span>
                                 </label>
                                 <input type="file" name="photo" class="form-control d-none" id="image" accept="image/jpeg,image/jpg,image/png">
-                                <small class="text-muted text-center mt-2">Allowed JPG, JPEG, PNG.</small>
+                                <small class="text-muted text-center mt-2" style="font-size: 0.80rem;">
+                                    <strong>Accepted formats:</strong> JPG, JPEG, PNG<br>
+                                    <strong>Max size:</strong> 2MB
+                                </small>
                             </div>
                         </div>
 
@@ -111,32 +114,61 @@
 
 <script type="text/javascript">
     const originalImageSrc = "{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}";
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+    const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 
     $(document).ready(function(){
+        // Toastr default options
+        toastr.options = {
+            "positionClass": "toast-top-right",
+            "timeOut": "3000",
+            "closeButton": true,
+            "progressBar": true,
+        };
+
         $('#image').change(function(e){
+            const file = e.target.files[0];
+            
+            // Reset if no file selected
+            if (!file) {
+                return;
+            }
+
+            // Validate file type
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                toastr.error('Invalid file format! Please upload JPG, JPEG, or PNG images only.');
+                $(this).val(''); // Clear the input
+                return;
+            }
+
+            // Validate file size
+            if (file.size > MAX_FILE_SIZE) {
+                toastr.error('File size too large! Maximum allowed size is 2MB.');
+                $(this).val(''); // Clear the input
+                return;
+            }
+
+            // If validation passes, show preview
             let reader = new FileReader();
             reader.onload = function(e){
                 $('#showImage').attr('src', e.target.result);
+                toastr.success('Image selected successfully!');
             }
-            reader.readAsDataURL(e.target.files[0]);
+            reader.onerror = function() {
+                toastr.error('Failed to read the image file. Please try again.');
+                $('#image').val('');
+            }
+            reader.readAsDataURL(file);
         });
 
         $('#profileForm').on('submit', function(e) {
             console.log('Form submitted');
         });
-
-        // Optional: Toastr default options
-        toastr.options = {
-            "positionClass": "toast-top-right",
-            "timeOut": "2000",
-        };
     });
 
     function resetForm() {
         document.getElementById("profileForm").reset();
         $('#showImage').attr('src', originalImageSrc);
-
-        // Show toastr message
         toastr.info('Profile form has been reset!');
     }
 </script>

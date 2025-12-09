@@ -55,55 +55,82 @@ class UserController extends Controller
     }
     //End Method 
 
-     public function UserProfile(){
-     $id = Auth::user()->id;
-     $profileData = User::find($id);
-     return view('client.user_profile',compact('profileData'));
+public function UserProfile(){
+    $id = Auth::user()->id;
+    $profileData = User::find($id);
+    return view('client.user_profile',compact('profileData'));
+}
 
-  }
-   //End Method 
+public function UserProfileStore(Request $request){
+    // Validate input with custom messages
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:20',
+        'address' => 'nullable|string|max:500',
+        'photo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // max 2MB
+    ], [
+        'photo.image' => 'The file must be an image.',
+        'photo.mimes' => 'Only JPG, JPEG, and PNG formats are allowed.',
+        'photo.max' => 'Image size must not exceed 2MB.',
+    ]);
 
+    $id = Auth::user()->id;
+    $data = User::find($id);
 
-   public function UserProfileStore(Request $request){
-     $id = Auth::user()->id;
-     $data = User::find($id);
+    $data->name = $request->name;
+    $data->email = $request->email;
+    $data->phone = $request->phone;
+    $data->address = $request->address;
 
-     $data->name = $request->name;
-     $data->email = $request->email;
-     $data->phone = $request->phone;
-     $data->address = $request->address;
+    $oldPhotoPath = $data->photo;
 
-     $oldPhotoPath = $data->photo;
+    if ($request->hasFile('photo')) {
+        try {
+            $file = $request->file('photo');
+            
+            // Additional validation check
+            if (!in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png'])) {
+                $notification = array(
+                    'message' => 'Invalid image format! Only JPG, JPEG, and PNG are allowed.',
+                    'alert-type' => 'error'
+                );
+                return redirect()->back()->with($notification);
+            }
+            
+            $filename = time().'.'.$file->getClientOriginalExtension();
+            $file->move(public_path('upload/user_images'), $filename);
+            $data->photo = $filename;
 
-     if ($request->hasFile('photo')) {
-        $file = $request->file('photo');     
-        $filename = time().'.'.$file->getClientOriginalExtension();
-        $file->move(public_path('upload/user_images'),$filename);
-        $data->photo = $filename;
+            // Delete old image if exists and is different
+            if ($oldPhotoPath && $oldPhotoPath !== $filename) {
+                $this->deleteOldImage($oldPhotoPath);
+            }
+        } catch (\Exception $e) {
+            $notification = array(
+                'message' => 'Failed to upload image. Please try again.',
+                'alert-type' => 'error'
+            );
+            return redirect()->back()->with($notification);
+        }
+    }
 
-        if ($oldPhotoPath && $oldPhotoPath !== $filename) {
-           $this->deleteOldImage($oldPhotoPath);
-        } 
-     }
+    $data->save();
 
-     $data->save();
-
-     $notification = array(
+    $notification = array(
         'message' => 'User Profile Updated Successfully',
         'alert-type' => 'success'
-     );
+    );
 
-     return redirect()->back()->with($notification);
-   }
-   //End Method 
+    return redirect()->back()->with($notification);
+}
 
-    private function deleteOldImage(string $oldPhotoPath) : void {
+private function deleteOldImage(string $oldPhotoPath) : void {
     $fullPath = public_path('upload/user_images/'.$oldPhotoPath);
     if (file_exists($fullPath)) {
-       unlink($fullPath);
+        @unlink($fullPath); // @ suppresses warnings if file can't be deleted
     }
-  }
-   //End private Method 
+}
 
    public function UserChangePassword(){
      return view('client.user_change_password');
