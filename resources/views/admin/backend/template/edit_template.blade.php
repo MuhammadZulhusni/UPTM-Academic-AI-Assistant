@@ -149,7 +149,7 @@
                                 <label for="promptCode" class="form-label fw-bold mb-2">Custom Prompt Code</label>
                                 <textarea name="prompt" id="promptCode" placeholder="Add your prompt code here..." class="form-control form-control-lg" rows="8" required>{{ $template->prompt }}</textarea>
                                 <small class="text-muted mt-2 d-block">
-                                    Use variables defined in Section 2 (e.g., **`{topic}`**) inside curly braces.
+                                    Use variables defined in Section 2 (e.g., {topic} ) inside curly braces.
                                 </small> 
                             </div>
                         </div>

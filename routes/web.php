@@ -29,10 +29,9 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
 
     // User Template & Document Management
     Route::controller(UserTemplateController::class)->group(function () {
-
         // Display templates filtered by the logged-in user's role
-        Route::get('/user/template', [UserTemplateController::class, 'UserTemplate'])->name('user.template');
-        // View details of a single template (only accessible if user's role matches template category)
+        Route::get('/user/template', 'UserTemplate')->name('user.template');
+        // View details of a single template
         Route::get('/user/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
         // Generate content for a specific template
         Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
