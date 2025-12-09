@@ -1,6 +1,6 @@
 @extends('client.client_dashboard')
 @section('client') 
-
+ 
 <style>
     :root {
         --primary-color: #007bff;
@@ -209,6 +209,7 @@
     }
 </style>
 
+
 <div class="nk-content-inner">
     <div class="nk-content-body">
         <div class="nk-block-head nk-page-head">
@@ -229,33 +230,29 @@
 
                             <div class="form-group">
                                 <label for="language" class="form-label">Language</label>
-                                <div class="form-control-wrap">
-                                    <select name="language" class="form-select" id="language" required>
-                                        <option value="">Select Language</option>
-                                        <option value="English">English</option>
-                                        <option value="Bahasa Melayu">Bahasa Melayu</option>
-                                    </select>
-                                </div>
+                                <select name="language" class="form-select" id="language" required>
+                                    <option value="">Select Language</option>
+                                    <option value="English">English</option>
+                                    <option value="Bahasa Melayu">Bahasa Melayu</option>
+                                </select>
                             </div>  
                             
                             @foreach ($template->inputFields as $field)
                             <div class="form-group mt-3">
                                 <label for="{{ $field->title }}">{{ $field->title }}</label>
-                               
                                 @if ($field->type === 'text')
                                 <input type="text" 
                                     name="{{ str_replace(' ', '_', $field->title) }}" 
                                     id="{{ $field->title }}" 
                                     class="form-control" 
-                                    maxlength="500"
+                                    maxlength="10000"
                                     required>
-                                
                                 @elseif ($field->type === 'textarea')
                                 <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
                                     id="{{ $field->title }}" 
                                     rows="5" 
                                     class="form-control" 
-                                    maxlength="1000"
+                                    maxlength="50000"
                                     required></textarea> 
                                 @endif
                                 <small>{{ $field->description }}</small>
@@ -264,31 +261,21 @@
 
                             <div class="form-group mt-3">
                                 <label for="ai_model" class="form-label">AI Model</label>
-                                <div class="form-control-wrap">
-                                    <select name="ai_model" class="form-select" id="ai_model">
-                                        <option value="gpt-3.5-turbo" selected>OpenAI | GPT-3.5-turbo (Faster)</option>
-                                        <option value="gpt-4">OpenAI | GPT 4 (Higher Quality)</option>
-                                    </select>
-                                </div>
+                                <select name="ai_model" class="form-select" id="ai_model">
+                                    <option value="gpt-3.5-turbo" selected>OpenAI | GPT-3.5-turbo (Faster)</option>
+                                    <option value="gpt-4">OpenAI | GPT 4 (Higher Quality)</option>
+                                </select>
                             </div>
 
-                            <div class="row mt-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="result_length" class="form-label">Result Length (words)</label>
-                                        <div class="form-control-wrap">
-                                            <input type="number" name="result_length" class="form-control" 
-                                                   id="result_length" value="100" min="50" max="1000" required>
-                                            <small class="text-muted">Refer to the description template for best results.</small>
-                                        </div>
-                                    </div> 
-                                </div> 
+                            <div class="form-group mt-3">
+                                <label for="result_length" class="form-label">Result Length (words)</label>
+                                <input type="number" name="result_length" class="form-control" 
+                                       id="result_length" value="100" min="1" max="5000" required>
+                                <small class="text-muted">Refer to the description template for best results.</small>
                             </div>
                             
                             <button type="submit" class="btn btn-primary mt-3 mb-3" id="generateBtn">
-                                <span class="btn-text">
-                                    Generate Content
-                                </span>
+                                <span class="btn-text">Generate Content</span>
                                 <span class="btn-loading" style="display: none;">
                                     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                                     Generating...
@@ -298,7 +285,7 @@
                     </div>
                     
                     <div class="col-md-8" style="position: relative;">
-                        <div class="loading-overlay" id="loadingOverlay">
+                        <div class="loading-overlay" id="loadingOverlay" style="display: none;">
                             <div class="loading-spinner">
                                 <div class="spinner"></div>
                                 <p><strong>AI is crafting your content...</strong></p>
