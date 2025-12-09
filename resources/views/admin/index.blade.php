@@ -531,7 +531,7 @@
     <div class="nk-content-body">
         <!-- Page Header -->
         <div class="page-header animate-scale">
-            <h2>Welcome back, {{ $user->name }}</h2>
+            <h2>Welcome, {{ $user->name }}</h2>
             <div class="greeting-subtext">
                 <span class="status-dot"></span>
                 <span id="greeting-text">All systems operational</span>

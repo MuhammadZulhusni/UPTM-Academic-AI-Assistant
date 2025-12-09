@@ -20,15 +20,6 @@
              </div>
          </div>
           
-        {{-- Use $templates->total() for the Grand Total --}}
-        @php
-            $totalTemplates = $templates->total();
-            // Category counts use the current page collection
-            // NOTE: These counts are only for the items visible on the current page.
-            $studentCount = $templates->where('category', 'Student')->count();
-            $lecturerCount = $templates->where('category', 'Lecturer')->count();
-        @endphp
-
         @if (auth()->user()->role === 'admin')
         <div class="nk-block">
             <div class="row g-3 mb-4">
