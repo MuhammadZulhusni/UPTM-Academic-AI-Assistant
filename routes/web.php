@@ -9,6 +9,9 @@ use App\Http\Controllers\Backend\Client\UserController;
 use App\Http\Controllers\Backend\Admin\DocumentController;
 use App\Http\Controllers\Backend\Admin\TemplateController;
 use App\Http\Controllers\Backend\Client\UserTemplateController;
+use App\Http\Controllers\Backend\SuperAdmin\SuperAdminController;
+use App\Http\Controllers\Backend\SuperAdmin\SuperAdminTemplateController;
+use App\Http\Controllers\Backend\SuperAdmin\SuperAdminDocumentController;
 
 // Public Routes
 Route::get('/', function () {
@@ -80,6 +83,41 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
         Route::get('/edit/document/{id}', 'EditAdminDocument')->name('edit.admin.document');
         Route::post('/update/document/{id}', 'AdminUpdateDocument')->name('admin.update.document');
         Route::delete('/delete/document/{id}', 'DeleteAdminDocument')->name('delete.admin.document');
+    });
+});
+
+// Super Admin Routes
+Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [SuperAdminController::class, 'Dashboard'])->name('superadmin.dashboard');
+    // Profile
+    Route::controller(SuperAdminController::class)->group(function () {
+        Route::get('/profile', 'Profile')->name('superadmin.profile');
+        Route::post('/profile/store', 'ProfileStore')->name('superadmin.profile.store');
+        Route::get('/change/password', 'ChangePassword')->name('superadmin.change.password');
+        Route::post('/password/update', 'PasswordUpdate')->name('superadmin.password.update');
+        Route::get('/logout', 'Logout')->name('superadmin.logout');
+    });
+    // Manage Admin & Users
+    Route::get('/users', [SuperAdminController::class, 'Users'])->name('superadmin.users');
+    Route::delete('/users/delete/{id}', [SuperAdminController::class, 'DeleteUser'])->name('superadmin.user.delete');
+    // Template Management
+    Route::controller(SuperAdminTemplateController::class)->group(function () {
+        Route::get('/template', 'Index')->name('superadmin.template');
+        Route::get('/add/template', 'Create')->name('superadmin.add.template');
+        Route::post('/store/template', 'Store')->name('superadmin.store.template');
+        Route::get('/edit/template/{id}', 'Edit')->name('superadmin.edit.template');
+        Route::post('/update/template/{id}', 'Update')->name('superadmin.update.template');
+        Route::get('/details/template/{id}', 'Show')->name('superadmin.details.template');
+        Route::post('/content/generate/{id}', 'ContentGenerate')->name('superadmin.content.generate');
+        Route::post('/templates/delete/{id}', 'Destroy')->name('superadmin.delete.template');
+    });
+    // Document Management
+    Route::controller(SuperAdminDocumentController::class)->group(function () {
+        Route::get('/document', 'Index')->name('superadmin.document');
+        Route::get('/edit/document/{id}', 'Edit')->name('superadmin.edit.document');
+        Route::post('/update/document/{id}', 'Update')->name('superadmin.update.document');
+        Route::delete('/delete/document/{id}', 'Destroy')->name('superadmin.delete.document');
     });
 });
 

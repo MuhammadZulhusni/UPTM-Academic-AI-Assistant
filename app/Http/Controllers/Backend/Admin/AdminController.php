@@ -85,6 +85,19 @@ class AdminController extends Controller
      */
     public function AdminProfileStore(Request $request)
     {
+        // Validate input with custom messages
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png|max:2048', // max 2MB
+        ], [
+            'photo.image' => 'The file must be an image.',
+            'photo.mimes' => 'Only JPG, JPEG, and PNG formats are allowed.',
+            'photo.max' => 'Image size must not exceed 2MB.',
+        ]);
+
         // Get the ID of the authenticated user
         $id = Auth::user()->id;
         $data = User::find($id);
@@ -100,21 +113,38 @@ class AdminController extends Controller
 
         // Check if a new photo has been uploaded
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');     
-            
-            // Generate a unique filename based on the current time
-            $filename = time().'.'.$file->getClientOriginalExtension();
+            try {
+                $file = $request->file('photo');
+                
+                // Additional validation check
+                if (!in_array($file->getClientOriginalExtension(), ['jpg', 'jpeg', 'png'])) {
+                    $notification = [
+                        'message' => 'Invalid image format! Only JPG, JPEG, and PNG are allowed.',
+                        'alert-type' => 'error'
+                    ];
+                    return redirect()->back()->with($notification);
+                }
+                
+                // Generate a unique filename based on the current time
+                $filename = time().'.'.$file->getClientOriginalExtension();
 
-            // Move the new file to the public 'upload/admin_images' directory
-            $file->move(public_path('upload/admin_images'), $filename);
+                // Move the new file to the public 'upload/admin_images' directory
+                $file->move(public_path('upload/admin_images'), $filename);
 
-            // Update the photo field with the new filename
-            $data->photo = $filename;
+                // Update the photo field with the new filename
+                $data->photo = $filename;
 
-            // Delete the old image if it exists and is not the same as the new one
-            if ($oldPhotoPath && $oldPhotoPath !== $filename) {
-               $this->deleteOldImage($oldPhotoPath);
-            } 
+                // Delete the old image if it exists and is not the same as the new one
+                if ($oldPhotoPath && $oldPhotoPath !== $filename) {
+                $this->deleteOldImage($oldPhotoPath);
+                }
+            } catch (\Exception $e) {
+                $notification = [
+                    'message' => 'Failed to upload image. Please try again.',
+                    'alert-type' => 'error'
+                ];
+                return redirect()->back()->with($notification);
+            }
         }
 
         $data->save();
@@ -141,7 +171,7 @@ class AdminController extends Controller
 
         // Check if the file exists before attempting to delete it
         if (file_exists($fullPath)) {
-           unlink($fullPath);
+        @unlink($fullPath); // @ suppresses warnings if file can't be deleted
         }
     }
 

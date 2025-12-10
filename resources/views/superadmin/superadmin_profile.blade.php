@@ -1,6 +1,7 @@
-@extends('client.client_dashboard')
+@extends('superadmin.dashboard')
 
-@section('client')
+@section('superadmin')
+<!-- Load jQuery 3.7.1 from Google CDN -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <div class="nk-content-inner">
@@ -16,14 +17,15 @@
 
         <div class="card shadow-sm border-0 rounded-3 profile-card">
             <div class="card-body p-4 p-md-5">
-                <form id="profileForm" action="{{ route('user.profile.store') }}" method="post" enctype="multipart/form-data">
+                <form id="profileForm" action="{{ route('superadmin.profile.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="row g-5">
                         <div class="col-lg-3 d-flex flex-column align-items-center justify-content-center border-end">
                             <div class="mb-4 text-center">
                                 <div class="position-relative">
                                     <img id="showImage" 
-                                         src="{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
+                                        {{-- Display admin profile photo if available; otherwise show default image --}}
+                                         src="{{ (!empty($profileData->photo)) ? url('upload/superadmin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 
                                          alt="Profile Image" 
                                          class="rounded-circle border border-3 border-light shadow"
                                          style="width: 150px; height: 150px; object-fit: cover;">
@@ -38,6 +40,7 @@
                                     <em class="icon ni ni-upload-cloud"></em>
                                     <span>Upload New Photo</span>
                                 </label>
+                                <!-- FILE INPUT NOW INSIDE THE FORM -->
                                 <input type="file" name="photo" class="form-control d-none" id="image" accept="image/jpeg,image/jpg,image/png">
                                 <small class="text-muted text-center mt-2" style="font-size: 0.80rem;">
                                     <strong>Accepted formats:</strong> JPG, JPEG, PNG<br>
@@ -113,7 +116,7 @@
 </style>
 
 <script type="text/javascript">
-    const originalImageSrc = "{{ (!empty($profileData->photo)) ? url('upload/user_images/'.$profileData->photo) : url('upload/no_image.jpg') }}";
+    const originalImageSrc = "{{ (!empty($profileData->photo)) ? url('upload/superadmin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}";
     const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
     const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png'];
 

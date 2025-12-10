@@ -29,12 +29,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
 
-        $notification = [
-            'message' => 'Login Successfully',
-            'alert-type' => 'success'
-        ];
+        // Super Admin redirect
+        if ($user->role === 'superadmin') {
+            return redirect()->intended(route('superadmin.dashboard'))->with([
+                'message' => 'Super Admin Login Successfully',
+                'alert-type' => 'success'
+            ]);
+        }
 
-        // Redirect based on role
+        // Admin redirect
         if ($user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard'))->with([
                 'message' => 'Admin Login Successfully',
@@ -42,13 +45,17 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
-        // For both student and lecturer
+        // Student & Lecturer redirect (user)
         if (in_array($user->role, ['student', 'lecturer'])) {
-            return redirect()->intended(route('user.dashboard'))->with($notification);
+            return redirect()->intended(route('user.dashboard'))->with([
+                'message' => 'Login Successfully',
+                'alert-type' => 'success'
+            ]);
         }
 
-        // If role is invalid
+        // Invalid role
         Auth::logout();
+
         return redirect('/')->with([
             'message' => 'Role not recognized!',
             'alert-type' => 'error'
