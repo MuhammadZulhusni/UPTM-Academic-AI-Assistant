@@ -27,11 +27,11 @@
             <div class="mb-5">
                 <h1 class="text-xl md:text-2xl font-extrabold text-[#1e40af] mb-1">Reset Password</h1>
                 <p class="text-[#64748b] text-xs md:text-sm font-medium max-w-xs mx-auto mt-2">
-                    Enter your new password below.
+                    Enter your email and new password below.
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('password.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('password.update') }}" class="space-y-4">
                 @csrf
 
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
@@ -39,7 +39,8 @@
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-1">Email Address</label>
                     <div class="relative">
-                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all" 
+                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all
+                               @error('email') border-red-500 @enderror" 
                             type="email" 
                             id="email" 
                             name="email"
@@ -57,7 +58,8 @@
                 <div>
                     <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-1">New Password</label>
                     <div class="relative">
-                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
+                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10
+                               @error('password') border-red-500 @enderror" 
                             type="password" 
                             id="password"
                             name="password" 
@@ -77,7 +79,8 @@
                 <div>
                     <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 text-left mb-1">Confirm New Password</label>
                     <div class="relative">
-                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
+                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10
+                               @error('password_confirmation') border-red-500 @enderror" 
                             type="password" 
                             id="password_confirmation"
                             name="password_confirmation" 
@@ -92,6 +95,14 @@
                     @error('password_confirmation')
                         <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
                     @enderror
+                </div>
+
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left text-sm text-gray-600">
+                    <strong class="block mb-1 text-gray-700"><i class="fas fa-info-circle mr-2"></i>Password Requirements:</strong>
+                    <ul class="list-disc list-inside ml-2 space-y-0.5 text-xs">
+                        <li>Minimum 8 characters long</li>
+                        <li>Passwords must match</li>
+                    </ul>
                 </div>
 
                 <div class="flex items-center justify-center pt-2">
@@ -145,24 +156,16 @@
         @endif
 
         // General error message for form validation errors
+        // This is a generic way to show an error if any validation fails
         @if ($errors->any())
             toastr.error("Please correct the errors in the form.");
         @endif
+        
+        // Also show success status from Laravel's password reset
+        @if (session('status'))
+            toastr.success("{{ session('status') }}");
+        @endif
     </script>
-
-    <script>
-    // Toastr notifications
-    @if(Session::has('message'))
-    var type = "{{ Session::get('alert-type','info') }}";
-    switch(type) {
-        case 'info': toastr.info("{{ Session::get('message') }}"); break;
-        case 'success': toastr.success("{{ Session::get('message') }}"); break;
-        case 'warning': toastr.warning("{{ Session::get('message') }}"); break;
-        case 'error': toastr.error("{{ Session::get('message') }}"); break;
-    }
-    @endif
-</script>
-
 </body>
 
 </html>

@@ -215,7 +215,7 @@ class AdminController extends Controller
         ]);
 
         // Store a flash message in the session to be displayed on the next request.
-        session()->flash('message', 'Password Updated Successfully');
+        session()->flash('message', 'Password updated successfully! Please login again.');
         session()->flash('alert-type', 'success');
 
         // Log the user out of the application.

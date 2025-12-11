@@ -16,7 +16,7 @@
 
             <div class="card shadow-sm border-0 rounded-3 password-card">
                 <div class="card-body p-4 p-md-5">
-                    <form action="{{ route('admin.password.update') }}" method="post">
+                    <form action="{{ route('superadmin.password.update') }}" method="post">
                         @csrf
                         <div class="row g-4">
                             <div class="col-md-6">

@@ -78,7 +78,12 @@
                             </li>
                             <li class="nk-menu-item">
                                 <a href="{{ route('superadmin.users') }}" class="nk-menu-link">
-                                    <span class="nk-menu-text">All Users</span>
+                                    <span class="nk-menu-text">Manage All Users</span>
+                                </a>
+                            </li>
+                            <li class="nk-menu-item">
+                                <a href="{{ route('superadmin.reset.password') }}" class="nk-menu-link">
+                                    <span class="nk-menu-text">Reset User Password</span>
                                 </a>
                             </li>
                         </ul>

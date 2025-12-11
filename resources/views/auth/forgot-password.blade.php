@@ -25,7 +25,7 @@
             </div>
 
             <div class="mb-5">
-                <h1 class="text-xl md:text-2xl font-extrabold text-[#1e40af] mb-1">UPTM Academic AI Assistant Tools</h1>
+                <h1 class="text-xl md:text-2xl font-extrabold text-[#1e40af] mb-1">Forgot Password</h1>
             </div>
             
             @if (session('status'))
@@ -44,7 +44,8 @@
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-1">Email Address</label>
                     <div class="relative">
-                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all" 
+                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all
+                               @error('email') border-red-500 @enderror" 
                             type="email" 
                             id="email" 
                             name="email"
@@ -94,7 +95,8 @@
         }
         @endif
 
-        // A general error message for form validation errors, matching the login reference
+        // A general error message for form validation errors
+        // This will catch any validation errors not specifically handled above, like rate limits.
         @if ($errors->any())
             toastr.error("Please correct the errors in the form.");
         @endif
