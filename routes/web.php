@@ -90,6 +90,7 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
 Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function () {
     // Dashboard
     Route::get('/dashboard', [SuperAdminController::class, 'Dashboard'])->name('superadmin.dashboard');
+    
     // Profile
     Route::controller(SuperAdminController::class)->group(function () {
         Route::get('/profile', 'Profile')->name('superadmin.profile');
@@ -98,9 +99,14 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::post('/password/update', 'PasswordUpdate')->name('superadmin.password.update');
         Route::get('/logout', 'Logout')->name('superadmin.logout');
     });
+    
     // Manage Admin & Users
     Route::get('/users', [SuperAdminController::class, 'Users'])->name('superadmin.users');
+    Route::get('/users/edit/{id}', [SuperAdminController::class, 'EditUser'])->name('superadmin.user.edit');
+    Route::post('/users/update/{id}', [SuperAdminController::class, 'UpdateUser'])->name('superadmin.user.update');
+    Route::post('/users/toggle-status/{id}', [SuperAdminController::class, 'ToggleUserStatus'])->name('superadmin.user.toggle.status');
     Route::delete('/users/delete/{id}', [SuperAdminController::class, 'DeleteUser'])->name('superadmin.user.delete');
+    
     // Template Management
     Route::controller(SuperAdminTemplateController::class)->group(function () {
         Route::get('/template', 'Index')->name('superadmin.template');
@@ -112,6 +118,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::post('/content/generate/{id}', 'ContentGenerate')->name('superadmin.content.generate');
         Route::post('/templates/delete/{id}', 'Destroy')->name('superadmin.delete.template');
     });
+    
     // Document Management
     Route::controller(SuperAdminDocumentController::class)->group(function () {
         Route::get('/document', 'Index')->name('superadmin.document');
@@ -120,7 +127,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::delete('/delete/document/{id}', 'Destroy')->name('superadmin.delete.document');
     });
 });
-
 
 // Laravel UI Routes (Default)
 Route::middleware('auth')->group(function () {
