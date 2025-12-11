@@ -116,6 +116,7 @@ class SuperAdminController extends Controller
     {
         // Get filter parameters from request
         $roleFilter = $request->get('role', 'all');
+        $statusFilter = $request->get('status', 'all');
         $search = $request->get('search', '');
 
         // Start building the query
@@ -124,6 +125,13 @@ class SuperAdminController extends Controller
         // Apply role filter
         if ($roleFilter !== 'all' && in_array($roleFilter, ['student', 'lecturer', 'admin'])) {
             $query->where('role', $roleFilter);
+        }
+
+        // Apply status filter
+        if ($statusFilter === 'active') {
+            $query->where('is_active', 1);
+        } elseif ($statusFilter === 'inactive') {
+            $query->where('is_active', 0);
         }
 
         // Apply search filter
@@ -141,7 +149,53 @@ class SuperAdminController extends Controller
                     ->paginate(10)
                     ->withQueryString();
                     
-        return view('superadmin.superadmin_users', compact('users', 'roleFilter', 'search'));
+        return view('superadmin.superadmin_users', compact('users', 'roleFilter', 'statusFilter', 'search'));
+    }
+
+    public function EditUser($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+
+    public function UpdateUser(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'role' => 'required|in:student,lecturer,admin'
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'role' => $request->role,
+            'is_active' => $request->has('is_active') ? 1 : 0
+        ]);
+
+        return back()->with([
+            'message' => 'User Updated Successfully',
+            'alert-type' => 'success'
+        ]);
+    }
+
+    public function ToggleUserStatus($id)
+    {
+        $user = User::findOrFail($id);
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        $status = $user->is_active ? 'activated' : 'deactivated';
+
+        return back()->with([
+            'message' => "User account has been {$status} successfully",
+            'alert-type' => 'success'
+        ]);
     }
 
     public function DeleteUser($id)

@@ -25,9 +25,23 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-        $request->session()->regenerate();
-
+        
         $user = $request->user();
+
+        // Check if user account is active
+        if (!$user->is_active) {
+            Auth::logout();
+            
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            
+            return redirect()->route('login')->with([
+                'message' => 'Your account has been deactivated. Please contact the administrator.',
+                'alert-type' => 'error'
+            ]);
+        }
+
+        $request->session()->regenerate();
 
         // Super Admin redirect
         if ($user->role === 'superadmin') {
