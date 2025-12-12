@@ -20,6 +20,9 @@ class TemplateController extends Controller
     public function AdminTemplate(Request $request){
         // Start the query with the base model
         $query = Template::query();
+
+        // Filter to show ONLY active templates (is_active = 1)
+        $query->where('is_active', 1);
         
         // 1. Apply Sorting (Order By) 
         $sort = $request->input('sort', 'newest'); // Default to 'newest'
@@ -35,6 +38,7 @@ class TemplateController extends Controller
         // 2. Apply Category Filter 
         $category = $request->input('category');
         if ($category && $category !== 'all') {
+            // The where('is_active', 1) filter is still applied here
             $query->where('category', ucfirst($category));
         }
 
@@ -42,6 +46,7 @@ class TemplateController extends Controller
         $search = $request->input('search');
         if ($search) {
             $searchTerm = '%' . $search . '%';
+            // The where('is_active', 1) filter is still applied here
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', $searchTerm)
                 ->orWhere('description', 'like', $searchTerm);
@@ -49,9 +54,15 @@ class TemplateController extends Controller
         }
 
         // 4. Get totals (without pagination)
+        // IMPORTANT: Cloned queries must also maintain the where('is_active', 1) constraint
         $totalTemplates  = $query->count(); // Total templates with applied filters
-        $studentCount    = (clone $query)->where('category', 'Student')->count();
-        $lecturerCount   = (clone $query)->where('category', 'Lecturer')->count();
+
+        // Clone the query *after* applying the is_active filter
+        $studentCountQuery = (clone $query)->where('category', 'Student');
+        $lecturerCountQuery = (clone $query)->where('category', 'Lecturer');
+
+        $studentCount    = $studentCountQuery->count();
+        $lecturerCount   = $lecturerCountQuery->count();
 
         // 5. Paginate and preserve query string 
         $templates = $query->paginate(8)->withQueryString(); 
@@ -63,7 +74,6 @@ class TemplateController extends Controller
             'lecturerCount'
         ));
     }
-
 
     // Displays the form for adding a new template
     public function AddTemplate(){
@@ -99,7 +109,7 @@ class TemplateController extends Controller
         $template->prompt = $validateData['prompt'];
 
         // Convert the checkbox value to 1 or 0
-        $template->is_active = isset($validateData['is_active_checkbox']) ? 1 : 0;
+        $template->is_active = isset($validateData['is_active_checkbox']) ? 0 : 1;
 
         // Sets the creator to the current authenticated user's ID
         $template->created_by = Auth::id();

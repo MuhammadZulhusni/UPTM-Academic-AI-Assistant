@@ -107,6 +107,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::get('/details/template/{id}', 'Show')->name('superadmin.details.template');
         Route::post('/content/generate/{id}', 'ContentGenerate')->name('superadmin.content.generate');
         Route::post('/templates/delete/{id}', 'Destroy')->name('superadmin.delete.template');
+        Route::post('/template/toggle-status/{id}', 'ToggleStatus')->name('superadmin.template.toggle-status');
     });
     
     Route::controller(SuperAdminDocumentController::class)->group(function () {
