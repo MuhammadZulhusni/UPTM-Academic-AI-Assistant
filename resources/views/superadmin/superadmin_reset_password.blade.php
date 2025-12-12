@@ -13,7 +13,6 @@
         </div>
 
         <div class="row g-4 mt-2">
-            <!-- Instructions Card -->
             <div class="col-lg-4">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body p-4">
@@ -66,7 +65,6 @@
                 </div>
             </div>
 
-            <!-- Reset Password Form -->
             <div class="col-lg-8">
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4">
@@ -103,7 +101,6 @@
                                     </div>
                                     <input type="hidden" name="user_id" id="user_id" required>
                                     
-                                    <!-- Search Results Dropdown -->
                                     <div class="search-results-dropdown" id="searchResultsDropdown">
                                         <div class="search-results-content" id="searchResultsContent">
                                             <div class="text-center text-muted py-3">
@@ -118,7 +115,6 @@
                                 </div>
                             </div>
 
-                            <!-- User Info Preview -->
                             <div id="userInfoPreview" class="user-info-preview d-none mb-4">
                                 <div class="card bg-light border-0">
                                     <div class="card-body p-3">
@@ -175,7 +171,6 @@
                     </div>
                 </div>
 
-                <!-- Important Notes -->
                 <div class="card shadow-sm border-0 mt-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-3">
@@ -253,17 +248,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    animation: float 3s ease-in-out infinite;
+    /* REMOVED: animation: float 3s ease-in-out infinite; */
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
+/* REMOVED: @keyframes float block */
 
 .user-info-preview {
     animation: slideDown 0.3s ease-out;
@@ -491,6 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Perform AJAX search
     function performSearch(query) {
+        // NOTE: This route is assumed to be defined in your Laravel application
         fetch(`{{ route('superadmin.users.search') }}?q=${encodeURIComponent(query)}`, {
             method: 'GET',
             headers: {
