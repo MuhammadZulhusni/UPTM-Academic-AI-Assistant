@@ -93,19 +93,21 @@ class SuperAdminController extends Controller
     {
         $user = Auth::user();
 
+        // Step 1: Validate the Current Password is entered
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed'
+            'new_password' => 'required|confirmed|min:8',
         ]);
 
+        // Step 2: Check if Current Password is correct
         if (!Hash::check($request->old_password, $user->password)) {
-            return back()->with([
-                'message' => 'Old Password Does Not Match!',
-                'alert-type' => 'error'
-            ]);
+            return back()->withErrors([
+                'old_password' => 'Current password is incorrect.',
+            ])->withInput();
         }
 
-        User::whereId($user->id)->update([
+        // Step 3: Update new password
+        $user->update([
             'password' => Hash::make($request->new_password)
         ]);
 

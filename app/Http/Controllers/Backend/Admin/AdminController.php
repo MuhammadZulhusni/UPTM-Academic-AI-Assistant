@@ -184,44 +184,34 @@ class AdminController extends Controller
         return view('admin.admin_change_password');
     }
 
-    /**
-     * Handles the logic for updating the admin's password.
-     *
-     * @param \Illuminate\Http\Request $request The incoming request.
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function AdminPasswordUpdate(Request $request){
+    public function AdminPasswordUpdate(Request $request)
+    {
+        $user = Auth::user();
 
-        $user = Auth::user(); 
-        
-        // Validate the incoming request data.
+        // Step 1: Validate the Current Password is entered
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed'
+            'new_password' => 'required|confirmed|min:8',
         ]);
 
-        // Check if the old password matches the one in the database.
+        // Step 2: Check if Current Password is correct
         if (!Hash::check($request->old_password, $user->password)) {
-            $notification = array(
-                'message' => 'Old Password Does not Match!',
-                'alert-type' => 'error'
-            );
-            return back()->with($notification);
+            return back()->withErrors([
+                'old_password' => 'Current password is incorrect.',
+            ])->withInput();
         }
 
-        // Update the user's password in the database.
-        User::whereId($user->id)->update([
+        // Step 3: Update new password
+        $user->update([
             'password' => Hash::make($request->new_password)
         ]);
 
-        // Store a flash message in the session to be displayed on the next request.
-        session()->flash('message', 'Password updated successfully! Please login again.');
-        session()->flash('alert-type', 'success');
-
-        // Log the user out of the application.
         Auth::logout();
 
-        return redirect()->route('login');
+        return redirect()->route('login')->with([
+            'message' => 'Password updated successfully! Please login again.',
+            'alert-type' => 'success'
+        ]);
     }
 
     public function AdminUsers(Request $request)

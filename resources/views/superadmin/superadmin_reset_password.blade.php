@@ -93,9 +93,9 @@
                                             <i class="bi bi-search text-muted"></i>
                                         </span>
                                         <input type="text" 
-                                               class="form-control border-start-0 ps-0" 
+                                               class="form-control border-start-0 ps-2" 
                                                id="user_search" 
-                                               placeholder="  Type name or email to search..."
+                                               placeholder="Type name or email to search..."
                                                autocomplete="off">
                                         <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" style="display: none;">
                                             <i class="bi bi-x-lg"></i>
@@ -167,8 +167,8 @@
                                     Send Password Reset Link
                                 </button>
                                 <a href="{{ route('superadmin.users') }}" class="btn btn-outline-secondary">
-                                    <i class="bi bi-arrow-left me-2"></i>
-                                    Back to Users
+                                    <i class="bi bi-people me-2"></i>
+                                    View All Users
                                 </a>
                             </div>
                         </form>
