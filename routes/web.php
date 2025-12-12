@@ -32,29 +32,20 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
 
     // User Template & Document Management
     Route::controller(UserTemplateController::class)->group(function () {
-        // Display templates filtered by the logged-in user's role
         Route::get('/user/template', 'UserTemplate')->name('user.template');
-        // View details of a single template
         Route::get('/user/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
-        // Generate content for a specific template
         Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
-        // List all documents created by the logged-in user
         Route::get('/user/document', 'UserDocument')->name('user.document');
-        // Edit a specific user document
         Route::get('/edit/user/document/{id}', 'EditUserDocument')->name('edit.user.document');
-        // Update a specific user document
         Route::post('/user/update/document/{id}', 'UserUpdateDocument')->name('user.update.document');
-        // Delete a specific user document
         Route::delete('/delete/user/document/{id}', 'DeleteUserDocument')->name('delete.user.document');
     });
 });
 
 // Admin Routes
 Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () {
-    // Admin Dashboard
     Route::get('/dashboard', [AdminController::class, 'AdminDashboard'])->name('admin.dashboard');
 
-    // Admin Account & User Management
     Route::controller(AdminController::class)->group(function () {
         Route::get('/profile', 'AdminProfile')->name('admin.profile');
         Route::post('/profile/store', 'AdminProfileStore')->name('admin.profile.store');
@@ -65,7 +56,6 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
         Route::delete('/users/delete/{id}', 'AdminDeleteUser')->name('admin.user.delete');
     });
 
-    // Template Management
     Route::controller(TemplateController::class)->group(function () {
         Route::get('/template', 'AdminTemplate')->name('admin.template');
         Route::get('/add/template', 'AddTemplate')->name('add.template');
@@ -77,7 +67,6 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
         Route::post('/templates/delete/{id}', 'DeleteTemplate')->name('delete.template');
     });
 
-    // Document Management
     Route::controller(DocumentController::class)->group(function () {
         Route::get('/document', 'AdminDocument')->name('admin.document');
         Route::get('/edit/document/{id}', 'EditAdminDocument')->name('edit.admin.document');
@@ -88,10 +77,8 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
 
 // Super Admin Routes
 Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function () {
-    // Dashboard
     Route::get('/dashboard', [SuperAdminController::class, 'Dashboard'])->name('superadmin.dashboard');
     
-    // Profile
     Route::controller(SuperAdminController::class)->group(function () {
         Route::get('/profile', 'Profile')->name('superadmin.profile');
         Route::post('/profile/store', 'ProfileStore')->name('superadmin.profile.store');
@@ -100,14 +87,15 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::get('/logout', 'Logout')->name('superadmin.logout');
     });
     
-    // Manage Admin & Users
     Route::get('/users', [SuperAdminController::class, 'Users'])->name('superadmin.users');
     Route::get('/users/edit/{id}', [SuperAdminController::class, 'EditUser'])->name('superadmin.user.edit');
     Route::post('/users/update/{id}', [SuperAdminController::class, 'UpdateUser'])->name('superadmin.user.update');
     Route::post('/users/toggle-status/{id}', [SuperAdminController::class, 'ToggleUserStatus'])->name('superadmin.user.toggle.status');
     Route::delete('/users/delete/{id}', [SuperAdminController::class, 'DeleteUser'])->name('superadmin.user.delete');
+    Route::get('/reset-password', [SuperAdminController::class, 'ResetPasswordPage'])->name('superadmin.reset.password');
+    Route::post('/send-reset-link', [SuperAdminController::class, 'SendResetLink'])->name('superadmin.send.reset.link');
+    Route::get('/superadmin/users/search', [SuperAdminController::class, 'searchUsers'])->name('superadmin.users.search');
     
-    // Template Management
     Route::controller(SuperAdminTemplateController::class)->group(function () {
         Route::get('/template', 'Index')->name('superadmin.template');
         Route::get('/add/template', 'Create')->name('superadmin.add.template');
@@ -119,7 +107,6 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::post('/templates/delete/{id}', 'Destroy')->name('superadmin.delete.template');
     });
     
-    // Document Management
     Route::controller(SuperAdminDocumentController::class)->group(function () {
         Route::get('/document', 'Index')->name('superadmin.document');
         Route::get('/edit/document/{id}', 'Edit')->name('superadmin.edit.document');

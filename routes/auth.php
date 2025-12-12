@@ -31,8 +31,9 @@ Route::middleware('guest')->group(function () {
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
         ->name('password.reset');
 
+    // Changed from password.store to password.update to match Laravel's expectations
     Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+        ->name('password.update');
 });
 
 Route::middleware('auth')->group(function () {
@@ -52,7 +53,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
-    Route::put('password', [PasswordController::class, 'update'])->name('password.update');
+    // This route is for changing password while authenticated (different from reset)
+    Route::put('password', [PasswordController::class, 'update'])->name('password.change');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');

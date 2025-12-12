@@ -9,6 +9,7 @@ use App\Models\GeneratedContent;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 
 class SuperAdminController extends Controller
@@ -92,24 +93,30 @@ class SuperAdminController extends Controller
     {
         $user = Auth::user();
 
+        // Step 1: Validate the Current Password is entered
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed'
+            'new_password' => 'required|confirmed|min:8',
         ]);
 
+        // Step 2: Check if Current Password is correct
         if (!Hash::check($request->old_password, $user->password)) {
-            return back()->with([
-                'message' => 'Old Password Does not Match!',
-                'alert-type' => 'error'
-            ]);
+            return back()->withErrors([
+                'old_password' => 'Current password is incorrect.',
+            ])->withInput();
         }
 
-        User::whereId($user->id)->update([
+        // Step 3: Update new password
+        $user->update([
             'password' => Hash::make($request->new_password)
         ]);
 
         Auth::logout();
-        return redirect()->route('login');
+
+        return redirect()->route('login')->with([
+            'message' => 'Password updated successfully! Please login again.',
+            'alert-type' => 'success'
+        ]);
     }
 
     public function Users(Request $request)
@@ -206,6 +213,52 @@ class SuperAdminController extends Controller
             'message' => 'User Deleted Successfully',
             'alert-type' => 'success'
         ]);
+    }
+
+    public function ResetPasswordPage()
+    {
+        $users = User::whereIn('role', ['student', 'lecturer', 'admin'])
+                    ->select('id', 'name', 'email', 'role')
+                    ->orderBy('name')
+                    ->get();
+        
+        return view('superadmin.superadmin_reset_password', compact('users'));
+    }
+
+    public function SendResetLink(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id'
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+
+        // Generate password reset token
+        $token = Password::broker()->createToken($user);
+        
+        // Send password reset notification
+        $user->sendPasswordResetNotification($token);
+
+        return back()->with([
+            'message' => "Password reset link has been sent to {$user->email}",
+            'alert-type' => 'success'
+        ]);
+    }
+
+    public function searchUsers(Request $request)
+    {
+        $query = $request->input('q');
+        
+        $users = User::where(function($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                ->orWhere('email', 'LIKE', "%{$query}%");
+            })
+            ->where('id', '!=', Auth::id()) // Exclude current user if needed
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'email', 'role']);
+        
+        return response()->json($users);
     }
 
     public function Logout(Request $request)
