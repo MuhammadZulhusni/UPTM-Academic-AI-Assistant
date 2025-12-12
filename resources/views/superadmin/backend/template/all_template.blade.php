@@ -1,5 +1,6 @@
 @extends('superadmin.dashboard')
 @section('superadmin')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
  <div class="nk-content-inner">
      <div class="nk-content-body">
@@ -105,60 +106,113 @@
         @endif
         {{-- END STATS CARD BLOCK --}}
 
-        {{-- TEMPLATE CARDS --}}
-            <div class="row g-3 g-md-4 mt-2" id="templates-container">
-                @foreach ($templates as $item)
-                <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
-                    data-category="{{ strtolower($item->category) }}"
-                    data-title="{{ strtolower($item->title) }}"
-                    data-description="{{ strtolower($item->description) }}"
-                    data-created="{{ $item->created_at->timestamp }}">
+        {{-- =========================
+            TEMPLATE CARDS + ACTIONS
+        ========================= --}}
+        <div class="row g-3 g-md-4 mt-2" id="templates-container">
+            @foreach ($templates as $item)
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
+                data-category="{{ strtolower($item->category) }}"
+                data-title="{{ strtolower($item->title) }}"
+                data-description="{{ strtolower($item->description) }}"
+                data-created="{{ $item->created_at->timestamp }}">
 
-                    <div class="card h-100 border-0 shadow-sm template-card">
-                        <div class="card-body p-3 d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                    <img src="{{ asset('upload/template/' . $item->icon) }}"
-                                        alt="Icon"
-                                        class="img-fluid"
-                                        style="width:22px; height:22px; object-fit:contain; border-radius:0;">
-                                </div>
-                                <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
-                                    {{ $item->category }}
-                                </span>
+                <div class="card h-100 shadow-sm template-card">
+                    <div class="card-body p-4">
+                        
+                        {{-- TOP: ICON & CATEGORY --}}
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-circle bg-light p-3">
+                                <img src="{{ asset('upload/template/' . $item->icon) }}"
+                                    alt="{{ $item->title }}"
+                                    width="32"
+                                    height="32"
+                                    style="object-fit:contain;">
                             </div>
-                            <div class="flex-grow-1">
-                                <h5 class="card-title fs-6 fw-medium mb-1">{{ $item->title }}</h5>
-                                <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-2">{{ $item->description }}</p>
-                            </div>
+                            <span class="badge rounded-pill bg-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
+                                {{ $item->category }}
+                            </span>
                         </div>
-                        <div class="card-footer bg-white border-0 py-2 px-3 d-flex justify-content-between align-items-center">
-                            <small class="text-muted d-flex align-items-center">
-                                <em class="icon ni ni-calendar me-1"></em>
-                                <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
-                                <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
-                            </small>
 
-                            <div class="d-flex gap-1">
-                                <a href="{{ route('superadmin.details.template', $item->id) }}" class="btn btn-sm btn-icon btn-light" title="View" data-bs-toggle="tooltip">
-                                    <em class="icon ni ni-eye"></em>
-                                </a>
-                                <a href="{{ route('superadmin.edit.template', $item->id) }}" class="btn btn-sm btn-icon btn-primary" title="Edit" data-bs-toggle="tooltip">
-                                    <em class="icon ni ni-edit"></em>
-                                </a>
-                                <button class="btn btn-sm btn-icon btn-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#confirmDeleteModal"
-                                        data-template-id="{{ $item->id }}"
-                                        title="Delete Template">
-                                    <em class="icon ni ni-trash" title="Delete" data-bs-toggle="tooltip"></em>
-                                </button>
-                            </div>
+                        {{-- TITLE --}}
+                        <h5 class="fw-bold mb-2">{{ $item->title }}</h5>
+
+                        {{-- DESCRIPTION --}}
+                        <p class="text-muted small mb-3" style="min-height: 60px;">
+                            {{ Str::limit($item->description, 80) }}
+                        </p>
+
+                        {{-- STATUS & DATE --}}
+                        <div class="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                            <span class="badge bg-{{ $item->is_active ? 'success' : 'secondary' }}">
+                                {{ $item->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                            <small class="text-muted">
+                                {{ $item->created_at->format('M d, Y') }}
+                            </small>
+                        </div>
+
+                        {{-- ACTION BUTTONS --}}
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('superadmin.details.template', $item->id) }}"
+                                class="btn btn-sm btn-outline-secondary flex-fill">
+                                <em class="icon ni ni-eye"></em>
+                            </a>
+
+                            <a href="{{ route('superadmin.edit.template', $item->id) }}"
+                                class="btn btn-sm btn-primary flex-fill">
+                                <em class="icon ni ni-edit"></em>
+                            </a>
+
+                            <button type="button"
+                                class="btn btn-sm btn-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#statusModal"
+                                data-template-id="{{ $item->id }}"
+                                data-template-status="{{ $item->is_active ? 1 : 0 }}">
+                                <em class="icon ni ni-repeat"></em>
+                            </button>
+
+                            <button type="button"
+                                class="btn btn-sm btn-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal"
+                                data-template-id="{{ $item->id }}">
+                                <em class="icon ni ni-trash"></em>
+                            </button>
                         </div>
                     </div>
-                </div> 
-                @endforeach
+                </div>
             </div> 
+            @endforeach
+        </div>
+
+        {{-- =========================
+            STATUS CHANGE MODAL
+        ========================= --}}
+        <div class="modal fade" id="statusModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form id="statusForm" method="POST">
+                        @csrf
+
+                        <div class="modal-body text-center p-5">
+                            <div class="text-warning mb-3">
+                                <em class="icon ni ni-alert-circle-fill" style="font-size: 64px;"></em>
+                            </div>
+                            <h4 class="mb-3">Change Status?</h4>
+                            <p id="statusModalText" class="text-muted"></p>
+                        </div>
+
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-warning">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
             {{-- MODERN MINIMALIST PAGINATION --}}
             @if ($totalTemplates > 0)
             <div class="nk-block pt-5">
@@ -602,6 +656,25 @@
 .pagination-minimal .page-item.active .page-link {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.template-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.template-card .btn {
+    transition: all 0.2s ease;
+}
+
+.template-card .btn:hover {
+    transform: scale(1.05);
+}
 </style>
 
 {{-- DELETE CONFIRMATION MODAL --}}
@@ -617,15 +690,13 @@
                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                     <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                 </svg>
-                <h5 class="fw-bold">Are you sure?</h5>
+                <h5 class="fw-bold mb-4">Are you sure?</h5>
                 <p class="text-muted">Do you really want to delete this template? This process cannot be undone.</p>
             </div>
-            <div class="modal-footer justify-content-center border-0 pt-0 gap-2">
+            <div class="modal-footer justify-content-center mt-1 border-0">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteTemplateForm" method="POST">
                     @csrf
-                    {{-- Use GET method for simplicity, or change route to POST/DELETE --}}
-                    {{-- @method('DELETE') --}}
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
             </div>
@@ -658,5 +729,34 @@
         }
     });
 </script>
+
+{{-- =========================
+     JAVASCRIPT: wire up modals  set form actions & text
+   ========================= --}}
+<script>
+    // STATUS modal handler
+    const statusModalEl = document.getElementById('statusModal');
+    if (statusModalEl) {
+        statusModalEl.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            if (!button) return;
+            const templateId = button.getAttribute('data-template-id');
+            const status = button.getAttribute('data-template-status'); // "1" or "0"
+            const form = document.getElementById('statusForm');
+
+            // Set action - adjust route path if your route is different
+            form.action = `/superadmin/template/toggle-status/${templateId}`;
+
+            // Update modal text contextually
+            const textEl = document.getElementById('statusModalText');
+            if (String(status) === '1') {
+                textEl.textContent = 'Are you sure you want to deactivate this template?';
+            } else {
+                textEl.textContent = 'Are you sure you want to activate this template?';
+            }
+        });
+    }
+</script>
+
 
 @endsection

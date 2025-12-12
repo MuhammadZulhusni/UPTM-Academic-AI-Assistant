@@ -4,116 +4,160 @@
 <style>
     :root {
         --primary-color: #007bff;
+        --primary-hover: #0056b3;
         --secondary-color: #6c757d;
         --success-color: #28a745;
-        --danger-color: #dc3545;
-        --info-color: #17a2b8;
-        --light-color: #f8f9fa;
         --dark-color: #343a40;
         --border-color: #dee2e6;
         --card-bg: #ffffff;
+        --panel-bg: #f8f9fa;
         --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
+    /* --- Base Resets & Typography --- */
     body {
         font-family: var(--font-family-base);
-        background-color: var(--light-color);
+        background-color: var(--panel-bg);
+        color: #495057;
+    }
+
+    .display-6 {
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0.25rem;
     }
     
-    .card {
+    /* --- Main Structure & Layout --- */
+    
+    .page-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .main-content-card {
         border: none;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-radius: 16px; 
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        background-color: var(--card-bg);
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    /* --- Control Panel (Left Side - Form) --- */
+    .control-panel {
+        background-color: var(--panel-bg); 
+        border-radius: 16px 0 0 16px; 
+        padding: 30px;
+        border-right: 1px solid var(--border-color);
+        position: relative;
+    }
+
+    @media (min-width: 992px) {
+        .control-panel {
+            min-height: 100%;
+        }
+        .form-sticky-wrap {
+            position: sticky;
+            top: 2rem;
+        }
+    }
+
+
+    /* --- Editor Panel (Right Side) --- */
+    .editor-panel-wrap {
+        padding: 30px;
+        flex-grow: 1;
+        background-color: var(--card-bg);
+        border-radius: 0 16px 16px 0;
     }
 
     .nk-editor {
+        position: relative; 
         border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border-radius: 12px; 
         overflow: hidden;
         background-color: var(--card-bg);
+        height: 100%; 
+        display: flex;
+        flex-direction: column;
+        min-height: 600px;
     }
 
     .nk-editor-header {
         background-color: #f0f3f7;
-        padding: 1.25rem 1.5rem;
+        padding: 1rem 1.5rem;
         border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
-    .nk-editor-main {
-        padding: 1rem 1.5rem;
+    .nk-editor-title h4 {
+        font-weight: 600;
+        color: var(--dark-color);
+        font-size: 1.15rem;
     }
 
+    .nk-editor-main {
+        flex-grow: 1;
+        overflow-y: auto; 
+    }
+
+    .nk-editor-body {
+        padding: 1.5rem; 
+        line-height: 1.7;
+    }
+
+    /* --- Form Elements --- */
     .form-label {
         font-weight: 600;
         color: var(--dark-color);
+        margin-bottom: 0.5rem;
+        display: block;
     }
     
     .form-control, .form-select {
         border-radius: 8px;
         padding: 0.75rem 1rem;
         border: 1px solid #ced4da;
+        box-shadow: none;
         transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
     }
 
+    /* --- Buttons & Export --- */
     .btn-primary {
         background-color: var(--primary-color);
         border-color: var(--primary-color);
         font-weight: 600;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 0.75rem 1.5rem;
-        transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+        transition: all 0.2s ease-in-out;
     }
 
     .btn-primary:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-        transform: translateY(-2px);
-    }
-
-    .btn-light.rounded-pill {
-        border-radius: 50px !important;
-        font-weight: 500;
-        transition: all 0.2s ease-in-out;
-    }
-    
-    .btn-light.rounded-pill:hover {
-        background-color: #e9ecef;
+        background-color: var(--primary-hover);
+        border-color: var(--primary-hover);
         transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
     }
     
-    .dropdown-menu {
-        border-radius: 8px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        border: none;
-    }
-
-    .dropdown-item {
-        transition: background-color 0.2s ease;
-    }
-
-    .dropdown-item:active {
-        background-color: var(--light-color);
-        color: var(--dark-color);
-    }
-
-    /* Loading Overlay & Animations */
+    /* --- Loading Overlay & Animations (Organized Position) --- */
     .loading-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(5px);
-        display: none;
+        border-radius: 12px; 
+        background: rgba(255, 255, 255, 0.98); 
+        backdrop-filter: blur(3px); 
+        display: flex;
         justify-content: center;
         align-items: center;
         z-index: 1000;
@@ -121,14 +165,15 @@
         transition: opacity 0.4s ease;
     }
 
+    /* *** REFINED LOADING SPINNER CONTAINER *** */
     .loading-spinner {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 15px;
+        gap: 20px; /* Increased vertical spacing between elements */
         text-align: center;
     }
-    
+
     .spinner {
         width: 48px;
         height: 48px;
@@ -143,34 +188,53 @@
         100% { transform: rotate(360deg); }
     }
     
-    .progress-bar {
-        width: 200px;
-        height: 6px;
-        background: #e9ecef;
-        border-radius: 3px;
-        overflow: hidden;
-        margin-top: 10px;
+    /* *** REFINED PROGRESS BAR & TEXT *** */
+    .loading-spinner > p {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--dark-color);
+        margin-bottom: 0;
     }
     
+    .progress-bar {
+        position: relative;
+        overflow: hidden;
+        width: 250px; /* Increased width for better visual impact */
+        height: 8px; /* Slightly thicker */
+        background: #e9ecef;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
     .progress-fill {
+        position: absolute;
         height: 100%;
         background: linear-gradient(90deg, var(--primary-color), #0056b3);
         width: 0%;
-        animation: progressPulse 2s ease-in-out infinite;
+        left: 0;
+        animation: progressLoad 2s linear infinite;
     }
     
-    @keyframes progressPulse {
-        0% { width: 0%; }
-        50% { width: 100%; }
-        100% { width: 0%; }
+    @keyframes progressLoad {
+        0% { width: 0%; left: -100%; }
+        50% { width: 100%; left: 0%; }
+        100% { width: 0%; left: 100%; }
+    }
+    
+    .typing-indicator {
+        margin-top: 15px; /* Added spacing below the progress bar */
+        display: flex;
+        align-items: center;
+        color: var(--secondary-color);
     }
     
     .typing-indicator .dot {
-        width: 10px;
-        height: 10px;
+        width: 8px; /* Slightly smaller dots */
+        height: 8px;
         background-color: var(--primary-color);
         animation: typingDots 1.4s infinite ease-in-out both;
         border-radius: 50%;
+        margin: 0 4px;
     }
     
     .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -178,200 +242,198 @@
     .typing-indicator .dot:nth-child(3) { animation-delay: 0s; }
     
     @keyframes typingDots {
-        0%, 80%, 100% { transform: scale(0.8); }
-        40% { transform: scale(1); }
+        0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+        40% { transform: scale(1); opacity: 1; }
     }
 
-    /* This is the change. 
-        We are targeting the placeholder content specifically
-        and allowing the generated content to follow the default alignment.
-    */
+
+    /* --- Placeholder & Icons --- */
     .placeholder-content {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
-        min-height: 300px;
+        min-height: 400px;
         padding: 20px;
+        color: #adb5bd; 
     }
     
-    /* Fresh Icons */
     .ni-edit-alt {
         color: #d1d9e2 !important;
-        font-size: 5rem !important;
-        opacity: 0.5 !important;
-        transition: all 0.3s ease;
+        font-size: 6rem !important; 
+        opacity: 0.6 !important;
     }
     
-    .nk-editor-body:hover .ni-edit-alt {
-        transform: scale(1.05);
+    /* --- Generated Content Styling --- */
+    .content-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--dark-color);
+        padding-top: 0.5rem;
     }
+    
+    .content-paragraph {
+        margin-bottom: 1.25rem;
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+    
 </style>
 
+
 <div class="nk-content-inner">
-    <div class="nk-content-body">
-        <div class="nk-block-head nk-page-head">
+    <div class="nk-content-body page-container">
+        
+        <div class="nk-block-head nk-page-head mb-4">
             <div class="nk-block-head-between">
                 <div class="nk-block-head-content">
                     <h2 class="display-6">{{ $template->title }}</h2>
-                    <p>{{ $template->description }}</p>
+                    <p class="text-muted">{{ $template->description }}</p>
                 </div>
             </div>
         </div>
         
-        <div class="card shadow-none">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <form id="generateForm" action="{{ route('content.generate', $template->id) }}" method="post">
-                            @csrf  
+        <div class="main-content-card row gx-0">
+            
+            <div class="col-lg-4 control-panel">
+                <div class="form-sticky-wrap">
 
-                            <div class="form-group">
-                                <label for="language" class="form-label">Language</label>
-                                <div class="form-control-wrap">
-                                    <select name="language" class="form-select" id="language" required>
-                                        <option value="">Select Language</option>
-                                        <option value="English">English</option>
-                                        <option value="Bahasa Melayu">Bahasa Melayu</option>
-                                    </select>
-                                </div>
-                            </div>  
-                            
-                            @foreach ($template->inputFields as $field)
-                            <div class="form-group mt-3">
-                                <label for="{{ $field->title }}">{{ $field->title }}</label>
-                               
-                                @if ($field->type === 'text')
-                                <input type="text" 
-                                    name="{{ str_replace(' ', '_', $field->title) }}" 
-                                    id="{{ $field->title }}" 
-                                    class="form-control" 
-                                    maxlength="100"
-                                    required>
-                                
-                                @elseif ($field->type === 'textarea')
-                                <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
-                                    id="{{ $field->title }}" 
-                                    rows="5" 
-                                    class="form-control" 
-                                    maxlength="10000"
-                                    required></textarea> 
-                                @endif
-                                <small>{{ $field->description }}</small>
-                            </div>
-                            @endforeach
+                    <form id="generateForm" action="{{ route('content.generate', $template->id) }}" method="post">
+                        @csrf  
 
-                            <div class="form-group mt-3">
-                                <label for="ai_model" class="form-label">AI Model</label>
-                                <div class="form-control-wrap">
-                                    <select name="ai_model" class="form-select" id="ai_model">
-                                        <option value="gpt-3.5-turbo" selected>OpenAI | GPT-3.5-turbo (Faster)</option>
-                                        <option value="gpt-4">OpenAI | GPT 4 (Higher Quality)</option>
-                                    </select>
-                                </div>
-                            </div>
+                        <div class="form-group mb-4">
+                            <label for="language" class="form-label">Language</label>
+                            <select name="language" class="form-select" id="language" required>
+                                <option value="">Select Language</option>
+                                <option value="English">English</option>
+                                <option value="Bahasa Melayu">Bahasa Melayu</option>
+                            </select>
+                        </div>  
+                        
+                        @foreach ($template->inputFields as $field)
+                        <div class="form-group mb-4">
+                            <label for="{{ $field->title }}" class="form-label">{{ $field->title }}</label>
+                            @if ($field->type === 'text')
+                            <input type="text" 
+                                name="{{ str_replace(' ', '_', $field->title) }}" 
+                                id="{{ $field->title }}" 
+                                class="form-control" 
+                                placeholder="Enter {{ $field->title }}"
+                                maxlength="10000"
+                                required>
+                            @elseif ($field->type === 'textarea')
+                            <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
+                                id="{{ $field->title }}" 
+                                rows="4" 
+                                class="form-control" 
+                                placeholder="Provide detailed description..."
+                                maxlength="50000"
+                                required></textarea> 
+                            @endif
+                            <small class="form-text text-muted">{{ $field->description }}</small>
+                        </div>
+                        @endforeach
 
-                            <div class="row mt-3">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label for="result_length" class="form-label">Result Length (words)</label>
-                                        <div class="form-control-wrap">
-                                            <input type="number" name="result_length" class="form-control" 
-                                                   id="result_length" value="100" min="1" max="1000" required>
-                                            <small class="text-muted">Refer to the description template for best results.</small>
-                                        </div>
-                                    </div> 
-                                </div> 
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary mt-3 mb-3" id="generateBtn">
-                                <span class="btn-text">
-                                    Generate Content
-                                </span>
+                        <div class="form-group mb-4">
+                            <label for="ai_model" class="form-label">AI Model</label>
+                            <select name="ai_model" class="form-select" id="ai_model">
+                                <option value="gpt-3.5-turbo" selected>OpenAI | GPT-3.5-turbo (Faster)</option>
+                                <option value="gpt-4">OpenAI | GPT 4 (Higher Quality)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label for="result_length" class="form-label">Result Length (words)</label>
+                            <input type="number" name="result_length" class="form-control" 
+                                   id="result_length" value="100" min="1" max="5000" required>
+                            <small class="form-text text-muted">Set the desired length for the output.</small>
+                        </div>
+                        
+                        <div class="d-grid gap-2 pt-2 pb-4">
+                            <button type="submit" class="btn btn-primary" id="generateBtn">
+                                <span class="btn-text">Generate Content</span>
                                 <span class="btn-loading" style="display: none;">
                                     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                                     Generating...
                                 </span>
                             </button> 
-                        </form>
-                    </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-lg-8 editor-panel-wrap">
+                <div class="nk-editor">
                     
-                    <div class="col-md-8" style="position: relative;">
-                        <div class="loading-overlay" id="loadingOverlay">
-                            <div class="loading-spinner">
-                                <div class="spinner"></div>
-                                <p><strong>AI is crafting your content...</strong></p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill"></div>
-                                </div>
-                                <div class="typing-indicator">
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                    <span class="ms-2 text-muted" id="loadingText">Analyzing request...</span>
-                                </div>
+                    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>AI is crafting your content...</p>
+                            
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            
+                            <div class="typing-indicator">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <span class="ms-3 text-dark fw-bold" id="loadingText">Analyzing request...</span>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="nk-editor">
-                            <div class="nk-editor-header">
-                                <div class="nk-editor-title">
-                                    <h4 class="me-3 mb-0 line-clamp-1">{{ $template->title }}</h4>
-                                </div>
-                                <div class="nk-editor-tools d-none d-xl-flex">
-                                    <ul class="d-inline-flex gap gx-3 gx-lg-4 pe-4 pe-lg-5">
-                                        <li>
-                                            <span class="sub-text text-nowrap">Words <span class="text-dark fw-bold" id="word-count">0</span></span>
-                                        </li>
-                                        <li>
-                                            <span class="sub-text text-nowrap">Characters <span class="text-dark fw-bold" id="char-count">0</span></span>
-                                        </li>
-                                    </ul>
-                                    <ul class="d-inline-flex gap gx-3">
-                                        <li>
-                                            <div class="dropdown">
-                                                <button class="btn btn-md btn-light rounded-pill" type="button" data-bs-toggle="dropdown">
-                                                    <em class="icon ni ni-download me-1"></em>
-                                                    <span>Export</span>
-                                                    <em class="icon ni ni-chevron-down"></em>
-                                                </button> 
-                                                <ul class="dropdown-menu">
-                                                    <li><a href="#" class="dropdown-item" id="copy-text">
-                                                        <em class="icon ni ni-copy me-2"></em>Copy Text</a></li>
-                                                    <li><a href="#" class="dropdown-item" id="download-txt">
-                                                        <em class="icon ni ni-file-text me-2"></em>Download TXT</a></li>
-                                                </ul>          
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+                    <div class="nk-editor-header">
+                        <div class="nk-editor-title">
+                            <h4 class="me-3 mb-0 line-clamp-1">{{ $template->title }} Output</h4>
+                        </div>
+                        <div class="nk-editor-tools d-flex align-items-center mt-2 mt-sm-0">
+                            <ul class="d-inline-flex gap gx-3 gx-lg-4 pe-4 pe-lg-5 mb-0 list-unstyled">
+                                <li>
+                                    <span class="sub-text text-nowrap">Words <span class="text-dark fw-bold" id="word-count">0</span></span>
+                                </li>
+                                <li>
+                                    <span class="sub-text text-nowrap">Characters <span class="text-dark fw-bold" id="char-count">0</span></span>
+                                </li>
+                            </ul>
+                            <div class="dropdown">
+                                <button class="btn btn-md btn-light rounded-pill" type="button" data-bs-toggle="dropdown">
+                                    <em class="icon ni ni-download me-1"></em>
+                                    <span>Export</span>
+                                    <em class="icon ni ni-chevron-down ms-1"></em>
+                                </button> 
+                                <ul class="dropdown-menu dropdown-menu-end mt-2">
+                                    <li><a href="#" class="dropdown-item" id="copy-text">
+                                        <em class="icon ni ni-copy me-2"></em>Copy Text</a></li>
+                                    <li><a href="#" class="dropdown-item" id="download-txt">
+                                        <em class="icon ni ni-file-text me-2"></em>Download TXT</a></li>
+                                </ul>          
                             </div>
-                            <div class="nk-editor-main">
-                                <div class="nk-editor-body">
-                                    <div class="wide-md h-100">
-                                        <div class="js-editor nk-editor-style-clean nk-editor-full">
-                                            <div id="editor-v1" style="min-height: 300px; padding: 20px;">
-                                                <div class="placeholder-content text-muted">
-                                                    <em class="icon ni ni-edit-alt"></em>
-                                                    <p class="mt-3">Your generated content will appear here...</p>
-                                                    <small>Fill out the form and click "Generate Content" to begin</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
+
+                    <div class="nk-editor-main">
+                        <div class="nk-editor-body">
+                            <div id="editor-v1">
+                                <div class="placeholder-content">
+                                    <em class="icon ni ni-edit-alt"></em>
+                                    <p class="mt-3 h5">Your generated content will appear here...</p>
+                                    <small class="text-muted">Fill out the control panel form and click "Generate Content" to begin</small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div> 
-            </div> 
+                </div>
+            </div>
         </div>
     </div>
 </div> 
 
 <script>
-// Optimized form submission with timeout and retry logic
+// --- JAVASCRIPT LOGIC (FIXED) ---
+
 document.getElementById('generateForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -380,18 +442,15 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
     const generateBtn = document.getElementById('generateBtn');
     const loadingOverlay = document.getElementById('loadingOverlay');
 
-    // Client-side validation for better UX
     if (!validateForm(form)) {
         return;
     }
 
     showLoading(generateBtn, loadingOverlay);
 
-    // Create AbortController for timeout handling
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); 
 
-    // Optimized fetch with timeout and better error handling
     fetch(form.action, {
         method: 'POST',
         body: formData,
@@ -405,7 +464,7 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
         clearTimeout(timeoutId);
         
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            return response.json().then(err => { throw new Error(err.message || `HTTP ${response.status}`); });
         }
         return response.json();
     })
@@ -413,12 +472,10 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
         if (data.success) {
             const editor = document.getElementById('editor-v1');
             if (editor) {
-                // Animate content appearance
                 const formattedContent = formatContent(data.output, formData);
                 editor.style.opacity = '0';
                 editor.innerHTML = formattedContent;
                 
-                // Smooth fade-in animation
                 setTimeout(() => {
                     editor.style.transition = 'opacity 0.5s ease';
                     editor.style.opacity = '1';
@@ -434,7 +491,7 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
         clearTimeout(timeoutId);
         console.error('Generation error:', error);
         
-        let errorMessage = 'Generation failed. Please try again.';
+        let errorMessage = error.message || 'Generation failed. Please try again.';
         if (error.name === 'AbortError') {
             errorMessage = 'Request timed out. Please try with shorter content or check your connection.';
         }
@@ -446,18 +503,25 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
     });
 });
 
-// Enhanced loading states with progress simulation
 function showLoading(btn, overlay) {
+    if (window.currentLoadingInterval) {
+        clearInterval(window.currentLoadingInterval);
+    }
+    
     btn.classList.add('generate-btn-loading');
     btn.querySelector('.btn-text').style.display = 'none';
     btn.querySelector('.btn-loading').style.display = 'inline-flex';
     btn.disabled = true;
     
+    const progressBar = overlay.querySelector('.progress-fill');
+    progressBar.style.animation = 'none';
+    progressBar.offsetHeight; 
+    progressBar.style.animation = 'progressLoad 2s linear infinite';
+
     overlay.style.display = 'flex';
     overlay.style.opacity = '0';
     setTimeout(() => overlay.style.opacity = '1', 10);
     
-    // Simulate progress with loading messages
     simulateProgress();
 }
 
@@ -467,18 +531,21 @@ function hideLoading(btn, overlay) {
     btn.querySelector('.btn-loading').style.display = 'none';
     btn.disabled = false;
     
+    if (window.currentLoadingInterval) {
+        clearInterval(window.currentLoadingInterval);
+    }
+    
     overlay.style.opacity = '0';
     setTimeout(() => overlay.style.display = 'none', 300);
 }
 
-// Progress simulation for better perceived performance
 function simulateProgress() {
     const messages = [
         'Analyzing your request...',
         'Connecting to AI service...',
         'Generating content...',
         'Optimizing output...',
-        'Almost ready...'
+        'Finalizing and spell checking...'
     ];
     
     let index = 0;
@@ -488,16 +555,14 @@ function simulateProgress() {
         if (loadingText && index < messages.length) {
             loadingText.textContent = messages[index];
             index++;
-        } else {
-            clearInterval(interval);
+        } else if (loadingText) {
+            loadingText.textContent = messages[messages.length - 1]; 
         }
     }, 2000);
     
-    // Store interval ID for cleanup
     window.currentLoadingInterval = interval;
 }
 
-// Client-side validation
 function validateForm(form) {
     const requiredFields = form.querySelectorAll('[required]');
     let isValid = true;
@@ -514,55 +579,77 @@ function validateForm(form) {
     return isValid;
 }
 
-// Enhanced word/character counting with debouncing
 function updateCounts() {
     const editor = document.getElementById('editor-v1');
     if (!editor) return;
     
-    const content = editor.textContent || editor.innerText || '';
+    // Use innerText to avoid counting HTML tags if content is complex
+    const content = editor.innerText || editor.textContent || ''; 
     const words = content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
     const characters = content.length;
     
-    // Animate counter updates
     animateCounter('word-count', words);
     animateCounter('char-count', characters);
 }
 
+/**
+ * FIX: Corrected counter animation logic to prevent non-stop incrementing.
+ */
 function animateCounter(elementId, targetValue) {
     const element = document.getElementById(elementId);
     if (!element) return;
     
-    const currentValue = parseInt(element.textContent) || 0;
-    const increment = Math.ceil((targetValue - currentValue) / 20);
+    let currentValue = parseInt(element.textContent) || 0;
     
-    if (currentValue < targetValue) {
-        element.textContent = Math.min(currentValue + increment, targetValue);
-        setTimeout(() => animateCounter(elementId, targetValue), 50);
-    } else {
-        element.textContent = targetValue;
+    // Check if we have reached the target
+    if (currentValue === targetValue) {
+        return; 
+    }
+
+    const diff = targetValue - currentValue;
+    const increment = Math.ceil(Math.abs(diff) / 10); // Use a percentage of the difference for smooth speed
+
+    if (diff > 0) {
+        currentValue = Math.min(currentValue + increment, targetValue);
+    } else if (diff < 0) {
+        currentValue = Math.max(currentValue - increment, targetValue);
+    }
+
+    element.textContent = currentValue;
+
+    // Continue animation only if the target is not reached
+    if (currentValue !== targetValue) {
+        setTimeout(() => animateCounter(elementId, targetValue), 10); 
     }
 }
 
-// Enhanced content formatting
 function formatContent(output, formData) {
     let title = 'Generated Content';
     
-    // Extract title from form data
     for (let [key, value] of formData.entries()) {
-        if (key.toLowerCase().includes('title') || key.toLowerCase().includes('topic')) {
-            title = value;
-            break;
+        const lowerKey = key.toLowerCase();
+        if (lowerKey.includes('title') || lowerKey.includes('topic') || lowerKey.includes('keywords')) {
+            if (value && value.trim()) {
+                title = value.trim().substring(0, 100);
+                break;
+            }
         }
     }
 
     const lines = output.split('\n').filter(line => line.trim() !== '');
+    
     let html = `<div class="content-wrapper">
                     <h2 class="content-title">${escapeHtml(title)}</h2>`;
     
     lines.forEach(line => {
         const trimmedLine = line.trim();
         if (trimmedLine) {
-            html += `<p class="content-paragraph">${escapeHtml(trimmedLine)}</p>`;
+            // Simple markdown detection for headings
+            if (trimmedLine.startsWith('#') || (trimmedLine.length < 80 && !trimmedLine.endsWith('.'))) {
+                html += `<h3 class="mt-4">${escapeHtml(trimmedLine.replace(/^[#*-]+/, '').trim())}</h3>`;
+            } else {
+                html += `<p class="content-paragraph">${escapeHtml(trimmedLine)}</p>`;
+            }
         }
     });
     
@@ -570,18 +657,17 @@ function formatContent(output, formData) {
     return html;
 }
 
-// Security helper
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Success/Error messaging
 function showSuccessMessage() {
-    // You can integrate with your existing toast/notification system
     if (typeof toastr !== 'undefined') {
         toastr.success('Content generated successfully!');
+    } else {
+        console.log('Success: Content generated successfully!');
     }
 }
 
@@ -593,7 +679,6 @@ function showError(message) {
     }
 }
 
-// Enhanced export functionality
 document.addEventListener('DOMContentLoaded', function() {
     const exportButtons = document.querySelectorAll('.dropdown-menu .dropdown-item');
     
@@ -612,9 +697,9 @@ function handleExport(action) {
         return;
     }
 
-    const content = editor.textContent || editor.innerText || '';
-    if (!content.trim()) {
-        showError('No content to export');
+    const content = editor.innerText || editor.textContent || ''; 
+    if (!content.trim().length || editor.querySelector('.placeholder-content')) {
+        showError('No generated content to export');
         return;
     }
 
@@ -638,7 +723,6 @@ async function copyToClipboard(text) {
             await navigator.clipboard.writeText(text);
             showSuccessMessage();
         } else {
-            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = text;
             textArea.style.position = 'fixed';
@@ -672,33 +756,11 @@ function downloadFile(content, fileName, mimeType) {
     }
 }
 
-// Cleanup on page unload
 window.addEventListener('beforeunload', function() {
     if (window.currentLoadingInterval) {
         clearInterval(window.currentLoadingInterval);
     }
 });
-
-// Form auto-save (optional)
-function enableAutoSave() {
-    const form = document.getElementById('generateForm');
-    const inputs = form.querySelectorAll('input, textarea, select');
-    
-    inputs.forEach(input => {
-        input.addEventListener('change', function() {
-            localStorage.setItem(`form_${this.name}`, this.value);
-        });
-        
-        // Restore saved values
-        const savedValue = localStorage.getItem(`form_${input.name}`);
-        if (savedValue && !input.value) {
-            input.value = savedValue;
-        }
-    });
-}
-
-// Initialize auto-save if needed
-// enableAutoSave();
 </script>
 
 @endsection

@@ -362,4 +362,19 @@ class SuperAdminTemplateController extends Controller
             'alert-type' => 'success'
         ]);
     }
+
+    public function toggleStatus($id)
+    {
+        $template = Template::findOrFail($id);
+
+        $template->is_active = !$template->is_active;
+        $template->save();
+
+        return redirect()->back()->with([
+            'message' => 'Template status updated successfully!',
+            'alert-type' => 'success'
+        ]);
+    }
+
+
 }

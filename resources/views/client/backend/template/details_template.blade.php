@@ -431,8 +431,9 @@
     </div>
 </div> 
 
+
 <script>
-// --- JAVASCRIPT LOGIC (RETAINED) ---
+// --- JAVASCRIPT LOGIC (FIXED) ---
 
 document.getElementById('generateForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -583,7 +584,8 @@ function updateCounts() {
     const editor = document.getElementById('editor-v1');
     if (!editor) return;
     
-    const content = editor.textContent || editor.innerText || ''; 
+    // Use innerText to avoid counting HTML tags if content is complex
+    const content = editor.innerText || editor.textContent || ''; 
     const words = content.trim() === '' ? 0 : content.trim().split(/\s+/).length;
     const characters = content.length;
     
@@ -591,18 +593,34 @@ function updateCounts() {
     animateCounter('char-count', characters);
 }
 
+/**
+ * FIX: Corrected counter animation logic to prevent non-stop incrementing.
+ */
 function animateCounter(elementId, targetValue) {
     const element = document.getElementById(elementId);
     if (!element) return;
     
-    const currentValue = parseInt(element.textContent) || 0;
-    const increment = Math.ceil((targetValue - currentValue) / 20);
+    let currentValue = parseInt(element.textContent) || 0;
     
-    if (Math.abs(currentValue - targetValue) > 0) {
-        element.textContent = currentValue + (currentValue < targetValue ? increment : -increment);
-        setTimeout(() => animateCounter(elementId, targetValue), 50);
-    } else {
-        element.textContent = targetValue;
+    // Check if we have reached the target
+    if (currentValue === targetValue) {
+        return; 
+    }
+
+    const diff = targetValue - currentValue;
+    const increment = Math.ceil(Math.abs(diff) / 10); // Use a percentage of the difference for smooth speed
+
+    if (diff > 0) {
+        currentValue = Math.min(currentValue + increment, targetValue);
+    } else if (diff < 0) {
+        currentValue = Math.max(currentValue - increment, targetValue);
+    }
+
+    element.textContent = currentValue;
+
+    // Continue animation only if the target is not reached
+    if (currentValue !== targetValue) {
+        setTimeout(() => animateCounter(elementId, targetValue), 10); 
     }
 }
 
@@ -627,6 +645,7 @@ function formatContent(output, formData) {
     lines.forEach(line => {
         const trimmedLine = line.trim();
         if (trimmedLine) {
+            // Simple markdown detection for headings
             if (trimmedLine.startsWith('#') || (trimmedLine.length < 80 && !trimmedLine.endsWith('.'))) {
                 html += `<h3 class="mt-4">${escapeHtml(trimmedLine.replace(/^[#*-]+/, '').trim())}</h3>`;
             } else {
@@ -679,7 +698,7 @@ function handleExport(action) {
         return;
     }
 
-    const content = editor.textContent || editor.innerText || ''; 
+    const content = editor.innerText || editor.textContent || ''; 
     if (!content.trim().length || editor.querySelector('.placeholder-content')) {
         showError('No generated content to export');
         return;

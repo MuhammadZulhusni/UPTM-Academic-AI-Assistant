@@ -173,12 +173,12 @@
                                         <span class="guide-tip">Use Variables:</span> Insert the user input from Section 2 into your prompt using curly braces `{}`. The variable name MUST exactly match the Field Title (Variable Name) you defined (e.g., if you created a field named `topic`, use `{topic}`).
                                     </div>
                                 </li>
-                                <li class="d-flex align-items-start mb-2">
+                                <!-- <li class="d-flex align-items-start mb-2">
                                     <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
                                     <div>
                                         <span class="guide-tip">Define Output Language/Tone:</span> The system automatically provides the output language via the variable `{language}`. Use this variable in your prompt to instruct the AI (e.g., "Ensure the entire output is written in {language}."). 
                                     </div>
-                                </li>
+                                </li> -->
                                 <li class="d-flex align-items-start mb-2">
                                     <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
                                     <div>
@@ -193,9 +193,9 @@
                                 </li>
                             </ul>
 
-                            <p class="mt-3 fw-bold">Example of a High-Quality Prompt (assuming `topic` and `language` variables are defined):</p>
+                            <p class="mt-3 fw-bold">Example of a High-Quality Prompt (assuming `topic` variables are defined):</p>
                             <div class="p-3 bg-white border rounded small">
-                                Act as an experienced university lecturer. Suggest 3 interactive classroom activities for teaching the topic {topic}. Each activity must be simple, time-efficient (under 15 minutes), and suitable for a university-level class. Format the output with clear headings for Activity Name, Instructions, and Learning Outcome. Ensure the entire output is written in {language}.
+                                Act as an experienced university lecturer. Suggest 3 interactive classroom activities for teaching the topic {topic}. Each activity must be simple, time-efficient (under 15 minutes), and suitable for a university-level class. Format the output with clear headings for Activity Name, Instructions, and Learning Outcome.
                             </div>
                         </div>
                     </div>
