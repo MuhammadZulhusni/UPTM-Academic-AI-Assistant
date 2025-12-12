@@ -9,11 +9,11 @@
         <div class="nk-block-head nk-page-head">
             <div class="nk-block-head-between flex-wrap gap g-2">
                 <div class="nk-block-head-content">
-                    <h2 class="display-6">
+                    <h2 class="display-6 mb-1">
                         My Generated Documents
                     </h2>
                     {{-- Hidden on mobile, visible on desktop --}}
-                    <p class="text-muted mb-0 d-none d-md-block">View and manage all AI content you've created.</p>
+                    <p class="text-muted mb-1">View and manage all AI content you've created.</p>
                 </div>
             </div>
         </div>

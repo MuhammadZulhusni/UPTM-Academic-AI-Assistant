@@ -95,6 +95,8 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
     Route::get('/reset-password', [SuperAdminController::class, 'ResetPasswordPage'])->name('superadmin.reset.password');
     Route::post('/send-reset-link', [SuperAdminController::class, 'SendResetLink'])->name('superadmin.send.reset.link');
     Route::get('/superadmin/users/search', [SuperAdminController::class, 'searchUsers'])->name('superadmin.users.search');
+    Route::get('/superadmin/create/user', [SuperAdminController::class, 'CreateUser'])->name('superadmin.create.user');
+    Route::post('/superadmin/store/user', [SuperAdminController::class, 'StoreUser'])->name('superadmin.store.user');
     
     Route::controller(SuperAdminTemplateController::class)->group(function () {
         Route::get('/template', 'Index')->name('superadmin.template');

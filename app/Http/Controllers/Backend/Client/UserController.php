@@ -47,7 +47,7 @@ class UserController extends Controller
         $request->session()->regenerateToken();
 
         $notification = array(
-            'message' => 'User Profile Updated Successfully',
+            'message' => 'Log Out Successfully',
             'alert-type' => 'success'
         );
 

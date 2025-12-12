@@ -267,6 +267,44 @@ class SuperAdminController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        $notification = array(
+            'message' => 'Log Out Successfully',
+            'alert-type' => 'success'
+        );
+
+        return redirect('/login')->with($notification);
+    }
+
+    public function CreateUser()
+    {
+        return view('superadmin.superadmin_create_user');
+    }
+
+    public function StoreUser(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+            'role' => 'required|in:student,lecturer,admin',
+            'is_active' => 'nullable|boolean'
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'role' => $request->role,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+        ]);
+
+        return redirect()->route('superadmin.users')->with([
+            'message' => 'User Created Successfully',
+            'alert-type' => 'success'
+        ]);
     }
 }

@@ -1,581 +1,576 @@
 @extends('client.client_dashboard')
-@section('client') 
+@section('client')
 
- <div class="nk-content-inner">
-     <div class="nk-content-body">
-
-        <div class="nk-block-head nk-page-head">
-             <div class="nk-block-head-between flex-wrap g-2">
-                 <div class="nk-block-head-content">
-                     <h2 class="display-6">Template Library</h2>
-                     <p class="text-muted">Simplify your task by using templates provided</p>
-                 </div>
-                 
-                 {{-- MODAL TRIGGER BUTTON --}}
-                 <div class="nk-block-head-content mt-4">
-                     <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
-                         <em class="icon ni ni-filter me-1"></em>
-                         <span>Filter & Search</span>
-                     </button>
-                 </div>
-             </div>
-        </div>
-
-        {{-- Use $templates->total() for the Grand Total --}}
-        @php
-            $totalTemplates = $templates->total();
-        @endphp
-
-        {{-- STATS CARD BLOCK - Only for Admin --}}
-        @if (auth()->user()->role === 'admin')
-        <div class="nk-block">
-            <div class="row g-3 mb-4">
-                {{-- Total Templates --}}
-                @if ($totalTemplates > 0)
-                <div class="col-6 col-md-4">
-                    <div class="card border-0 bg-primary bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-primary text-white me-2 me-md-3">
-                                    <em class="icon ni ni-template"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ $totalTemplates }}</h6>
-                                    <span class="small text-muted d-block">Total Templates</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div class="nk-content-inner">
+    <div class="nk-content-body">
+        
+        {{-- Header with Gradient --}}
+        <div class="nk-block-head nk-page-head mb-4">
+            <div class="row align-items-center g-3">
+                <div class="col-lg-7">
+                    <h2 class="display-6 mb-1 animate-fade-in">Template Library</h2>
+                    <p class="text-muted mb-0">Browse and select from our curated collection</p>
                 </div>
-                @endif
-
-                {{-- Student Templates --}}
-                @php
-                    $studentCount = $templates->where('category', 'Student')->count();
-                @endphp
-                @if ($studentCount > 0)
-                <div class="col-6 col-md-4">
-                    <div class="card border-0 bg-info bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-info text-white me-2 me-md-3">
-                                    <em class="icon ni ni-user"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ $studentCount }}</h6>
-                                    <span class="small text-muted d-block">Student</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-lg-5 text-lg-end">
+                    <button class="btn btn-primary btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
+                        <em class="icon ni ni-filter"></em>
+                        <span class="ms-2">Filters</span>
+                    </button>
                 </div>
-                @endif
-
-                {{-- Lecturer Templates --}}
-                @php
-                    $lecturerCount = $templates->where('category', 'Lecturer')->count();
-                @endphp
-                @if ($lecturerCount > 0)
-                <div class="col-6 col-md-4">
-                    <div class="card border-0 bg-warning bg-opacity-10">
-                        <div class="card-body py-3 px-3">
-                            <div class="d-flex align-items-center">
-                                <div class="media media-sm media-circle bg-warning text-white me-2 me-md-3">
-                                    <em class="icon ni ni-user-check"></em>
-                                </div>
-                                <div class="flex-grow-1 min-w-0">
-                                    <h6 class="mb-0 fs-6">{{ $lecturerCount }}</h6>
-                                    <span class="small text-muted d-block">Lecturer</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endif
             </div>
         </div>
-        @endif
-        {{-- END STATS CARD BLOCK --}}
 
-        {{-- TEMPLATE CARDS --}}
-        <div class="row g-3 g-md-4 mt-2" id="templates-container">
-            @foreach ($templates as $item)
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item">
-                <div class="card h-100 border-0 shadow-sm template-card">
-                    <div class="card-body p-3 p-md-4 d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
-                            <div class="media media-md media-circle bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} bg-opacity-20 text-{{ $item->category == 'Student' ? 'primary' : 'info' }}">
-                                <img src="{{ asset('upload/template/' . $item->icon) }}"
-                                    alt="Icon"
-                                    class="img-fluid"
-                                    style="width:22px; height:22px; object-fit:contain; border-radius:0;">
+        {{-- Stats Cards (Admin Only) --}}
+        @if(auth()->user()->role === 'admin')
+        @php
+            $stats = [
+                ['count' => $templates->total(), 'label' => 'Total', 'icon' => 'ni-template', 'color' => 'primary'],
+                ['count' => $templates->where('category', 'Student')->count(), 'label' => 'Student', 'icon' => 'ni-user', 'color' => 'info'],
+                ['count' => $templates->where('category', 'Lecturer')->count(), 'label' => 'Lecturer', 'icon' => 'ni-user-check', 'color' => 'warning']
+            ];
+        @endphp
+        
+        <div class="row g-3 mb-4 animate-slide-up">
+            @foreach($stats as $stat)
+            @if($stat['count'] > 0)
+            <div class="col-6 col-lg-4">
+                <div class="stat-card stat-card-{{ $stat['color'] }}">
+                    <div class="stat-icon">
+                        <em class="icon ni {{ $stat['icon'] }}"></em>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ $stat['count'] }}</h3>
+                        <span>{{ $stat['label'] }}</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+            @endforeach
+        </div>
+        @endif
+
+        {{-- Template Grid --}}
+        @if($templates->total() > 0)
+        <div class="row g-3 g-lg-4 template-grid">
+            @foreach($templates as $item)
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <a href="{{ route('user.details.template', $item->id) }}" class="template-card-link">
+                    <div class="template-card">
+                        <div class="template-card-header">
+                            <div class="template-icon template-icon-{{ strtolower($item->category) }}">
+                                <img src="{{ asset('upload/template/' . $item->icon) }}" alt="{{ $item->title }}">
                             </div>
-                            </a>
-                            <span class="badge bg-{{ $item->category == 'Student' ? 'primary' : 'info' }} badge-sm">
+                            <span class="template-badge badge-{{ strtolower($item->category) }}">
                                 {{ $item->category }}
                             </span>
                         </div>
-                        <div class="flex-grow-1">
-                            <a href="{{ route('user.details.template',$item->id) }}" class="text-decoration-none">
-                                <h5 class="card-title fs-6 fs-md-5 fw-medium mb-2 text-dark">{{ $item->title }}</h5>
-                                <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-3">{{ $item->description }}</p>
-                            </a>
+                        <div class="template-card-body">
+                            <h5>{{ $item->title }}</h5>
+                            <p>{{ Str::limit($item->description, 80) }}</p>
                         </div>
-                        <div class="template-footer mt-auto">
-                            <small class="text-muted d-flex align-items-center">
-                                <em class="icon ni ni-calendar me-1"></em>
-                                <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
-                                <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
+                        <div class="template-card-footer">
+                            <small>
+                                <em class="icon ni ni-calendar"></em>
+                                {{ $item->created_at->format('M d, Y') }}
                             </small>
                         </div>
                     </div>
-                </div>
+                </a>
             </div>
             @endforeach
         </div>
 
-        {{-- MODERN MINIMALIST PAGINATION --}}
-        @if ($totalTemplates > 0)
-        <div class="nk-block pt-5">
-            <div class="row g-3 align-items-center">
-                {{-- Pagination Summary --}}
-                <div class="col-12 col-md-6">
-                    <p class="text-muted mb-0 fs-14px">
-                        Showing <span class="fw-medium text-dark">{{ $templates->firstItem() }}</span> to 
-                        <span class="fw-medium text-dark">{{ $templates->lastItem() }}</span> of 
-                        <span class="fw-medium text-dark">{{ $templates->total() }}</span> templates
-                    </p>
+        {{-- Pagination --}}
+        <div class="pagination-wrapper">
+            <div class="pagination-info">
+                Showing {{ $templates->firstItem() }}-{{ $templates->lastItem() }} of {{ $templates->total() }}
+            </div>
+            <nav>
+                <ul class="modern-pagination">
+                    <li class="{{ $templates->onFirstPage() ? 'disabled' : '' }}">
+                        <a href="{{ $templates->previousPageUrl() }}">
+                            <em class="icon ni ni-chevron-left"></em>
+                        </a>
+                    </li>
+                    
+                    @foreach(range(1, $templates->lastPage()) as $page)
+                        @if($page == 1 || $page == $templates->lastPage() || abs($page - $templates->currentPage()) <= 1)
+                        <li class="{{ $page == $templates->currentPage() ? 'active' : '' }}">
+                            <a href="{{ $templates->url($page) }}">{{ $page }}</a>
+                        </li>
+                        @elseif(abs($page - $templates->currentPage()) == 2)
+                        <li class="disabled"><span>...</span></li>
+                        @endif
+                    @endforeach
+                    
+                    <li class="{{ !$templates->hasMorePages() ? 'disabled' : '' }}">
+                        <a href="{{ $templates->nextPageUrl() }}">
+                            <em class="icon ni ni-chevron-right"></em>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        @else
+        {{-- Empty State --}}
+        <div class="empty-state">
+            <div class="empty-icon">
+                <em class="icon ni ni-search"></em>
+            </div>
+            <h4>No templates found</h4>
+            <p>Try adjusting your filters or search terms</p>
+            <a href="{{ route('user.template') }}" class="btn btn-primary">Reset Filters</a>
+        </div>
+        @endif
+
+    </div>
+</div>
+
+{{-- Filter Modal --}}
+<div class="modal fade" id="filterModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modern-modal">
+            <form action="{{ route('user.template') }}" method="GET">
+                <div class="modal-header">
+                    <h5>Filter and Sort</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 
-                {{-- Pagination Controls --}}
-                <div class="col-12 col-md-6">
-                    <nav aria-label="Template pagination">
-                        <ul class="pagination pagination-minimal justify-content-md-end mb-0">
-                            {{-- Previous Button --}}
-                            <li class="page-item {{ $templates->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" 
-                                   href="{{ $templates->previousPageUrl() }}" 
-                                   aria-label="Previous"
-                                   {{ $templates->onFirstPage() ? 'tabindex=-1' : '' }}>
-                                    <em class="icon ni ni-chevron-left"></em>
-                                    <span class="d-none d-sm-inline ms-1">Previous</span>
-                                </a>
-                            </li>
+                <div class="modal-body">
+                    {{-- Search --}}
+                    <div class="filter-group">
+                        <label>Search</label>
+                        <div class="search-input">
+                            <em class="icon ni ni-search"></em>
+                            <input type="text" name="search" placeholder="Search templates..." value="{{ request('search') }}">
+                        </div>
+                    </div>
 
-                            {{-- Page Numbers (Smart Display) --}}
-                            @php
-                                $currentPage = $templates->currentPage();
-                                $lastPage = $templates->lastPage();
-                                $start = max(1, $currentPage - 1);
-                                $end = min($lastPage, $currentPage + 1);
-                                
-                                // Adjust if at edges
-                                if ($currentPage <= 2) {
-                                    $end = min(3, $lastPage);
-                                }
-                                if ($currentPage >= $lastPage - 1) {
-                                    $start = max(1, $lastPage - 2);
-                                }
-                            @endphp
+                    {{-- Category (Admin) --}}
+                    @if(auth()->user()->role === 'admin')
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <div class="button-group">
+                            @foreach(['all' => 'All', 'student' => 'Student', 'lecturer' => 'Lecturer'] as $val => $label)
+                            <label class="btn-radio">
+                                <input type="radio" name="category" value="{{ $val }}" {{ request('category', 'all') == $val ? 'checked' : '' }}>
+                                <span>{{ $label }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
 
-                            {{-- First Page --}}
-                            @if ($start > 1)
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $templates->url(1) }}">1</a>
-                                </li>
-                                @if ($start > 2)
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                @endif
-                            @endif
-
-                            {{-- Page Range --}}
-                            @for ($page = $start; $page <= $end; $page++)
-                                <li class="page-item {{ $page == $currentPage ? 'active' : '' }}">
-                                    <a class="page-link" href="{{ $templates->url($page) }}">{{ $page }}</a>
-                                </li>
-                            @endfor
-
-                            {{-- Last Page --}}
-                            @if ($end < $lastPage)
-                                @if ($end < $lastPage - 1)
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                @endif
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $templates->url($lastPage) }}">{{ $lastPage }}</a>
-                                </li>
-                            @endif
-
-                            {{-- Next Button --}}
-                            <li class="page-item {{ !$templates->hasMorePages() ? 'disabled' : '' }}">
-                                <a class="page-link" 
-                                   href="{{ $templates->nextPageUrl() }}" 
-                                   aria-label="Next"
-                                   {{ !$templates->hasMorePages() ? 'tabindex=-1' : '' }}>
-                                    <span class="d-none d-sm-inline me-1">Next</span>
-                                    <em class="icon ni ni-chevron-right"></em>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                    {{-- Sort --}}
+                    <div class="filter-group mb-0">
+                        <label>Sort By</label>
+                        <div class="button-group">
+                            @foreach(['newest' => 'Newest', 'title' => 'A-Z', 'title-desc' => 'Z-A'] as $val => $label)
+                            <label class="btn-radio">
+                                <input type="radio" name="sort" value="{{ $val }}" {{ request('sort', 'newest') == $val ? 'checked' : '' }}>
+                                <span>{{ $label }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
-            </div>
+                
+                <div class="modal-footer">
+                    <a href="{{ route('user.template') }}" class="btn btn-light">Reset</a>
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+            </form>
         </div>
-        @endif
-
-        {{-- NO RESULTS BLOCK --}}
-        @if ($templates->total() === 0)
-        <div class="text-center py-5" id="no-results">
-            <div class="media media-xl media-circle bg-light text-muted mx-auto mb-3" style="width: 100px; height: 100px;">
-                <em class="icon ni ni-search" style="font-size: 2rem;"></em>
-            </div>
-            <h4 class="text-muted mb-2">No templates found</h4>
-            <p class="text-muted">Try adjusting your search terms or filter selection.</p>
-            <a href="{{ route('user.template') }}" class="btn btn-outline-primary btn-sm">Reset Filters</a>
-        </div>
-        @endif
-
-     </div>
- </div>
-
-
-{{-- FILTER MODAL --}}
-<div class="modal fade" id="templateFilterModal" tabindex="-1" aria-labelledby="templateFilterModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      
-      {{-- WRAP IN GET FORM --}}
-      <form id="templateFilterForm" action="{{ route('user.template') }}" method="GET">
-      
-      <div class="modal-header">
-        <h5 class="modal-title" id="templateFilterModalLabel">Filter Templates</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      
-      <div class="modal-body">
-        
-        {{-- HIDDEN INPUT for Sort --}}
-        <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
-        
-        <div class="mb-4">
-            <h6 class="text-muted mb-2">Search by Title or Description</h6>
-             <div class="form-group mb-0">
-                 <div class="form-control-wrap">
-                     <div class="form-control-icon start text-light">
-                         <em class="icon ni ni-search"></em>
-                     </div>
-                     <input type="text" 
-                            class="form-control" 
-                            placeholder="Search templates..." 
-                            id="searchInput" 
-                            name="search" 
-                            value="{{ request('search') }}">
-                 </div>
-             </div>
-        </div>
-
-        {{-- CATEGORY FILTER - Only for Admin --}}
-        @if (auth()->user()->role === 'admin')
-        <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
-        
-        <div class="mb-4">
-            <h6 class="text-muted mb-2">Category</h6>
-            <div class="btn-group category-segment-control w-100" role="group" id="categoryFilter">
-                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category', 'all') == 'all' ? 'active' : '' }}" data-value="all">
-                    <em class="icon ni ni-grid-sq me-1"></em> All
-                </button>
-                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'student' ? 'active' : '' }}" data-value="student">
-                    <em class="icon ni ni-user me-1"></em> Student
-                </button>
-                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'lecturer' ? 'active' : '' }}" data-value="lecturer">
-                    <em class="icon ni ni-user-check me-1"></em> Lecturer
-                </button>
-            </div>
-        </div>
-        @endif
-
-        <div class="mb-0">
-             <h6 class="text-muted mb-2">Sort By</h6>
-             <div class="btn-group sort-segment-control w-100" role="group" id="sortFilter">
-                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort', 'newest') == 'newest' ? 'active' : '' }}" data-value="newest">
-                     <em class="icon ni ni-clock me-1"></em> Newest
-                 </button>
-                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title' ? 'active' : '' }}" data-value="title">
-                     <em class="icon ni ni-text me-1"></em> Title (A-Z)
-                 </button>
-                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title-desc' ? 'active' : '' }}" data-value="title-desc">
-                     <em class="icon ni ni-text-a me-1"></em> Title (Z-A)
-                 </button>
-             </div>
-        </div>
-
-      </div>
-      
-      <div class="modal-footer justify-content-between">
-        <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ route('user.template') }}'">Reset Filters</button>
-        <button type="submit" class="btn btn-primary">Apply & View</button>
-      </div>
-      
-      </form>
     </div>
-  </div>
 </div>
-{{-- END FILTER MODAL --}}
-
-{{-- REQUIRED JAVASCRIPT --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Function to handle segment button clicks and update the hidden input
-        function setupSegmentControls(controlId, hiddenInputId) {
-            const controls = document.getElementById(controlId);
-            const hiddenInput = document.getElementById(hiddenInputId);
-
-            if (!controls || !hiddenInput) return;
-
-            controls.addEventListener('click', function(e) {
-                const target = e.target.closest('.segment-btn');
-                if (target) {
-                    // Remove 'active' from all siblings
-                    controls.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
-                    // Add 'active' to the clicked button
-                    target.classList.add('active');
-                    // Update the value of the hidden input
-                    hiddenInput.value = target.dataset.value;
-                }
-            });
-        }
-
-        // Apply setup for category (only if admin) and sort filters
-        setupSegmentControls('categoryFilter', 'category_hidden');
-        setupSegmentControls('sortFilter', 'sort_hidden');
-    });
-</script>
 
 <style>
-.media-circle {
-    border-radius: 50% !important; 
+:root {
+    --primary: #6366f1;
+    --info: #06b6d4;
+    --warning: #f59e0b;
+    --success: #10b981;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --bg: #f8fafc;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.5s ease; }
+.animate-slide-up { animation: slideUp 0.6s ease; }
+
+/* Stats Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5rem;
 }
 
-.media-md .icon {
-    font-size: 1.25rem; 
+.stat-card-primary .stat-icon { background: #ede9fe; color: var(--primary); }
+.stat-card-info .stat-icon { background: #cffafe; color: var(--info); }
+.stat-card-warning .stat-icon { background: #fef3c7; color: var(--warning); }
+
+.stat-content h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text);
 }
 
-.media-sm .icon {
-    font-size: 1rem;
+.stat-content span {
+    color: var(--text-muted);
+    font-size: 0.875rem;
 }
 
-/* --- Other Styles --- */
-.category-segment-control .btn,
-.sort-segment-control .btn {
-    border-radius: 8px !important;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    padding: 0.5rem 0.9rem;
-    flex: 1 1 auto;
+/* Template Cards */
+.template-card-link {
+    text-decoration: none;
+    display: block;
+    height: 100%;
 }
 
-.category-segment-control,
-.sort-segment-control {
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.category-segment-control .segment-btn.active {
-    background-color: var(--bs-primary);
-    border-color: var(--bs-primary);
-    color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-}
-
-.sort-segment-control .segment-btn.active {
-    background-color: var(--bs-info);
-    border-color: var(--bs-info);
-    color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transform: translateY(-1px);
-}
-
-.btn-group > .btn.segment-btn:not(:last-child):not(.dropdown-toggle),
-.btn-group > .btn.segment-btn:not(:first-child) {
-    border-radius: 0;
-    margin-left: -1px;
-}
-
-.btn-group > .btn.segment-btn:first-child {
-    border-top-left-radius: 8px !important;
-    border-bottom-left-radius: 8px !important;
-}
-.btn-group > .btn.segment-btn:last-child {
-    border-top-right-radius: 8px !important;
-    border-bottom-right-radius: 8px !important;
-}
-
-.modal-content {
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    border-bottom: none;
+.template-card {
+    background: white;
+    border-radius: 16px;
     padding: 1.5rem;
-}
-
-.modal-body {
-    padding: 0 1.5rem;
-}
-
-.modal-footer {
-    border-top: none;
-    padding: 1.5rem;
-}
-
-.template-item {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 1;
-    transform: translateZ(0) scale(1);
-    will-change: opacity, transform;
-}
-
-.template-item.hiding {
-    opacity: 0;
-    transform: translateZ(0) scale(0.95);
-    pointer-events: none;
-}
-
-.template-item.hidden {
-    display: none !important;
-}
-
-@keyframes sortComplete {
-    0% { transform: translateZ(0) scale(1) translateY(0); }
-    50% { transform: translateZ(0) scale(1.02) translateY(-4px); }
-    100% { transform: translateZ(0) scale(1) translateY(0); }
-}
-
-.template-item.sort-complete {
-    animation: sortComplete 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.card {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 12px;
-    overflow: hidden;
-    transform: translateZ(0);
-}
-
-.card:hover {
-    transform: translateZ(0) translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
-}
-
-.card.bg-primary.bg-opacity-10,
-.card.bg-info.bg-opacity-10,
-.card.bg-warning.bg-opacity-10,
-.card.bg-success.bg-opacity-10 {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
-    will-change: transform, opacity;
-}
-
-.form-select, .form-control {
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.form-select:focus, .form-control:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border);
+    position: relative;
     overflow: hidden;
 }
 
-@media (max-width: 767.98px) {
-    .category-segment-control .btn,
-    .sort-segment-control .btn {
-        padding: 0.5rem 0.5rem;
-    }
-    
-    .modal-dialog {
-        margin: 0.5rem;
-    }
+.template-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--info));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
 }
 
-/* Modern Minimalist Pagination Styles */
-.pagination-minimal {
+.template-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    border-color: var(--primary);
+}
+
+.template-card:hover::before {
+    transform: scaleX(1);
+}
+
+.template-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.template-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+
+.template-icon-student { background: #ede9fe; }
+.template-icon-lecturer { background: #cffafe; }
+
+.template-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.template-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-student {
+    background: #ede9fe;
+    color: var(--primary);
+}
+
+.badge-lecturer {
+    background: #cffafe;
+    color: var(--info);
+}
+
+.template-card-body {
+    flex: 1;
+    margin-bottom: 1rem;
+}
+
+.template-card-body h5 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.template-card-body p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.template-card-footer {
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.template-card-footer small {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    display: flex;
+    align-items: center;
     gap: 0.375rem;
 }
 
-.pagination-minimal .page-link {
-    border: 1px solid #e5e9f2;
-    color: #526484;
-    padding: 0.5rem 0.875rem;
-    border-radius: 0.5rem;
+/* Pagination */
+.pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pagination-info {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.modern-pagination {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.modern-pagination li a,
+.modern-pagination li span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.75rem;
+    border-radius: 10px;
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.modern-pagination li a:hover {
+    background: var(--bg);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.modern-pagination li.active a {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.modern-pagination li.disabled a,
+.modern-pagination li.disabled span {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* Modal */
+.modern-modal {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+}
+
+.modern-modal .modal-header {
+    border: none;
+    padding: 1.5rem;
+}
+
+.modern-modal .modal-body {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.modern-modal .modal-footer {
+    border: none;
+    padding: 1.5rem;
+    gap: 0.75rem;
+}
+
+.filter-group {
+    margin-bottom: 1.5rem;
+}
+
+.filter-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.search-input {
+    position: relative;
+}
+
+.search-input em {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+}
+
+.search-input input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.75rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+}
+
+.search-input input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.button-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-radio {
+    flex: 1;
+    margin: 0;
+    cursor: pointer;
+}
+
+.btn-radio input {
+    display: none;
+}
+
+.btn-radio span {
+    display: block;
+    padding: 0.625rem 1rem;
+    background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
     font-weight: 500;
     font-size: 0.875rem;
+    color: var(--text);
     transition: all 0.2s ease;
-    background-color: #fff;
+}
+
+.btn-radio input:checked + span {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--bg);
+    border-radius: 50%;
     display: flex;
-    align-items-center;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--text-muted);
 }
 
-.pagination-minimal .page-link:hover {
-    background-color: #f5f6fa;
-    border-color: #d4dae6;
-    color: #364a63;
-    transform: translateY(-1px);
+.empty-state h4 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
 }
 
-.pagination-minimal .page-item.active .page-link {
-    background-color: #6576ff;
-    border-color: #6576ff;
-    color: #fff;
-    box-shadow: 0 2px 6px rgba(101, 118, 255, 0.3);
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
 }
 
-.pagination-minimal .page-item.disabled .page-link {
-    background-color: transparent;
-    border-color: #e5e9f2;
-    color: #c4cefe;
-    opacity: 0.6;
-}
-
-.pagination-minimal .page-link em {
-    font-size: 1rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 575.98px) {
-    .pagination-minimal {
-        gap: 0.25rem;
+/* Responsive */
+@media (max-width: 768px) {
+    .stat-card {
+        padding: 1.25rem;
     }
     
-    .pagination-minimal .page-link {
-        padding: 0.425rem 0.625rem;
-        font-size: 0.8125rem;
+    .template-card {
+        padding: 1.25rem;
     }
     
-    .pagination-minimal .page-item:not(:first-child):not(:last-child):not(.active) {
+    .pagination-wrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .modern-pagination li:not(.active):not(:first-child):not(:last-child) {
         display: none;
     }
 }
-
-/* Smooth transitions */
-.pagination-minimal .page-link,
-.pagination-minimal .page-item.active .page-link {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
 </style>
+
 @endsection
