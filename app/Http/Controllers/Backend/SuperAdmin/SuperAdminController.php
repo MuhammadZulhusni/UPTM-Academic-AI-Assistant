@@ -267,7 +267,12 @@ class SuperAdminController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        $notification = array(
+            'message' => 'Log Out Successfully',
+            'alert-type' => 'success'
+        );
+
+        return redirect('/login')->with($notification);
     }
 
     public function CreateUser()
