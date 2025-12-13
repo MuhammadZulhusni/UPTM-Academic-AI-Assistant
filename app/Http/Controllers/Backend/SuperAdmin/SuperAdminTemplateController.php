@@ -37,7 +37,17 @@ class SuperAdminTemplateController extends Controller
             $query->where('category', ucfirst($category));
         }
 
-        // 3. Apply Search Filter 
+        // 3. Apply Status Filter (NEW)
+        $status = $request->input('status');
+        if ($status && $status !== 'all') {
+            if ($status === 'active') {
+                $query->where('is_active', 1);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', 0);
+            }
+        }
+
+        // 4. Apply Search Filter 
         $search = $request->input('search');
         if ($search) {
             $searchTerm = '%' . $search . '%';
@@ -47,12 +57,12 @@ class SuperAdminTemplateController extends Controller
             });
         }
 
-        // 4. Get totals (without pagination)
+        // 5. Get totals (without pagination)
         $totalTemplates  = $query->count(); // Total templates with applied filters
         $studentCount    = (clone $query)->where('category', 'Student')->count();
         $lecturerCount   = (clone $query)->where('category', 'Lecturer')->count();
 
-        // 5. Paginate and preserve query string 
+        // 6. Paginate and preserve query string 
         $templates = $query->paginate(8)->withQueryString(); 
 
         return view('superadmin.backend.template.all_template', compact(

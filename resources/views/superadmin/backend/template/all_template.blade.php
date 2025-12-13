@@ -196,15 +196,15 @@
                     <form id="statusForm" method="POST">
                         @csrf
 
-                        <div class="modal-body text-center p-5">
-                            <div class="text-warning mb-3">
+                        <div class="modal-body text-center px-5 pt-5 pb-2">
+                            <div class="text-warning mb-4">
                                 <em class="icon ni ni-alert-circle-fill" style="font-size: 64px;"></em>
                             </div>
                             <h4 class="mb-3">Change Status?</h4>
-                            <p id="statusModalText" class="text-muted"></p>
+                            <p id="statusModalText" class="text-muted mb-0"></p>
                         </div>
 
-                        <div class="modal-footer justify-content-center">
+                        <div class="modal-footer justify-content-center pt-3 pb-4 border-0">
                             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
                             <button type="submit" class="btn btn-warning">Update</button>
                         </div>
@@ -335,6 +335,9 @@
         {{-- HIDDEN INPUT to hold the selected Category value --}}
         <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
 
+        {{-- HIDDEN INPUT to hold the selected Status value --}}
+        <input type="hidden" id="status_hidden" name="status" value="{{ request('status', 'all') }}">
+
         {{-- HIDDEN INPUT to hold the selected Sort value --}}
         <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
         
@@ -370,6 +373,22 @@
                 </button>
                 <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'lecturer' ? 'active' : '' }}" data-value="lecturer">
                     <em class="icon ni ni-user-check me-1"></em> Lecturer
+                </button>
+            </div>
+        </div>
+
+        {{-- NEW: STATUS FILTER --}}
+        <div class="mb-4">
+            <h6 class="text-muted mb-2">Status</h6>
+            <div class="btn-group status-segment-control w-100" role="group" id="statusFilter">
+                <button type="button" class="btn btn-outline-success segment-btn {{ request('status', 'all') == 'all' ? 'active' : '' }}" data-value="all">
+                    <em class="icon ni ni-check-circle me-1"></em> All
+                </button>
+                <button type="button" class="btn btn-outline-success segment-btn {{ request('status') == 'active' ? 'active' : '' }}" data-value="active">
+                    <em class="icon ni ni-check me-1"></em> Active
+                </button>
+                <button type="button" class="btn btn-outline-success segment-btn {{ request('status') == 'inactive' ? 'active' : '' }}" data-value="inactive">
+                    <em class="icon ni ni-cross me-1"></em> Inactive
                 </button>
             </div>
         </div>
@@ -428,8 +447,9 @@
             });
         }
 
-        // Apply setup to both category and sort filters
+        // Apply setup to category, status, and sort filters
         setupSegmentControls('categoryFilter', 'category_hidden');
+        setupSegmentControls('statusFilter', 'status_hidden');
         setupSegmentControls('sortFilter', 'sort_hidden');
     });
 </script>
