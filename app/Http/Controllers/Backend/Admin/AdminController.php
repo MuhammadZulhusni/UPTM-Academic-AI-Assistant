@@ -10,9 +10,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use App\Traits\LogsAdminActivity; // Activities logging trait
 
 class AdminController extends Controller
 {
+    use LogsAdminActivity; // Activities logging trait
+
     public function AdminDashboard()
     {
         // Fetch the authenticated user and their specific counts
@@ -48,6 +51,9 @@ class AdminController extends Controller
      */
     public function AdminLogout(Request $request)
     {
+        // Log the logout activity BEFORE logging out
+        $this->logLogout();
+
         Auth::guard('web')->logout();
         // Invalidate the current session
         $request->session()->invalidate();
@@ -102,6 +108,15 @@ class AdminController extends Controller
         $id = Auth::user()->id;
         $data = User::find($id);
 
+        // Store old data for potential logging (optional - profile updates typically aren't logged)
+        // But keeping it here in case  want to track profile changes
+        $oldData = [
+            'name' => $data->name,
+            'email' => $data->email,
+            'phone' => $data->phone,
+            'address' => $data->address,
+        ];
+
         // Update the user data with values from the request
         $data->name = $request->name;
         $data->email = $request->email;
@@ -136,7 +151,7 @@ class AdminController extends Controller
 
                 // Delete the old image if it exists and is not the same as the new one
                 if ($oldPhotoPath && $oldPhotoPath !== $filename) {
-                $this->deleteOldImage($oldPhotoPath);
+                    $this->deleteOldImage($oldPhotoPath);
                 }
             } catch (\Exception $e) {
                 $notification = [
@@ -148,6 +163,20 @@ class AdminController extends Controller
         }
 
         $data->save();
+
+        // Optional: Log profile update (uncomment if you want to track this)
+        // $this->logActivity(
+        //     'profile_updated',
+        //     "Updated own profile",
+        //     'user',
+        //     $data->id,
+        //     [
+        //         'old_name' => $oldData['name'],
+        //         'new_name' => $data->name,
+        //         'old_email' => $oldData['email'],
+        //         'new_email' => $data->email,
+        //     ]
+        // );
 
         $notification = [
             'message' => 'Admin Profile Updated Successfully',
@@ -171,7 +200,7 @@ class AdminController extends Controller
 
         // Check if the file exists before attempting to delete it
         if (file_exists($fullPath)) {
-        @unlink($fullPath); // @ suppresses warnings if file can't be deleted
+            @unlink($fullPath); // @ suppresses warnings if file can't be deleted
         }
     }
 
@@ -205,6 +234,14 @@ class AdminController extends Controller
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);
+
+        // Log password change activity (before logout)
+        $this->logActivity(
+            'password_changed',
+            "Changed own password",
+            'user',
+            $user->id
+        );
 
         Auth::logout();
 
@@ -248,8 +285,18 @@ class AdminController extends Controller
 
     public function AdminDeleteUser($id)
     {
-        // Find the user by ID and delete them.
-        User::findOrFail($id)->delete();
+        // Find the user by ID
+        $user = User::findOrFail($id);
+        
+        // Store user info for logging
+        $userName = $user->name;
+        $userEmail = $user->email;
+        
+        // Delete the user
+        $user->delete();
+
+        // Log the activity
+        $this->logUserDeleted($userName, $userEmail, $id);
 
         // Prepare a success notification message.
         $notification = [

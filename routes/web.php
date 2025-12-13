@@ -97,6 +97,10 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
     Route::get('/superadmin/users/search', [SuperAdminController::class, 'searchUsers'])->name('superadmin.users.search');
     Route::get('/superadmin/create/user', [SuperAdminController::class, 'CreateUser'])->name('superadmin.create.user');
     Route::post('/superadmin/store/user', [SuperAdminController::class, 'StoreUser'])->name('superadmin.store.user');
+    // Admin Activity Tracking Routes
+    Route::get('/admin-activities', [SuperAdminController::class, 'AdminActivities'])->name('superadmin.admin.activities');
+    Route::get('/admin-activity/{id}', [SuperAdminController::class, 'AdminActivityDetails'])->name('superadmin.admin.activity.details');
+    Route::get('/admin-activities/export', [SuperAdminController::class, 'ExportAdminActivities'])->name('superadmin.admin.activities.export');
     
     Route::controller(SuperAdminTemplateController::class)->group(function () {
         Route::get('/template', 'Index')->name('superadmin.template');
