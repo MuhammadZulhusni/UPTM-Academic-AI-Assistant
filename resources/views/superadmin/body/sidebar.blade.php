@@ -110,6 +110,14 @@
                         </a>
                     </li>
                     <li class="nk-menu-item">
+                        <a href="{{ route('superadmin.admin.activities') }}" class="nk-menu-link">
+                            <span class="nk-menu-icon">
+                                <em class="icon bi bi-activity icon-outline-purple"></em>
+                            </span>
+                            <span class="nk-menu-text">Admin Activities</span>
+                        </a>
+                    </li>
+                    <li class="nk-menu-item">
                         <a href="{{ route('superadmin.document') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
                                 <em class="icon bi bi-file-spreadsheet-fill icon-outline-blue"></em>

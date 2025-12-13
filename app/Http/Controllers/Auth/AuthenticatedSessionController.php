@@ -8,9 +8,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Traits\LogsAdminActivity;
 
 class AuthenticatedSessionController extends Controller
 {
+    use LogsAdminActivity; // Activities logging trait
     /**
      * Display the login view.
      */
@@ -53,6 +55,10 @@ class AuthenticatedSessionController extends Controller
 
         // Admin redirect
         if ($user->role === 'admin') {
+
+            $this->logLogin();
+
+             
             return redirect()->intended(route('admin.dashboard'))->with([
                 'message' => 'Admin Login Successfully',
                 'alert-type' => 'success'

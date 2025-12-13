@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
+use App\Models\AdminActivity;
 
 class SuperAdminController extends Controller
 {
@@ -306,5 +307,132 @@ class SuperAdminController extends Controller
             'message' => 'User Created Successfully',
             'alert-type' => 'success'
         ]);
+    }
+
+    public function AdminActivities(Request $request)
+    {
+        $adminFilter = $request->get('admin', 'all');
+        $activityFilter = $request->get('activity', 'all');
+        $dateFilter = $request->get('date', 'all');
+        $search = $request->get('search', '');
+
+        // Get all admins for filter dropdown
+        $admins = User::where('role', 'admin')->select('id', 'name')->orderBy('name')->get();
+
+        // Build query
+        $query = AdminActivity::with('admin')
+            ->whereHas('admin', function($q) {
+                $q->where('role', 'admin');
+            });
+
+        // Apply admin filter
+        if ($adminFilter !== 'all') {
+            $query->where('admin_id', $adminFilter);
+        }
+
+        // Apply activity type filter
+        if ($activityFilter !== 'all') {
+            $query->where('activity_type', $activityFilter);
+        }
+
+        // Apply date filter
+        if ($dateFilter !== 'all') {
+            switch ($dateFilter) {
+                case 'today':
+                    $query->whereDate('created_at', Carbon::today());
+                    break;
+                case 'yesterday':
+                    $query->whereDate('created_at', Carbon::yesterday());
+                    break;
+                case 'week':
+                    $query->where('created_at', '>=', Carbon::now()->subWeek());
+                    break;
+                case 'month':
+                    $query->where('created_at', '>=', Carbon::now()->subMonth());
+                    break;
+            }
+        }
+
+        // Apply search
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('activity_description', 'like', "%{$search}%")
+                ->orWhereHas('admin', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Get activities with pagination
+        $activities = $query->latest()->paginate(10)->withQueryString();
+
+        // Get statistics
+        $stats = [
+            'total_activities' => AdminActivity::whereHas('admin', function($q) {
+                $q->where('role', 'admin');
+            })->count(),
+            'today_activities' => AdminActivity::whereHas('admin', function($q) {
+                $q->where('role', 'admin');
+            })->whereDate('created_at', Carbon::today())->count(),
+            'total_admins' => User::where('role', 'admin')->count(),
+            'templates_created' => AdminActivity::where('activity_type', 'template_created')->count(),
+            'users_created' => AdminActivity::where('activity_type', 'user_created')->count(),
+        ];
+
+        return view('superadmin.admin_activities', compact(
+            'activities',
+            'admins',
+            'adminFilter',
+            'activityFilter',
+            'dateFilter',
+            'search',
+            'stats'
+        ));
+    }
+
+    public function AdminActivityDetails($id)
+    {
+        $activity = AdminActivity::with('admin')->findOrFail($id);
+        return response()->json($activity);
+    }
+
+    public function ExportAdminActivities(Request $request)
+    {
+        // Export to CSV
+        $activities = AdminActivity::with('admin')
+            ->whereHas('admin', function($q) {
+                $q->where('role', 'admin');
+            })
+            ->latest()
+            ->get();
+
+        $filename = 'admin_activities_' . date('Y-m-d_His') . '.csv';
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+        ];
+
+        $callback = function() use ($activities) {
+            $file = fopen('php://output', 'w');
+            
+            // Add headers
+            fputcsv($file, ['Date', 'Time', 'Day', 'Admin Name', 'Activity Type', 'Description']);
+            
+            // Add data
+            foreach ($activities as $activity) {
+                fputcsv($file, [
+                    $activity->formatted_date,
+                    $activity->formatted_time,
+                    $activity->day_name,
+                    $activity->admin->name,
+                    str_replace('_', ' ', ucwords($activity->activity_type)),
+                    $activity->activity_description,
+                ]);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

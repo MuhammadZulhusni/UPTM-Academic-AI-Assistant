@@ -12,10 +12,12 @@ use App\Models\GeneratedContent;
 use OpenAI\Laravel\Facades\OpenAI;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-
+use App\Traits\LogsAdminActivity; // Activities logging trait
 
 class TemplateController extends Controller
 {
+    use LogsAdminActivity; // Activities logging trait
+
     // Fetches all templates and displays them in the admin view
     public function AdminTemplate(Request $request){
         // Start the query with the base model
@@ -125,6 +127,9 @@ class TemplateController extends Controller
                 'is_required' => true, // Assuming all fields are required
             ]);
         }
+
+        // Log the activity
+        $this->logTemplateCreated($template);
         
         // Prepares a success notification message
         $notification = array(
@@ -163,40 +168,51 @@ class TemplateController extends Controller
             'input_fields.*.description' => 'required|string',
         ]);
 
-    // Finds the existing template by its ID.
-    $template = Template::findOrFail($id);
-    
-    // Updates the template's properties with the validated data from the request.
-    $template->title = $validateData['title']; 
-    $template->description = $validateData['description'];
-    $template->category = $validateData['category'];
-    $template->icon = $validateData['icon'];
-    $template->prompt = $validateData['prompt'];
-    $template->save();
+        // Finds the existing template by its ID.
+        $template = Template::findOrFail($id);
 
-    // The code below handles updating the related input fields.
-    // Gets the first (and in this case, only) input field from the validated data array.
-    $inputField = $validateData['input_fields'][0];
-     
-    // Finds the corresponding input field in the database based on the template's ID.
-    $templateInputField = TemplateInputFields::where('template_id',$template->id)->first();
+        // Store old data for logging
+        $oldData = [
+            'title' => $template->title,
+            'description' => $template->description,
+            'category' => $template->category,
+            'icon' => $template->icon,
+        ];
+        
+        // Updates the template's properties with the validated data from the request.
+        $template->title = $validateData['title']; 
+        $template->description = $validateData['description'];
+        $template->category = $validateData['category'];
+        $template->icon = $validateData['icon'];
+        $template->prompt = $validateData['prompt'];
+        $template->save();
 
-    // Checks if a matching input field was found.
-    if ($templateInputField ) {
-       // If found, update its properties with the new validated data.
-       $templateInputField->title = $inputField['title'];
-       $templateInputField->description = $inputField['description']; 
-       $templateInputField->type = 'textarea';
-       $templateInputField->is_required = true;
-       $templateInputField->save();
-    } 
+        // The code below handles updating the related input fields.
+        // Gets the first (and in this case, only) input field from the validated data array.
+        $inputField = $validateData['input_fields'][0];
+         
+        // Finds the corresponding input field in the database based on the template's ID.
+        $templateInputField = TemplateInputFields::where('template_id',$template->id)->first();
 
-    $notification = array(
-        'message' => 'Template Updated Successfully',
-        'alert-type' => 'success'
-     );
+        // Checks if a matching input field was found.
+        if ($templateInputField ) {
+           // If found, update its properties with the new validated data.
+           $templateInputField->title = $inputField['title'];
+           $templateInputField->description = $inputField['description']; 
+           $templateInputField->type = 'textarea';
+           $templateInputField->is_required = true;
+           $templateInputField->save();
+        }
 
-    return redirect()->route('admin.template')->with($notification); 
+        // Log the activity
+        $this->logTemplateUpdated($template, $oldData);
+
+        $notification = array(
+            'message' => 'Template Updated Successfully',
+            'alert-type' => 'success'
+         );
+
+        return redirect()->route('admin.template')->with($notification); 
     }
 
     public function DetailsTemplate($id){
@@ -241,7 +257,7 @@ class TemplateController extends Controller
         $template = Template::with(['inputFields' => function ($query) {
             $query->select('id', 'template_id', 'title'); // load only needed columns
         }])
-        ->select('id', 'prompt') // select only necessary template columns
+        ->select('id', 'prompt', 'title') // select only necessary template columns (added 'title' for logging)
         ->findOrFail($id); // find template by ID or fail if not found
 
         // Build dynamic validation rules based on template input fields
@@ -299,12 +315,13 @@ class TemplateController extends Controller
             $wordCount = str_word_count($output);
 
             // Step 7: Save generated content and update user usage (word) in database
-            DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
-                // Increase user’s used words
+            $generatedContent = null;
+            DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount, &$generatedContent) {
+                // Increase user's used words
                 User::where('id', $user->id)->increment('words_used', $wordCount);
 
                 // Save the generated content record
-                GeneratedContent::create([
+                $generatedContent = GeneratedContent::create([
                     'user_id' => $user->id,
                     'template_id' => $template->id,
                     'input' => json_encode($inputData, JSON_UNESCAPED_UNICODE),
@@ -314,6 +331,22 @@ class TemplateController extends Controller
                     'updated_at' => now(),
                 ]);
             });
+
+            // Log document creation activity
+            if ($generatedContent) {
+                $this->logActivity(
+                    'document_created',
+                    "Generated document from template: {$template->title}",
+                    'document',
+                    $generatedContent->id,
+                    [
+                        'template_title' => $template->title,
+                        'word_count' => $wordCount,
+                        'language' => $validatedData['language'],
+                        'ai_model' => $validatedData['ai_model'],
+                    ]
+                );
+            }
 
             // Return successful response with generated output
             return response()->json([
@@ -434,9 +467,15 @@ class TemplateController extends Controller
 
     public function DeleteTemplate($id)
     {
-        // Find the template by its ID and delete it
+        // Find the template by its ID
         $template = Template::findOrFail($id);
+        $templateTitle = $template->title;
+        
+        // Delete it
         $template->delete();
+
+        // Log the activity
+        $this->logTemplateDeleted($templateTitle, $id);
         
         $notification = [
             'message' => 'Template Deleted Successfully',
