@@ -101,6 +101,10 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
     Route::get('/admin-activities', [SuperAdminController::class, 'AdminActivities'])->name('superadmin.admin.activities');
     Route::get('/admin-activity/{id}', [SuperAdminController::class, 'AdminActivityDetails'])->name('superadmin.admin.activity.details');
     Route::get('/admin-activities/export', [SuperAdminController::class, 'ExportAdminActivities'])->name('superadmin.admin.activities.export');
+    // Activity Settings Routes (NEW)
+    Route::get('/activity-settings', [SuperAdminController::class, 'ActivitySettings'])->name('superadmin.activity.settings');
+    Route::post('/activity-settings/update', [SuperAdminController::class, 'UpdateActivitySettings'])->name('superadmin.activity.settings.update');
+    Route::post('/activity-manual-cleanup', [SuperAdminController::class, 'ManualCleanup'])->name('superadmin.activity.manual.cleanup');
     
     Route::controller(SuperAdminTemplateController::class)->group(function () {
         Route::get('/template', 'Index')->name('superadmin.template');

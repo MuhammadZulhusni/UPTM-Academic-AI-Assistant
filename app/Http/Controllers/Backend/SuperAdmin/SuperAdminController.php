@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 use App\Models\AdminActivity;
+use App\Models\SystemSetting;
+use Illuminate\Support\Facades\Artisan;
 
 class SuperAdminController extends Controller
 {
@@ -316,13 +318,18 @@ class SuperAdminController extends Controller
         $dateFilter = $request->get('date', 'all');
         $search = $request->get('search', '');
 
-        // Get all admins for filter dropdown
-        $admins = User::where('role', 'admin')->select('id', 'name')->orderBy('name')->get();
+        // Get ONLY ACTIVE admins for filter dropdown
+        $admins = User::where('role', 'admin')
+            ->where('is_active', 1)
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
 
-        // Build query
+        // Build main query (ONLY ACTIVE admins)
         $query = AdminActivity::with('admin')
-            ->whereHas('admin', function($q) {
-                $q->where('role', 'admin');
+            ->whereHas('admin', function ($q) {
+                $q->where('role', 'admin')
+                ->where('is_active', 1);
             });
 
         // Apply admin filter
@@ -341,42 +348,63 @@ class SuperAdminController extends Controller
                 case 'today':
                     $query->whereDate('created_at', Carbon::today());
                     break;
+
                 case 'yesterday':
                     $query->whereDate('created_at', Carbon::yesterday());
                     break;
+
                 case 'week':
                     $query->where('created_at', '>=', Carbon::now()->subWeek());
                     break;
+
                 case 'month':
                     $query->where('created_at', '>=', Carbon::now()->subMonth());
                     break;
             }
         }
 
-        // Apply search
+        // Apply search (activity description OR admin name)
         if (!empty($search)) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('activity_description', 'like', "%{$search}%")
-                ->orWhereHas('admin', function($q) use ($search) {
+                ->orWhereHas('admin', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
                 });
             });
         }
 
         // Get activities with pagination
-        $activities = $query->latest()->paginate(10)->withQueryString();
+        $activities = $query->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-        // Get statistics
+        // Statistics (ONLY ACTIVE admins)
         $stats = [
-            'total_activities' => AdminActivity::whereHas('admin', function($q) {
-                $q->where('role', 'admin');
+            'total_activities' => AdminActivity::whereHas('admin', function ($q) {
+                $q->where('role', 'admin')
+                ->where('is_active', 1);
             })->count(),
-            'today_activities' => AdminActivity::whereHas('admin', function($q) {
-                $q->where('role', 'admin');
+
+            'today_activities' => AdminActivity::whereHas('admin', function ($q) {
+                $q->where('role', 'admin')
+                ->where('is_active', 1);
             })->whereDate('created_at', Carbon::today())->count(),
-            'total_admins' => User::where('role', 'admin')->count(),
-            'templates_created' => AdminActivity::where('activity_type', 'template_created')->count(),
-            'users_created' => AdminActivity::where('activity_type', 'user_created')->count(),
+
+            'total_admins' => User::where('role', 'admin')
+                ->where('is_active', 1)
+                ->count(),
+
+            'templates_created' => AdminActivity::where('activity_type', 'template_created')
+                ->whereHas('admin', function ($q) {
+                    $q->where('role', 'admin')
+                    ->where('is_active', 1);
+                })->count(),
+
+            'users_created' => AdminActivity::where('activity_type', 'user_created')
+                ->whereHas('admin', function ($q) {
+                    $q->where('role', 'admin')
+                    ->where('is_active', 1);
+                })->count(),
         ];
 
         return view('superadmin.admin_activities', compact(
@@ -434,5 +462,99 @@ class SuperAdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Show activity settings page
+     */
+    public function ActivitySettings()
+    {
+        $retentionDays = SystemSetting::getActivityLogRetentionDays();
+        $autoCleanup = SystemSetting::isAutoCleanupEnabled();
+        
+        // Get statistics
+        $totalLogs = AdminActivity::count();
+        $oldestLog = AdminActivity::oldest()->first();
+        $newestLog = AdminActivity::latest()->first();
+        
+        // Calculate logs that would be deleted
+        $cutoffDate = Carbon::now()->subDays($retentionDays);
+        $logsToDelete = AdminActivity::where('created_at', '<', $cutoffDate)->count();
+        
+        return view('superadmin.activity_settings', compact(
+            'retentionDays',
+            'autoCleanup',
+            'totalLogs',
+            'oldestLog',
+            'newestLog',
+            'logsToDelete'
+        ));
+    }
+
+    /**
+     * Update activity settings
+     */
+    public function UpdateActivitySettings(Request $request)
+    {
+        $request->validate([
+            'retention_days' => 'required|integer|min:1|max:365',
+        ]);
+
+        // Update retention days
+        SystemSetting::set(
+            'activity_log_retention_days',
+            $request->retention_days,
+            'integer',
+            'Number of days to keep admin activity logs before auto-deletion'
+        );
+
+        // Always enable auto cleanup when settings are saved
+        SystemSetting::set(
+            'activity_log_auto_cleanup',
+            1,
+            'boolean',
+            'Enable automatic cleanup of old activity logs'
+        );
+
+        return back()->with([
+            'message' => 'Settings saved! Auto-cleanup is now active and will run every night at midnight.',
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * Manually trigger cleanup
+     */
+    public function ManualCleanup(Request $request)
+    {
+        $request->validate([
+            'days' => 'required|integer|min:1|max:365',
+        ]);
+
+        try {
+            $cutoffDate = Carbon::now()->subDays($request->days);
+            $count = AdminActivity::where('created_at', '<', $cutoffDate)->count();
+
+            if ($count === 0) {
+                return back()->with([
+                    'message' => 'No activity logs found older than ' . $request->days . ' days',
+                    'alert-type' => 'info'
+                ]);
+            }
+
+            // Delete old logs
+            $deleted = AdminActivity::where('created_at', '<', $cutoffDate)->delete();
+
+            return back()->with([
+                'message' => "Successfully deleted {$deleted} old activity log(s)",
+                'alert-type' => 'success'
+            ]);
+
+        } catch (\Exception $e) {
+            return back()->with([
+                'message' => 'Error during cleanup: ' . $e->getMessage(),
+                'alert-type' => 'error'
+            ]);
+        }
     }
 }
