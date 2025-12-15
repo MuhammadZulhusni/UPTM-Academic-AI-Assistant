@@ -13,6 +13,9 @@
                     <p class="text-muted mb-3">Monitor all admin actions and activities</p>
                 </div>
                 <div class="nk-block-head-content">
+                    <a href="{{ route('superadmin.activity.settings') }}" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-gear me-2"></i>Settings
+                    </a>
                     <a href="{{ route('superadmin.admin.activities.export') }}" class="btn btn-primary">
                         <i class="bi bi-download me-2"></i>Export to CSV
                     </a>
