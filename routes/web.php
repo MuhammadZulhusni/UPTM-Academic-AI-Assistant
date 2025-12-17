@@ -123,6 +123,9 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::get('/edit/document/{id}', 'Edit')->name('superadmin.edit.document');
         Route::post('/update/document/{id}', 'Update')->name('superadmin.update.document');
         Route::delete('/delete/document/{id}', 'Destroy')->name('superadmin.delete.document');
+        Route::get('/retention-settings',  'DocumentSettings')->name('superadmin.document.settings');
+        Route::post('/document-settings/update','UpdateDocumentSettings')->name('superadmin.document.settings.update');
+        Route::post('/document-manual-cleanup','ManualDocumentCleanup')->name('superadmin.document.manual.cleanup');
     });
 });
 

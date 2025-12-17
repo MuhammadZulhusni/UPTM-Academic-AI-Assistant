@@ -5,38 +5,33 @@
     <div class="nk-content-body">
         <!-- Page Header -->
         <div class="nk-block-head nk-page-head">
-            <div class="nk-block-head-between flex-wrap g-2 align-items-center">
+            <div class="nk-block-head-between flex-wrap g-2">
                 <div class="nk-block-head-content">
-                    <h2 class="display-6">Activity Log Cleanup</h2>
-                    <p class="text-muted mb-0">Delete old admin activity logs to save database space</p>
-                </div>
-                <div class="nk-block-head-content mb-4 mt-4">
-                    <a href="{{ route('superadmin.admin.activities') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-arrow-left me-2"></i>Back to Activities
-                    </a>
+                    <h2 class="display-6">Document Cleanup</h2>
+                    <p class="text-muted mb-4">Delete old user-generated documents to save database space</p>
                 </div>
             </div>
         </div>
 
         <!-- Statistics Cards -->
         <div class="row g-3 mb-4">
-            <div class="col-lg-6 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center">
                             <div class="stat-icon bg-primary-subtle">
-                                <i class="bi bi-database text-primary"></i>
+                                <i class="bi bi-file-earmark-text text-primary"></i>
                             </div>
                             <div class="ms-3 flex-grow-1">
-                                <p class="text-muted mb-1 small">Total Activity Logs</p>
-                                <h3 class="mb-0 fw-bold">{{ number_format($totalLogs) }}</h3>
+                                <p class="text-muted mb-1 small">Total Documents</p>
+                                <h3 class="mb-0 fw-bold">{{ number_format($totalDocuments) }}</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-6 col-md-6">
+            <div class="col-lg-4 col-md-6">
                 <div class="card border-0 shadow-sm h-100 stat-card">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-center">
@@ -45,14 +40,43 @@
                             </div>
                             <div class="ms-3 flex-grow-1">
                                 <p class="text-muted mb-1 small">Date Range</p>
-                                @if($oldestLog && $newestLog)
+                                @if($oldestDocument && $newestDocument)
                                     <div class="small fw-semibold">
-                                        <div>{{ $oldestLog->created_at->format('M d, Y') }}</div>
-                                        <div class="small fw-semibold">to {{ $newestLog->created_at->format('M d, Y') }}</div>
+                                        <div>{{ $oldestDocument->created_at->format('M d, Y') }}</div>
+                                        <div class="small fw-semibold">to {{ $newestDocument->created_at->format('M d, Y') }}</div>
                                     </div>
                                 @else
-                                    <p class="mb-0 text-muted small">No logs available</p>
+                                    <p class="mb-0 text-muted small">No documents</p>
                                 @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card border-0 shadow-sm h-100 stat-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center">
+                            <div class="stat-icon bg-success-subtle">
+                                <i class="bi bi-people text-success"></i>
+                            </div>
+                            <div class="ms-3 flex-grow-1">
+                                <p class="text-muted mb-2 small">Documents by Role</p>
+                                <div class="role-stats">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small text-muted">Students</span>
+                                        <span class="small fw-semibold">{{ number_format($studentDocuments) }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <span class="small text-muted">Lecturers</span>
+                                        <span class="small fw-semibold">{{ number_format($lecturerDocuments) }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="small text-muted">Admins</span>
+                                        <span class="small fw-semibold">{{ number_format($adminDocuments) }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -70,75 +94,60 @@
                                 <i class="bi bi-trash"></i>
                             </div>
                             <div class="ms-3">
-                                <h5 class="mb-0 fw-bold text-white">Delete Old Activity Logs</h5>
+                                <h5 class="mb-0 fw-bold text-white">Delete Old Documents</h5>
                                 <small class="text-white-50">Cleanup tool</small>
                             </div>
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <form action="{{ route('superadmin.activity.manual.cleanup') }}" method="POST" id="manualCleanupForm">
+                        <form action="{{ route('superadmin.document.manual.cleanup') }}" method="POST" id="manualDocCleanupForm">
                             @csrf
                             
                             <div class="cleanup-input-group mb-4">
                                 <label class="form-label fw-semibold mb-3">
-                                    <i class="bi bi-calendar-x me-2 text-danger"></i>Delete logs older than:
+                                    <i class="bi bi-calendar-x me-2 text-danger"></i>Delete documents older than:
                                 </label>
                                 <div class="input-wrapper">
                                     <input 
                                         type="number" 
                                         name="days" 
                                         class="form-control form-control-lg" 
-                                        value="{{ $retentionDays }}"
-                                        min="1"
+                                        value="90"
+                                        min="7"
                                         max="365"
                                         required
-                                        id="manualDays"
+                                        id="manualDocDays"
                                     >
                                     <span class="input-suffix me-3">days</span>
                                 </div>
                                 <div class="form-text mt-2">
                                     <i class="bi bi-info-circle me-1"></i>
-                                    Example: Enter 30 to delete logs older than 30 days
+                                    Example: Enter 90 to delete documents older than 90 days
                                 </div>
                             </div>
 
                             <!-- Quick Selection Buttons -->
                             <div class="mb-4">
                                 <label class="form-label fw-semibold mb-3">
-                                    Quick select:
+                                   </i>Quick select:
                                 </label>
                                 <div class="quick-select-grid">
-                                    <button type="button" class="quick-btn" onclick="setRetention(7)">
-                                        <div class="quick-btn-value">7</div>
-                                        <div class="quick-btn-label">Days</div>
-                                    </button>
-                                    <button type="button" class="quick-btn active" onclick="setRetention(30)">
+                                    <button type="button" class="quick-btn" onclick="setDocDays(30)">
                                         <div class="quick-btn-value">30</div>
                                         <div class="quick-btn-label">Days</div>
                                     </button>
-                                    <button type="button" class="quick-btn" onclick="setRetention(90)">
+                                    <button type="button" class="quick-btn active" onclick="setDocDays(90)">
                                         <div class="quick-btn-value">90</div>
                                         <div class="quick-btn-label">Days</div>
                                     </button>
-                                    <button type="button" class="quick-btn" onclick="setRetention(180)">
+                                    <button type="button" class="quick-btn" onclick="setDocDays(180)">
                                         <div class="quick-btn-value">180</div>
                                         <div class="quick-btn-label">Days</div>
                                     </button>
-                                </div>
-                            </div>
-
-                            <!-- Preview Box -->
-                            <div class="preview-box mb-4">
-                                <div class="d-flex align-items-start">
-                                    <div class="preview-icon">
-                                        <i class="bi bi-eye"></i>
-                                    </div>
-                                    <div class="ms-3 flex-grow-1">
-                                        <h6 class="fw-semibold mb-1">Preview</h6>
-                                        <p class="mb-0 small" id="previewText">
-                                            This will delete <strong>{{ number_format($logsToDelete) }}</strong> log(s)
-                                        </p>
-                                    </div>
+                                    <button type="button" class="quick-btn" onclick="setDocDays(365)">
+                                        <div class="quick-btn-value">365</div>
+                                        <div class="quick-btn-label">Days</div>
+                                    </button>
                                 </div>
                             </div>
 
@@ -149,7 +158,7 @@
                                     </div>
                                     <div class="ms-3">
                                         <h6 class="fw-bold mb-1">Important Warning</h6>
-                                        <p class="mb-0 small">Once deleted, logs cannot be recovered. This action is permanent.</p>
+                                        <p class="mb-0 small">Deleted documents cannot be recovered. This action is permanent and will affect all users.</p>
                                     </div>
                                 </div>
                             </div>
@@ -157,9 +166,9 @@
                             <button 
                                 type="button" 
                                 class="btn btn-danger btn-lg w-100 delete-btn" 
-                                onclick="confirmCleanup()"
+                                onclick="confirmDocCleanup()"
                             >
-                                <i class="bi bi-trash me-2"></i>Delete Logs Now
+                                <i class="bi bi-trash me-2"></i>Delete Documents Now
                             </button>
                         </form>
                     </div>
@@ -186,7 +195,7 @@
 </div>
 
 <!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="confirmationDocModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header border-0 pb-0">
@@ -201,51 +210,25 @@
                 
                 <div class="alert alert-warning border-0 mb-4">
                     <p class="mb-2"><strong>You are about to permanently delete:</strong></p>
-                    <h4 class="text-danger mb-2" id="confirmLogsCount">0 log(s)</h4>
-                    <p class="mb-0 small">Logs older than <strong id="confirmDays">0</strong> days</p>
+                    <p class="mb-0">Documents older than <strong id="confirmDocDays">0</strong> days</p>
                 </div>
                 
                 <div class="text-start mb-4">
                     <div class="alert alert-danger border-0">
                         <ul class="mb-0 ps-3 small">
                             <li>This action cannot be undone</li>
-                            <li>Deleted logs are gone forever</li>
-                            <li>Consider exporting logs before deletion</li>
+                            <li>Users will lose their content history</li>
+                            <li>Deleted documents are gone forever</li>
                         </ul>
                     </div>
                 </div>
                 
                 <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-danger btn-lg" id="confirmDeleteBtn">
+                    <button type="button" class="btn btn-danger btn-lg" id="confirmDocDeleteBtn">
                         <i class="bi bi-trash me-2"></i>Yes, Delete Permanently
                     </button>
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         <i class="bi bi-x-circle me-2"></i>Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Final Confirmation Modal -->
-<div class="modal fade" id="finalConfirmationModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content border-0 shadow-lg border-danger" style="border: 3px solid #dc3545 !important;">
-            <div class="modal-body text-center p-4">
-                <div class="danger-icon-pulse mb-3">
-                    <i class="bi bi-exclamation-octagon-fill"></i>
-                </div>
-                
-                <h4 class="fw-bold text-danger mb-3">FINAL WARNING!</h4>
-                <p class="mb-4">This is your last chance to cancel. Are you absolutely sure?</p>
-                
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-danger" id="finalConfirmBtn">
-                        <i class="bi bi-check-circle me-2"></i>Yes, I'm Sure
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                        Cancel
                     </button>
                 </div>
             </div>
@@ -276,6 +259,10 @@
 
 .stat-icon i {
     font-size: 24px;
+}
+
+.role-stats {
+    font-size: 0.875rem;
 }
 
 /* Cleanup Card */
@@ -392,30 +379,6 @@
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Preview Box */
-.preview-box {
-    background: linear-gradient(135deg, #e7f5ff 0%, #e3f2fd 100%);
-    border: 2px solid #2196f3;
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-}
-
-.preview-icon {
-    width: 36px;
-    height: 36px;
-    background: #2196f3;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.preview-icon i {
-    color: white;
-    font-size: 18px;
-}
-
 /* Warning Box */
 .warning-box {
     background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%);
@@ -525,23 +488,6 @@
     color: white;
 }
 
-.danger-icon-pulse {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    animation: pulse 1.5s infinite;
-    margin: 0 auto;
-}
-
-.danger-icon-pulse i {
-    font-size: 40px;
-    color: white;
-}
-
 /* Animations */
 @keyframes scaleIn {
     0% { transform: scale(0); }
@@ -617,9 +563,8 @@ function showModal(type, message) {
     modal.show();
 }
 
-function setRetention(days) {
-    document.getElementById('manualDays').value = days;
-    updatePreview();
+function setDocDays(days) {
+    document.getElementById('manualDocDays').value = days;
     
     // Update active state
     document.querySelectorAll('.quick-btn').forEach(btn => {
@@ -628,44 +573,21 @@ function setRetention(days) {
     event.target.closest('.quick-btn').classList.add('active');
 }
 
-function updatePreview() {
-    const days = document.getElementById('manualDays')?.value;
-    if (days) {
-        document.getElementById('previewText').innerHTML = 
-            `This will delete logs older than <strong>${days}</strong> days`;
-    }
-}
-
-function confirmCleanup() {
-    const days = document.getElementById('manualDays').value;
-    const logsCount = {{ $logsToDelete }};
+function confirmDocCleanup() {
+    const days = document.getElementById('manualDocDays').value;
+    document.getElementById('confirmDocDays').textContent = days;
     
-    document.getElementById('confirmDays').textContent = days;
-    document.getElementById('confirmLogsCount').textContent = logsCount.toLocaleString() + ' log(s)';
-    
-    const confirmModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmationDocModal'));
     confirmModal.show();
 }
 
-document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
-    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmationModal'));
+document.getElementById('confirmDocDeleteBtn')?.addEventListener('click', function() {
+    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmationDocModal'));
     confirmModal.hide();
     
     setTimeout(function() {
-        const finalModal = new bootstrap.Modal(document.getElementById('finalConfirmationModal'));
-        finalModal.show();
+        document.getElementById('manualDocCleanupForm').submit();
     }, 300);
 });
-
-document.getElementById('finalConfirmBtn')?.addEventListener('click', function() {
-    const finalModal = bootstrap.Modal.getInstance(document.getElementById('finalConfirmationModal'));
-    finalModal.hide();
-    
-    setTimeout(function() {
-        document.getElementById('manualCleanupForm').submit();
-    }, 300);
-});
-
-document.getElementById('manualDays')?.addEventListener('input', updatePreview);
 </script>
 @endsection

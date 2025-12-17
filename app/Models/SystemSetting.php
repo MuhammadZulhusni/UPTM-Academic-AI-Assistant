@@ -73,4 +73,20 @@ class SystemSetting extends Model
     {
         return self::get('activity_log_retention_days', 30);
     }
+
+    /**
+     * Check if document auto cleanup is enabled
+     */
+    public static function isDocumentAutoCleanupEnabled()
+    {
+        return self::get('document_auto_cleanup', false);
+    }
+
+    /**
+     * Get retention days for documents
+     */
+    public static function getDocumentRetentionDays()
+    {
+        return self::get('document_retention_days', 90);
+    }
 }
