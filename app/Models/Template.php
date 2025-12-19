@@ -25,4 +25,9 @@ class Template extends Model
     public function inputFields(){
         return $this->hasMany(TemplateInputFields::class, 'template_id');
     }
+
+    public function generatedContents()
+{
+    return $this->hasMany(GeneratedContent::class);
+}
 }
