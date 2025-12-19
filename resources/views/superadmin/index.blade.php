@@ -7,6 +7,14 @@
     --primary: #3b82f6;
     --primary-light: #60a5fa;
     --primary-dark: #2563eb;
+    --success: #10b981;
+    --success-light: #34d399;
+    --warning: #f59e0b;
+    --warning-light: #fbbf24;
+    --danger: #ef4444;
+    --danger-light: #f87171;
+    --purple: #8b5cf6;
+    --purple-light: #a78bfa;
     --text-primary: #0f172a;
     --text-secondary: #64748b;
     --bg-card: #ffffff;
@@ -20,14 +28,12 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Layout */
 .nk-content-inner {
     max-width: 1400px;
     margin: 0 auto;
     padding: 2rem 1rem;
 }
 
-/* Header with Greeting Animation */
 .page-header {
     margin-bottom: 3rem;
     position: relative;
@@ -52,7 +58,7 @@
 .status-dot {
     width: 8px;
     height: 8px;
-    background: #10b981;
+    background: var(--success);
     border-radius: 50%;
     animation: pulse 2s infinite;
 }
@@ -62,10 +68,34 @@
     50% { opacity: 0.5; }
 }
 
-/* Stats Grid */
+/* Stats Section */
+.stats-section {
+    margin-bottom: 2rem;
+}
+
+.section-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-label::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
@@ -88,24 +118,10 @@
     left: 0;
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+    background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.4s ease;
-}
-
-.stat-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: var(--radius);
-    padding: 1px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    transition: opacity 0.3s ease;
 }
 
 .stat-card:hover {
@@ -115,14 +131,6 @@
 
 .stat-card:hover::before {
     transform: scaleX(1);
-}
-
-.stat-card:hover::after {
-    opacity: 1;
-}
-
-.stat-card:active {
-    transform: translateY(-4px) scale(0.98);
 }
 
 .stat-content {
@@ -137,8 +145,6 @@
     color: var(--text-primary);
     line-height: 1;
     letter-spacing: -0.03em;
-    position: relative;
-    display: inline-block;
 }
 
 .stat-label {
@@ -166,39 +172,179 @@
 
 .stat-card:hover .stat-icon {
     opacity: 1;
-    background: #eff6ff;
     transform: rotate(360deg) scale(1.1);
 }
 
 .stat-icon em {
     font-size: 1.5rem;
-    color: var(--primary);
 }
 
-/* Growth Indicator */
 .stat-growth {
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #10b981;
     margin-top: 0.5rem;
-    opacity: 0;
-    transform: translateY(10px);
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.03);
+}
+
+.stat-growth.positive {
+    color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.stat-growth.negative {
+    color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.stat-growth.neutral {
+    color: var(--text-secondary);
+}
+
+/* Card Color Variants */
+.stat-card.blue {
+    --card-color: var(--primary);
+    --card-color-light: var(--primary-light);
+}
+
+.stat-card.blue .stat-icon {
+    background: #eff6ff;
+}
+
+.stat-card.blue .stat-icon em {
+    color: var(--primary);
+}
+
+.stat-card.green {
+    --card-color: var(--success);
+    --card-color-light: var(--success-light);
+}
+
+.stat-card.green .stat-icon {
+    background: #f0fdf4;
+}
+
+.stat-card.green .stat-icon em {
+    color: var(--success);
+}
+
+.stat-card.orange {
+    --card-color: var(--warning);
+    --card-color-light: var(--warning-light);
+}
+
+.stat-card.orange .stat-icon {
+    background: #fffbeb;
+}
+
+.stat-card.orange .stat-icon em {
+    color: var(--warning);
+}
+
+.stat-card.purple {
+    --card-color: var(--purple);
+    --card-color-light: var(--purple-light);
+}
+
+.stat-card.purple .stat-icon {
+    background: #faf5ff;
+}
+
+.stat-card.purple .stat-icon em {
+    color: var(--purple);
+}
+
+.stat-card.red {
+    --card-color: var(--danger);
+    --card-color-light: var(--danger-light);
+}
+
+.stat-card.red .stat-icon {
+    background: #fef2f2;
+}
+
+.stat-card.red .stat-icon em {
+    color: var(--danger);
+}
+
+/* Quick Insights Cards */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.insight-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
     transition: var(--transition);
 }
 
-.stat-card:hover .stat-growth {
-    opacity: 1;
-    transform: translateY(0);
+.insight-card:hover {
+    box-shadow: var(--shadow-lg);
 }
 
-.stat-growth em {
+.insight-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.insight-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.insight-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-hover);
+    border-radius: 8px;
+}
+
+.insight-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.insight-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.insight-item:last-child {
+    border-bottom: none;
+}
+
+.insight-item-label {
     font-size: 0.875rem;
+    color: var(--text-secondary);
 }
 
-/* Section Header */
+.insight-item-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -265,16 +411,6 @@
     z-index: 1;
 }
 
-.section-link:hover em {
-    transform: translateX(4px);
-}
-
-.section-link em {
-    font-size: 0.875rem;
-    transition: transform 0.3s ease;
-}
-
-/* Templates Grid */
 .templates-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -297,30 +433,10 @@
     overflow: hidden;
 }
 
-.template-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(96, 165, 250, 0.05));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
 .template-card:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: var(--shadow-xl);
     border-color: var(--primary);
-}
-
-.template-card:hover::before {
-    opacity: 1;
-}
-
-.template-card:active {
-    transform: translateY(-4px) scale(1);
 }
 
 .template-icon-wrapper {
@@ -332,8 +448,6 @@
     align-items: center;
     justify-content: center;
     transition: var(--transition);
-    position: relative;
-    z-index: 1;
 }
 
 .template-card:hover .template-icon-wrapper {
@@ -346,17 +460,6 @@
     width: 32px;
     height: 32px;
     object-fit: contain;
-    filter: grayscale(0.3);
-    transition: filter 0.3s ease;
-}
-
-.template-card:hover .template-icon-img {
-    filter: grayscale(0);
-}
-
-.template-content {
-    position: relative;
-    z-index: 1;
 }
 
 .template-content h3 {
@@ -365,11 +468,6 @@
     margin: 0 0 0.5rem 0;
     color: var(--text-primary);
     line-height: 1.4;
-    transition: color 0.3s ease;
-}
-
-.template-card:hover .template-content h3 {
-    color: var(--primary);
 }
 
 .template-content p {
@@ -377,46 +475,8 @@
     font-size: 0.875rem;
     line-height: 1.6;
     margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
 }
 
-.template-badge {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 6px;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: var(--transition);
-    z-index: 2;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.template-card:hover .template-badge {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Different badge styles */
-.template-badge.badge-new {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
-}
-
-.template-badge.badge-featured {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-}
-
-/* Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -428,24 +488,8 @@
     }
 }
 
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
 .animate-in {
     animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
-}
-
-.animate-scale {
-    animation: scaleIn 0.5s ease forwards;
     opacity: 0;
 }
 
@@ -453,171 +497,350 @@
 .animate-delay-2 { animation-delay: 0.2s; }
 .animate-delay-3 { animation-delay: 0.3s; }
 .animate-delay-4 { animation-delay: 0.4s; }
+.animate-delay-5 { animation-delay: 0.5s; }
+.animate-delay-6 { animation-delay: 0.6s; }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .nk-content-inner {
         padding: 1.5rem 1rem;
     }
     
-    .page-header {
-        margin-bottom: 2rem;
-    }
-    
-    .page-header h2 {
-        font-size: 1.5rem;
-    }
-    
     .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-    
-    .stat-card {
-        padding: 1.25rem;
-    }
-    
-    .stat-number {
-        font-size: 2rem;
-    }
-    
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        right: 1rem;
-        top: 1rem;
-    }
-    
-    .stat-icon em {
-        font-size: 1.25rem;
-    }
-    
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
+        grid-template-columns: 1fr;
         gap: 1rem;
     }
     
-    .section-title {
-        font-size: 1.25rem;
-    }
-    
-    .templates-grid {
+    .insights-grid {
         grid-template-columns: 1fr;
     }
-}
-
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Loading Skeleton */
-.skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
 }
 </style>
 
 <div class="nk-content-inner">
     <div class="nk-content-body">
         <!-- Page Header -->
-        <div class="page-header animate-scale">
-            <h2>Welcome, {{ $user->name }}</h2>
+        <div class="page-header animate-in">
+            <h2>Welcome back, {{ $user->name }}</h2>
             <div class="greeting-subtext">
                 <span class="status-dot"></span>
                 <span id="greeting-text">All systems operational</span>
             </div>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-            <div class="stat-card animate-in animate-delay-1">
-                <div class="stat-icon">
-                    <em class="icon ni ni-user-alt"></em>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <span id="totalUsers" data-count="{{ $totalUsers }}">0</span>
-                    </div>
-                    <div class="stat-label">Total Users</div>
-                    <div class="stat-growth">
+        <!-- User Statistics Section -->
+        <div class="stats-section">
+            <div class="section-label">
+                <span>User Metrics</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card blue animate-in animate-delay-1">
+                    <div class="stat-icon">
                         <em class="icon ni ni-users"></em>
-                        <span>All registered users</span>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $totalUsers }}">0</span>
+                        </div>
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-growth {{ $userGrowthRate > 0 ? 'positive' : ($userGrowthRate < 0 ? 'negative' : 'neutral') }}">
+                            <em class="icon ni ni-{{ $userGrowthRate > 0 ? 'trend-up' : ($userGrowthRate < 0 ? 'trend-down' : 'minus') }}"></em>
+                            <span>{{ $userGrowthRate > 0 ? '+' : '' }}{{ $userGrowthRate }}% vs last week</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="stat-card animate-in animate-delay-2">
-                <div class="stat-icon">
-                    <em class="icon ni ni-book-read"></em>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <span id="newUsersCount" data-count="{{ $studentTemplateCount }}">0</span>
+                <div class="stat-card green animate-in animate-delay-2">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-user-add"></em>
                     </div>
-                    <div class="stat-label">Student Templates</div>
-                    <div class="stat-growth">
-                        <em class="icon ni ni-file-text"></em>
-                        <span>Templates for students</span>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $newUsersCount }}">0</span>
+                        </div>
+                        <div class="stat-label">New Users (7 days)</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-clock"></em>
+                            <span>Last week registrations</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="stat-card animate-in animate-delay-3">
-                <div class="stat-icon">
-                    <em class="icon ni ni-file-docs"></em>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <span id="totalDocuments" data-count="{{ $lecturerTemplateCount }}">0</span>
+                <div class="stat-card purple animate-in animate-delay-3">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-activity"></em>
                     </div>
-                    <div class="stat-label">Lecturer Templates</div>
-                    <div class="stat-growth">
-                        <em class="icon ni ni-files"></em>
-                        <span>Templates for lecturers</span>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $activeUsersThisWeek }}">0</span>
+                        </div>
+                        <div class="stat-label">Active Users (Week)</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-check-circle"></em>
+                            <span>Generated content this week</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="stat-card animate-in animate-delay-4">
-                <div class="stat-icon">
-                    <em class="icon ni ni-grid-plus"></em>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <span id="totalTemplates" data-count="{{ $totalTemplates }}">0</span>
+                <div class="stat-card orange animate-in animate-delay-4">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-spark"></em>
                     </div>
-                    <div class="stat-label">Total Templates</div>
-                    <div class="stat-growth">
-                        <em class="icon ni ni-template"></em>
-                        <span>All available templates</span>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $activeUsersToday }}">0</span>
+                        </div>
+                        <div class="stat-label">Active Today</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-calendar"></em>
+                            <span>Users active today</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section Header -->
+        <!-- Template Statistics Section -->
+        <div class="stats-section">
+            <div class="section-label">
+                <span>Template Metrics</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card blue animate-in animate-delay-1">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-template"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $totalTemplates }}">0</span>
+                        </div>
+                        <div class="stat-label">Total Templates</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-file-docs"></em>
+                            <span>All templates created</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card green animate-in animate-delay-2">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-check-circle"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $activeTemplates }}">0</span>
+                        </div>
+                        <div class="stat-label">Active Templates</div>
+                        <div class="stat-growth positive">
+                            <em class="icon ni ni-done"></em>
+                            <span>Currently available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card orange animate-in animate-delay-3">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-book-read"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $studentTemplateCount }}">0</span>
+                        </div>
+                        <div class="stat-label">Student Templates</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-user"></em>
+                            <span>For students</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card purple animate-in animate-delay-4">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-users"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $lecturerTemplateCount }}">0</span>
+                        </div>
+                        <div class="stat-label">Lecturer Templates</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-user-alt"></em>
+                            <span>For lecturers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Statistics Section -->
+        <div class="stats-section">
+            <div class="section-label">
+                <span>Document Metrics</span>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card blue animate-in animate-delay-1">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-file-docs"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $totalDocuments }}">0</span>
+                        </div>
+                        <div class="stat-label">Total Documents</div>
+                        <div class="stat-growth {{ $documentGrowthRate > 0 ? 'positive' : ($documentGrowthRate < 0 ? 'negative' : 'neutral') }}">
+                            <em class="icon ni ni-{{ $documentGrowthRate > 0 ? 'trend-up' : ($documentGrowthRate < 0 ? 'trend-down' : 'minus') }}"></em>
+                            <span>{{ $documentGrowthRate > 0 ? '+' : '' }}{{ $documentGrowthRate }}% vs last week</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card green animate-in animate-delay-2">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-spark"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $documentsToday }}">0</span>
+                        </div>
+                        <div class="stat-label">Generated Today</div>
+                        <div class="stat-growth positive">
+                            <em class="icon ni ni-calendar"></em>
+                            <span>Today's activity</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card purple animate-in animate-delay-3">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-bar-chart"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $documentsThisWeek }}">0</span>
+                        </div>
+                        <div class="stat-label">This Week</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-clock"></em>
+                            <span>Last 7 days</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="stat-card orange animate-in animate-delay-4">
+                    <div class="stat-icon">
+                        <em class="icon ni ni-edit"></em>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">
+                            <span data-count="{{ $avgWordsPerDocument }}">0</span>
+                        </div>
+                        <div class="stat-label">Avg Words/Doc</div>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-file-text"></em>
+                            <span>Average content length</span>
+                        </div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+
+        <!-- Quick Insights -->
+        <div class="stats-section">
+            <div class="section-label">
+                <span>Quick Insights</span>
+            </div>
+            <div class="insights-grid">
+                <!-- Popular Templates -->
+                <div class="insight-card animate-in" style="animation-delay: 0.2s;">
+                    <div class="insight-header">
+                        <h4 class="insight-title">Most Used Templates</h4>
+                        <div class="insight-icon">
+                            <em class="icon ni ni-growth" style="color: var(--primary);"></em>
+                        </div>
+                    </div>
+                    <ul class="insight-list">
+                        @forelse($popularTemplates as $template)
+                        <li class="insight-item">
+                            <span class="insight-item-label">{{ $template->title }}</span>
+                            <span class="insight-item-value">{{ $template->generated_contents_count }} uses</span>
+                        </li>
+                        @empty
+                        <li class="insight-item">
+                            <span class="insight-item-label">No data available</span>
+                        </li>
+                        @endforelse
+                    </ul>
+                </div>
+
+                <!-- Top Active Users -->
+                <div class="insight-card animate-in" style="animation-delay: 0.3s;">
+                    <div class="insight-header">
+                        <h4 class="insight-title">Most Active Users</h4>
+                        <div class="insight-icon">
+                            <em class="icon ni ni-user-list" style="color: var(--success);"></em>
+                        </div>
+                    </div>
+                    <ul class="insight-list">
+                        @forelse($topUsers as $topUser)
+                        <li class="insight-item">
+                            <span class="insight-item-label">{{ $topUser->name }}</span>
+                            <span class="insight-item-value">{{ $topUser->generated_contents_count }} docs</span>
+                        </li>
+                        @empty
+                        <li class="insight-item">
+                            <span class="insight-item-label">No data available</span>
+                        </li>
+                        @endforelse
+                    </ul>
+                </div>
+
+                <!-- System Health -->
+                <!-- <div class="insight-card animate-in" style="animation-delay: 0.4s;">
+                    <div class="insight-header">
+                        <h4 class="insight-title">System Health</h4>
+                        <div class="insight-icon">
+                            <em class="icon ni ni-shield-check" style="color: var(--purple);"></em>
+                        </div>
+                    </div>
+                    <ul class="insight-list">
+                        <li class="insight-item">
+                            <span class="insight-item-label">Document Retention</span>
+                            <span class="insight-item-value">{{ $documentRetentionDays }} days</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-item-label">Activity Log Retention</span>
+                            <span class="insight-item-value">{{ $activityLogRetentionDays }} days</span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-item-label">Docs to be Deleted</span>
+                            <span class="insight-item-value" style="color: {{ $documentsToBeDeleted > 0 ? 'var(--warning)' : 'var(--success)' }}">
+                                {{ $documentsToBeDeleted }}
+                            </span>
+                        </li>
+                        <li class="insight-item">
+                            <span class="insight-item-label">Inactive Templates</span>
+                            <span class="insight-item-value" style="color: {{ $inactiveTemplates > 0 ? 'var(--warning)' : 'var(--success)' }}">
+                                {{ $inactiveTemplates }}
+                            </span>
+                        </li>
+                    </ul>
+                </div> -->
+            </div>
+        </div>
+
+        <!-- Templates Section -->
         <div class="section-header animate-in" style="animation-delay: 0.5s;">
-            <h3 class="section-title">Available Templates</h3>
+            <h3 class="section-title">Recent Templates</h3>
             <a href="{{ route('superadmin.template') }}" class="section-link">
                 <span>View all</span>
                 <em class="icon ni ni-arrow-right"></em>
             </a>
         </div>
 
-        <!-- Templates Grid -->
         <div class="templates-grid">
             @foreach ($templates as $index => $template)
-            <a href="{{ route('superadmin.details.template', $template->id) }}" class="template-card animate-in" style="animation-delay: {{ 0.6 + ($index * 0.1) }}s;">
+            <a href="{{ route('superadmin.details.template', $template->id) }}" 
+               class="template-card animate-in" 
+               style="animation-delay: {{ 0.6 + ($index * 0.1) }}s;">
                 <div class="template-icon-wrapper">
                     <img src="{{ asset('upload/template/' . $template->icon) }}"
                          alt="{{ $template->title }}"
@@ -625,7 +848,7 @@
                 </div>
                 <div class="template-content">
                     <h3>{{ $template->title }}</h3>
-                    <p>{{ $template->description }}</p>
+                    <p>{{ Str::limit($template->description, 80) }}</p>
                 </div>
             </a>
             @endforeach
@@ -634,23 +857,19 @@
 </div>
 
 <script>
-// Smooth Counter Animation
-function animateValue(id, start, end, duration) {
+function animateValue(element, start, end, duration) {
     if (start === end) return;
     
-    const obj = document.getElementById(id);
     const range = end - start;
     const startTime = performance.now();
     
     const animate = (currentTime) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function for smooth animation
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         const current = Math.floor(start + (range * easeOutQuart));
         
-        obj.textContent = current.toLocaleString();
+        element.textContent = current.toLocaleString();
         
         if (progress < 1) {
             requestAnimationFrame(animate);
@@ -660,94 +879,39 @@ function animateValue(id, start, end, duration) {
     requestAnimationFrame(animate);
 }
 
-// Dynamic Greeting Based on Time
 function updateGreeting() {
     const hour = new Date().getHours();
     const greetingEl = document.getElementById('greeting-text');
     
     if (hour < 12) {
-        greetingEl.textContent = 'Good morning, SuperAdmin! Let’s start creating impactful academic templates today.';
+        greetingEl.textContent = 'Good morning! Dashboard shows real-time system metrics.';
     } else if (hour < 18) {
-        greetingEl.textContent = 'Good afternoon, SuperAdmin! Keep your academic templates organized.';
+        greetingEl.textContent = 'Good afternoon! Monitor your platform performance.';
     } else {
-        greetingEl.textContent = 'Good evening, SuperAdmin! Keep building meaningful academic content.';
+        greetingEl.textContent = 'Good evening! All systems running smoothly.';
     }
 }
-
-// Add Ripple Effect to Cards
-function createRipple(event) {
-    const card = event.currentTarget;
-    const ripple = document.createElement('span');
-    const rect = card.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = event.clientX - rect.left - size / 2;
-    const y = event.clientY - rect.top - size / 2;
-    
-    ripple.style.cssText = `
-        position: absolute;
-        width: ${size}px;
-        height: ${size}px;
-        border-radius: 50%;
-        background: rgba(59, 130, 246, 0.3);
-        left: ${x}px;
-        top: ${y}px;
-        pointer-events: none;
-        animation: ripple 0.6s ease-out;
-    `;
-    
-    card.appendChild(ripple);
-    
-    setTimeout(() => ripple.remove(), 600);
-}
-
-// Add ripple animation CSS
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes ripple {
-        to {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Update greeting
     updateGreeting();
     
-    // Animate counters with delay
     setTimeout(() => {
         document.querySelectorAll('[data-count]').forEach(element => {
             const endValue = parseInt(element.getAttribute('data-count'));
-            animateValue(element.id, 0, endValue, 2000);
+            animateValue(element, 0, endValue, 2000);
         });
     }, 300);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateGreeting();
     
-    // Add ripple effect to stat cards
-    document.querySelectorAll('.stat-card').forEach(card => {
-        card.addEventListener('click', createRipple);
-    });
-    
-    // Add ripple effect to template cards
-    document.querySelectorAll('.template-card').forEach(card => {
-        card.addEventListener('click', createRipple);
-    });
-    
-    // Parallax effect on mouse move
-    document.addEventListener('mousemove', (e) => {
-        const cards = document.querySelectorAll('.stat-card, .template-card');
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-        
-        cards.forEach((card, index) => {
-            const speed = (index % 3 + 1) * 0.5;
-            const xOffset = (x - 0.5) * speed;
-            const yOffset = (y - 0.5) * speed;
-            
-            card.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+    setTimeout(() => {
+        document.querySelectorAll('[data-count]').forEach(element => {
+            const endValue = parseInt(element.getAttribute('data-count'));
+            animateValue(element, 0, endValue, 2000);
         });
-    });
+    }, 300);
 });
 </script>
 

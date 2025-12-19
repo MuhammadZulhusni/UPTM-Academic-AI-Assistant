@@ -13,34 +13,113 @@ use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 use App\Models\AdminActivity;
 use App\Models\SystemSetting;
+use Illuminate\Support\Facades\DB; 
 use Illuminate\Support\Facades\Artisan;
 
 class SuperAdminController extends Controller
 {
-    public function Dashboard()
-    {
-        $user = User::withCount(['generatedContents', 'createdTemplates'])
-            ->find(Auth::id());
+public function Dashboard()
+{
+    $user = User::withCount(['generatedContents', 'createdTemplates'])
+        ->find(Auth::id());
 
-        $newUsersCount = User::where('created_at', '>=', Carbon::now()->subWeeks(7))->count();
-        $totalUsers = User::count();
-        $totalTemplates = Template::count();
-        $totalDocuments = GeneratedContent::count();
-        $studentTemplateCount  = Template::where('category', 'Student')->count();
-        $lecturerTemplateCount = Template::where('category', 'Lecturer')->count();
-        $templates = Template::latest()->limit(6)->get();
+    // User Statistics
+    $totalUsers = User::count();
+    $newUsersCount = User::where('created_at', '>=', Carbon::now()->subWeeks(7))->count();
+    $activeUsersToday = User::whereHas('generatedContents', function($query) {
+        $query->whereDate('created_at', Carbon::today());
+    })->count();
+    $activeUsersThisWeek = User::whereHas('generatedContents', function($query) {
+        $query->where('created_at', '>=', Carbon::now()->subWeek());
+    })->count();
+    $activeUsersThisMonth = User::whereHas('generatedContents', function($query) {
+        $query->where('created_at', '>=', Carbon::now()->subMonth());
+    })->count();
 
-        return view('superadmin.index', compact(
-            'user',
-            'newUsersCount',
-            'totalUsers',
-            'totalDocuments',
-            'totalTemplates',
-            'templates',
-            'studentTemplateCount',
-            'lecturerTemplateCount'
-        ));
-    }
+    // Template Statistics
+    $totalTemplates = Template::count();
+    $activeTemplates = Template::where('is_active', 1)->count();
+    $inactiveTemplates = Template::where('is_active', 0)->count();
+    $studentTemplateCount = Template::where('category', 'Student')->count();
+    $lecturerTemplateCount = Template::where('category', 'Lecturer')->count();
+    
+    // Document/Content Statistics
+    $totalDocuments = GeneratedContent::count();
+    $documentsToday = GeneratedContent::whereDate('created_at', Carbon::today())->count();
+    $documentsThisWeek = GeneratedContent::where('created_at', '>=', Carbon::now()->subWeek())->count();
+    $documentsThisMonth = GeneratedContent::where('created_at', '>=', Carbon::now()->subMonth())->count();
+    $totalWordCount = GeneratedContent::sum('word_count');
+    $avgWordsPerDocument = $totalDocuments > 0 ? round($totalWordCount / $totalDocuments) : 0;
+
+    // Most Popular Templates (by usage)
+    $popularTemplates = Template::withCount('generatedContents')
+        ->orderBy('generated_contents_count', 'desc')
+        ->limit(5)
+        ->get();
+
+    // Most Active Users (by document generation)
+    $topUsers = User::withCount('generatedContents')
+        ->orderBy('generated_contents_count', 'desc')
+        ->limit(5)
+        ->get();
+
+    // System Health Metrics
+    $systemSettings = DB::table('system_settings')->pluck('value', 'key');
+    $documentRetentionDays = $systemSettings['document_retention_days'] ?? 90;
+    $activityLogRetentionDays = $systemSettings['activity_log_retention_days'] ?? 30;
+    $documentsToBeDeleted = GeneratedContent::where('created_at', '<=', Carbon::now()->subDays($documentRetentionDays))->count();
+
+    // Recent Activity
+    $recentDocuments = GeneratedContent::with(['user', 'template'])
+        ->latest()
+        ->limit(10)
+        ->get();
+
+    // Growth Rate Calculations (comparing this week vs last week)
+    $lastWeekUsers = User::whereBetween('created_at', [
+        Carbon::now()->subWeeks(2),
+        Carbon::now()->subWeek()
+    ])->count();
+    $userGrowthRate = $lastWeekUsers > 0 ? round((($newUsersCount - $lastWeekUsers) / $lastWeekUsers) * 100, 1) : 0;
+
+    $lastWeekDocuments = GeneratedContent::whereBetween('created_at', [
+        Carbon::now()->subWeeks(2),
+        Carbon::now()->subWeek()
+    ])->count();
+    $documentGrowthRate = $lastWeekDocuments > 0 ? round((($documentsThisWeek - $lastWeekDocuments) / $lastWeekDocuments) * 100, 1) : 0;
+
+    // Latest templates for display
+    $templates = Template::latest()->limit(6)->get();
+
+    return view('superadmin.index', compact(
+        'user',
+        'totalUsers',
+        'newUsersCount',
+        'activeUsersToday',
+        'activeUsersThisWeek',
+        'activeUsersThisMonth',
+        'totalTemplates',
+        'activeTemplates',
+        'inactiveTemplates',
+        'studentTemplateCount',
+        'lecturerTemplateCount',
+        'totalDocuments',
+        'documentsToday',
+        'documentsThisWeek',
+        'documentsThisMonth',
+        'totalWordCount',
+        'avgWordsPerDocument',
+        'popularTemplates',
+        'topUsers',
+        'documentRetentionDays',
+        'activityLogRetentionDays',
+        'documentsToBeDeleted',
+        'recentDocuments',
+        'userGrowthRate',
+        'documentGrowthRate',
+        'templates'
+    ));
+}
 
     public function Profile()
     {
