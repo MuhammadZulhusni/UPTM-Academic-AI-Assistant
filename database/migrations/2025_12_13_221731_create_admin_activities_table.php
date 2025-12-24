@@ -12,8 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('admin_activities', function (Blueprint $table) {
+
+            // Primary key (unique ID for each activity log)
             $table->id();
-            $table->foreignId('admin_id')->constrained('users')->onDelete('cascade');
+
+            // Stores the admin (user) who performed the activity
+            // Linked to users.id
+            $table->foreignId('admin_id')
+                ->constrained('users')
+                ->onDelete('cascade');
+
+            // Type of activity performed by admin
+            // Used to categorize actions for filtering and reporting
             $table->enum('activity_type', [
                 'template_created',
                 'template_updated',
@@ -27,20 +37,49 @@ return new class extends Migration
                 'login',
                 'logout'
             ]);
+
+            // Short readable description of the activity
+            // Example: "Admin updated template A"
             $table->string('activity_description');
-            $table->string('entity_type')->nullable(); // e.g., 'template', 'user', 'document'
-            $table->unsignedBigInteger('entity_id')->nullable(); // ID of the affected entity
-            $table->json('metadata')->nullable(); // Additional data (old values, new values, etc.)
+
+            // Type of entity affected by the activity
+            // Example values: 'template', 'user', 'document'
+            // Nullable because some actions like login/logout
+            // do not involve a specific entity
+            $table->string('entity_type')->nullable();
+
+            // ID of the affected entity
+            // Example: template_id, user_id, document_id
+            // Nullable for actions without entities (login/logout)
+            $table->unsignedBigInteger('entity_id')->nullable();
+
+            // Stores additional information in JSON format
+            // Example: old data, new data, changes made
+            $table->json('metadata')->nullable();
+
+            // IP address of the admin during the activity
+            // Useful for security and audit tracking
             $table->ipAddress('ip_address')->nullable();
+
+            // Browser and device information of the admin
+            // Helps in activity tracking and security analysis
             $table->string('user_agent')->nullable();
+
+            // Stores created_at and updated_at timestamps
             $table->timestamps();
-            
-            // Indexes for better query performance
+
+            // Indexes to improve query performance
+            // Faster filtering by admin and date
             $table->index(['admin_id', 'created_at']);
+
+            // Faster filtering by activity type
             $table->index('activity_type');
+
+            // Faster lookup for entity-based activities
             $table->index(['entity_type', 'entity_id']);
         });
     }
+
 
     /**
      * Reverse the migrations.
