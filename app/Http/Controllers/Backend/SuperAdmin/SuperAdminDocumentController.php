@@ -139,7 +139,17 @@ class SuperAdminDocumentController extends Controller
     }
 
     /**
-     * Manually trigger document cleanup
+     * Manually deletes generated documents older than a specified number of days.
+     *
+     * This method:
+     * - Validates the input to ensure the number of days is between 7 and 365
+     * - Calculates a cutoff date based on the given days
+     * - Checks if any documents exist before the cutoff date
+     * - Deletes all documents created before that date
+     * - Returns a status message (success, info, or error) to the user
+     *
+     * This action is typically triggered by an admin to clean up old documents
+     * and reduce unnecessary data in the system.
      */
     public function ManualDocumentCleanup(Request $request)
     {
