@@ -602,18 +602,27 @@ public function Dashboard()
     }
 
     /**
-     * Manually trigger cleanup
+     * Manually trigger cleanup of admin activity logs
+     * This method deletes activity logs older than the selected number of days
      */
     public function ManualCleanup(Request $request)
     {
+        // Validate user input:
+        // - days is required
+        // - must be an integer
+        // - minimum 1 day, maximum 365 days
         $request->validate([
             'days' => 'required|integer|min:1|max:365',
         ]);
 
+        // Calculate the cutoff date based on the selected number of days
+        // Example: if days = 30, delete logs older than 30 days
         try {
             $cutoffDate = Carbon::now()->subDays($request->days);
+            // Count how many activity logs are older than the cutoff date
             $count = AdminActivity::where('created_at', '<', $cutoffDate)->count();
 
+             // If no old activity logs are found, return an info message
             if ($count === 0) {
                 return back()->with([
                     'message' => 'No activity logs found older than ' . $request->days . ' days',
@@ -621,15 +630,17 @@ public function Dashboard()
                 ]);
             }
 
-            // Delete old logs
+            // Delete all activity logs older than the cutoff date
             $deleted = AdminActivity::where('created_at', '<', $cutoffDate)->delete();
 
+            // Return success message with total deleted records
             return back()->with([
                 'message' => "Successfully deleted {$deleted} old activity log(s)",
                 'alert-type' => 'success'
             ]);
 
         } catch (\Exception $e) {
+            // Handle any unexpected errors during the cleanup process
             return back()->with([
                 'message' => 'Error during cleanup: ' . $e->getMessage(),
                 'alert-type' => 'error'
