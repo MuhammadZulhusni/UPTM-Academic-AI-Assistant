@@ -273,12 +273,21 @@ public function Dashboard()
         ]);
     }
 
+    /**
+     * Toggle user account active status
+     * This method activates or deactivates a user account
+     */
     public function ToggleUserStatus($id)
     {
         $user = User::findOrFail($id);
+
+        // Toggle the user's active status
+        // If currently active → deactivate
+        // If currently inactive → activate
         $user->is_active = !$user->is_active;
         $user->save();
 
+        // Set readable status message based on new state
         $status = $user->is_active ? 'activated' : 'deactivated';
 
         return back()->with([
