@@ -308,8 +308,12 @@ public function Dashboard()
 
     public function ResetPasswordPage()
     {
+        // Retrieve users with allowed roles only
+        // Roles included: student, lecturer, and admin
         $users = User::whereIn('role', ['student', 'lecturer', 'admin'])
+                    // Select only necessary fields to reduce data load
                     ->select('id', 'name', 'email', 'role')
+                    // Sort users alphabetically by name
                     ->orderBy('name')
                     ->get();
         
