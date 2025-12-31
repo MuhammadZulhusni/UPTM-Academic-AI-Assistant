@@ -340,17 +340,26 @@ public function Dashboard()
         ]);
     }
 
+    /**
+     * Search users based on name or email
+     */
     public function searchUsers(Request $request)
     {
+         // Get search keyword from request (e.g. typed text)
         $query = $request->input('q');
         
+        // Search users where name OR email matches the keyword
         $users = User::where(function($q) use ($query) {
                 $q->where('name', 'LIKE', "%{$query}%")
                 ->orWhere('email', 'LIKE', "%{$query}%");
             })
+            // Exclude currently logged-in user from search result
             ->where('id', '!=', Auth::id()) // Exclude current user if needed
+            // Sort result alphabetically by name
             ->orderBy('name')
+             // Limit result to 10 users for performance
             ->limit(10)
+            // Return only required fields
             ->get(['id', 'name', 'email', 'role']);
         
         return response()->json($users);
