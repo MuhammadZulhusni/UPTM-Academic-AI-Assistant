@@ -373,10 +373,17 @@ class SuperAdminTemplateController extends Controller
         ]);
     }
 
+    /**
+     * Toggle template active status
+     * This method enables or disables a template
+     */
     public function toggleStatus($id)
     {
         $template = Template::findOrFail($id);
 
+        // Toggle template status
+        // If active = deactivate
+        // If inactive = activate
         $template->is_active = !$template->is_active;
         $template->save();
 
@@ -385,6 +392,4 @@ class SuperAdminTemplateController extends Controller
             'alert-type' => 'success'
         ]);
     }
-
-
 }
