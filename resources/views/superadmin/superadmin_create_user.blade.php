@@ -124,7 +124,7 @@
                                                 <i class="bi bi-eye" id="eyeIcon"></i>
                                             </button>
                                         </div>
-                                        <small class="text-muted">Minimum 8 characters</small>
+                                        <small class="text-muted">Must be 8-64 characters with uppercase, lowercase, number & special character (@$!%*#?&)</small>
                                         @error('password')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
@@ -152,7 +152,7 @@
                                         <div class="progress" style="height: 8px;">
                                             <div class="progress-bar" role="progressbar" id="strengthBar"></div>
                                         </div>
-                                        <small class="text-muted mt-1" id="strengthText"></small>
+                                        <small class="text-muted mt-1 d-block" id="strengthText"></small>
                                     </div>
                                 </div>
                             </div>
@@ -211,7 +211,7 @@
                             </li>
                             <li class="mb-3">
                                 <i class="bi bi-check-circle text-success me-1"></i>
-                                <small>Choose a strong password with at least 8 characters</small>
+                                <small>Create a strong password meeting all security requirements</small>
                             </li>
                             <li class="mb-3">
                                 <i class="bi bi-check-circle text-success me-1"></i>
@@ -270,8 +270,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- Existing Code ---
-
         // Toggle Password Visibility
         const togglePassword = document.getElementById('togglePassword');
         const password = document.getElementById('password');
@@ -296,7 +294,7 @@
             eyeIconConfirm.classList.toggle('bi-eye-slash');
         });
 
-        // Password Strength Checker
+        // Enhanced Password Strength Checker
         const passwordInput = document.getElementById('password');
         const strengthBar = document.getElementById('strengthBar');
         const strengthText = document.getElementById('strengthText');
@@ -316,23 +314,37 @@
             let text = '';
             let color = '';
 
-            // Check password strength
-            if (value.length >= 8) strength += 25;
-            if (value.match(/[a-z]+/)) strength += 25;
-            if (value.match(/[A-Z]+/)) strength += 25;
-            if (value.match(/[0-9]+/)) strength += 15;
-            if (value.match(/[$@#&!]+/)) strength += 10;
+            // Check password criteria
+            const hasMinLength = value.length >= 8;
+            const hasMaxLength = value.length <= 64;
+            const hasLowerCase = /[a-z]/.test(value);
+            const hasUpperCase = /[A-Z]/.test(value);
+            const hasNumber = /[0-9]/.test(value);
+            const hasSpecialChar = /[@$!%*#?&]/.test(value);
+
+            // Calculate strength based on requirements
+            if (hasMinLength && hasMaxLength) strength += 20;
+            if (hasLowerCase) strength += 20;
+            if (hasUpperCase) strength += 20;
+            if (hasNumber) strength += 20;
+            if (hasSpecialChar) strength += 20;
 
             // Set color and text based on strength
             if (strength < 40) {
                 color = 'bg-danger';
-                text = 'Weak';
-            } else if (strength < 70) {
+                text = 'Very Weak - Missing required characters';
+            } else if (strength < 60) {
                 color = 'bg-warning';
-                text = 'Medium';
+                text = 'Weak - Add more character types';
+            } else if (strength < 80) {
+                color = 'bg-info';
+                text = 'Medium - Almost there';
+            } else if (strength < 100) {
+                color = 'bg-primary';
+                text = 'Good - Add special character';
             } else {
                 color = 'bg-success';
-                text = 'Strong';
+                text = 'Strong - All requirements met!';
             }
 
             strengthBar.style.width = strength + '%';
@@ -344,37 +356,34 @@
         const form = document.getElementById('createUserForm');
         const submitBtn = document.getElementById('submitBtn');
         
-        form.addEventListener('submit', function() {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
-        });
+        if (form && submitBtn) {
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+            });
+        }
 
-        // --- New Code for Reset Button and Toastr ---
-
+        // Reset Button with Toastr
         const resetFormBtn = document.getElementById('resetFormBtn');
 
-        resetFormBtn.addEventListener('click', function(e) {
-            // The button is of type="reset", so it will clear the form fields by default.
-            // We prevent the default to manually clear things up and then show the toastr
-            // e.preventDefault(); 
-            // form.reset(); // If it wasn't type="reset"
+        if (resetFormBtn) {
+            resetFormBtn.addEventListener('click', function(e) {
+                // Show Toastr message after form reset
+                if (typeof toastr !== 'undefined') {
+                    toastr.info('The form fields have been cleared and reset.', 'Form Reset', {
+                        "closeButton": true,
+                        "progressBar": true,
+                        "positionClass": "toast-top-right",
+                        "timeOut": "3000"
+                    });
+                } else {
+                    console.warn('Toastr is not defined. Please ensure the library is included.');
+                }
 
-            // Show Toastr message after form reset
-            // Check if toastr is defined before calling it
-            if (typeof toastr !== 'undefined') {
-                toastr.info('The form fields have been cleared and reset.', 'Form Reset', {
-                    "closeButton": true,
-                    "progressBar": true,
-                    "positionClass": "toast-top-right",
-                    "timeOut": "3000"
-                });
-            } else {
-                console.warn('Toastr is not defined. Please ensure the library is included.');
-            }
-
-            // Manually re-hide password strength indicator on reset
-            passwordStrength.classList.add('d-none');
-        });
+                // Manually re-hide password strength indicator on reset
+                passwordStrength.classList.add('d-none');
+            });
+        }
     });
 </script>
 
@@ -387,10 +396,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* REMOVED: animation: float 3s ease-in-out infinite; */
 }
-
-/* REMOVED: @keyframes float block */
 
 .form-section {
     border-bottom: 1px solid #e5e7eb;

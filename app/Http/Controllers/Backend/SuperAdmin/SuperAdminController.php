@@ -386,30 +386,82 @@ public function Dashboard()
 
     public function StoreUser(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:500',
-            'role' => 'required|in:student,lecturer,admin',
-            'is_active' => 'nullable|boolean'
-        ]);
+        try {
+            // First validate basic fields
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|confirmed|min:8|max:64',
+                'phone' => 'nullable|string|max:20',
+                'address' => 'nullable|string|max:500',
+                'role' => 'required|in:student,lecturer,admin',
+                'is_active' => 'nullable|boolean'
+            ], [
+                'password.min' => 'Password must be at least 8 characters.',
+                'password.max' => 'Password must not exceed 64 characters.',
+                'password.confirmed' => 'Password confirmation does not match.',
+            ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'phone' => $request->phone,
-            'address' => $request->address,
-            'role' => $request->role,
-            'is_active' => $request->has('is_active') ? 1 : 0,
-        ]);
+            // Additional password strength validation with specific messages
+            $password = $request->password;
+            $errors = [];
 
-        return redirect()->route('superadmin.users')->with([
-            'message' => 'User Created Successfully',
-            'alert-type' => 'success'
-        ]);
+            if (!preg_match('/[a-z]/', $password)) {
+                $errors[] = 'Password must contain at least one lowercase letter (a-z).';
+            }
+            if (!preg_match('/[A-Z]/', $password)) {
+                $errors[] = 'Password must contain at least one uppercase letter (A-Z).';
+            }
+            if (!preg_match('/[0-9]/', $password)) {
+                $errors[] = 'Password must contain at least one number (0-9).';
+            }
+            if (!preg_match('/[@$!%*#?&]/', $password)) {
+                $errors[] = 'Password must contain at least one special character (@$!%*#?&).';
+            }
+
+            if (!empty($errors)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['password' => $errors])
+                    ->with([
+                        'message' => 'Please check the password requirements.',
+                        'alert-type' => 'error'
+                    ]);
+            }
+
+            User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'role' => $request->role,
+                'is_active' => $request->has('is_active') ? 1 : 0,
+            ]);
+
+            $notification = array(
+                'message' => 'User created successfully!',
+                'alert-type' => 'success'
+            );
+
+            return redirect()->route('superadmin.users')->with($notification);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $notification = array(
+                'message' => 'Please check the form fields and correct the errors.',
+                'alert-type' => 'error'
+            );
+
+            return redirect()->back()->withErrors($e->validator)->withInput()->with($notification);
+
+        } catch (\Exception $e) {
+            $notification = array(
+                'message' => 'An error occurred while creating the user. Please try again.',
+                'alert-type' => 'error'
+            );
+
+            return redirect()->back()->withInput()->with($notification);
+        }
     }
 
     public function AdminActivities(Request $request)
