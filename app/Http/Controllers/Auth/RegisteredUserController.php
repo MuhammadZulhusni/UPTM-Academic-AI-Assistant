@@ -28,12 +28,26 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        // Validate user input, including role
+        // Validate user input with enhanced password rules
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required', 
+                'confirmed',
+                'min:8',                    // Minimum 8 characters
+                'max:64',                   // Maximum 64 characters
+                'regex:/[a-z]/',            // Must contain at least one lowercase letter
+                'regex:/[A-Z]/',            // Must contain at least one uppercase letter
+                'regex:/[0-9]/',            // Must contain at least one number
+                'regex:/[@$!%*#?&]/',       // Must contain at least one special character
+            ],
             'role' => ['required', 'in:student,lecturer'], // Only allow student or lecturer
+        ], [
+            // Custom error messages for password validation
+            'password.min' => 'Password must be at least 8 characters long.',
+            'password.max' => 'Password must not exceed 64 characters.',
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&).',
         ]);
 
         // Create user with Diamond plan (ID 1) automatically
