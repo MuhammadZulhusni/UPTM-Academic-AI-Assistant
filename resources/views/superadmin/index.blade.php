@@ -542,9 +542,9 @@
                             <span data-count="{{ $totalUsers }}">0</span>
                         </div>
                         <div class="stat-label">Total Users</div>
-                        <div class="stat-growth {{ $userGrowthRate > 0 ? 'positive' : ($userGrowthRate < 0 ? 'negative' : 'neutral') }}">
-                            <em class="icon ni ni-{{ $userGrowthRate > 0 ? 'trend-up' : ($userGrowthRate < 0 ? 'trend-down' : 'minus') }}"></em>
-                            <span>{{ $userGrowthRate > 0 ? '+' : '' }}{{ $userGrowthRate }}% vs last week</span>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-user-list"></em>
+                            <span>Total users in system</span>
                         </div>
                     </div>
                 </div>
@@ -686,9 +686,9 @@
                             <span data-count="{{ $totalDocuments }}">0</span>
                         </div>
                         <div class="stat-label">Total Documents</div>
-                        <div class="stat-growth {{ $documentGrowthRate > 0 ? 'positive' : ($documentGrowthRate < 0 ? 'negative' : 'neutral') }}">
-                            <em class="icon ni ni-{{ $documentGrowthRate > 0 ? 'trend-up' : ($documentGrowthRate < 0 ? 'trend-down' : 'minus') }}"></em>
-                            <span>{{ $documentGrowthRate > 0 ? '+' : '' }}{{ $documentGrowthRate }}% vs last week</span>
+                        <div class="stat-growth neutral">
+                            <em class="icon ni ni-files"></em>
+                            <span>All generated documents</span>
                         </div>
                     </div>
                 </div>
