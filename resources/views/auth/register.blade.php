@@ -10,6 +10,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+    <style>
+        .requirement-met {
+            color: #10b981;
+        }
+        .requirement-unmet {
+            color: #ef4444;
+        }
+    </style>
 </head>
 
 <body class="bg-[#f0f4f8] min-h-screen flex items-center justify-center relative p-4">
@@ -68,19 +76,56 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-2">Password</label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="password" class="block text-sm font-semibold text-gray-700">Password</label>
+                        <button type="button" 
+                            onclick="openPasswordModal()" 
+                            class="text-xs text-[#1e40af] hover:text-[#1d4ed8] font-semibold flex items-center gap-1">
+                            <i class="fas fa-info-circle"></i>
+                            Requirements
+                        </button>
+                    </div>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
                             type="password" 
                             id="password"
                             name="password" 
                             placeholder="Enter your password"
+                            oninput="validatePassword()"
                             required autocomplete="new-password" />
                         <a href="#" class="absolute right-0 top-1/2 -translate-y-1/2 pr-3 text-[#94a3b8] hover:text-[#1e40af] transition-colors"
                             title="Toggle show/hide password" onclick="togglePasswordVisibility(event, 'password')">
                             <i class="fas fa-eye-slash" id="eye-icon-password"></i>
                         </a>
                     </div>
+                    
+                    <!-- Real-time validation preview -->
+                    <div id="validation-preview" class="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <p class="text-xs font-semibold text-gray-700 mb-2">Password Requirements:</p>
+                        <ul class="space-y-1 text-xs">
+                            <li id="req-length" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Must be 8-64 characters long</span>
+                            </li>
+                            <li id="req-uppercase" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one uppercase letter (A-Z)</span>
+                            </li>
+                            <li id="req-lowercase" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one lowercase letter (a-z)</span>
+                            </li>
+                            <li id="req-number" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one number (0-9)</span>
+                            </li>
+                            <li id="req-special" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one special character (@$!%*#?&)</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     @error('password')
                         <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
                     @enderror
@@ -94,12 +139,28 @@
                             id="password_confirmation"
                             name="password_confirmation" 
                             placeholder="Confirm your password"
+                            oninput="validatePasswordMatch()"
                             required autocomplete="new-password" />
                         <a href="#" class="absolute right-0 top-1/2 -translate-y-1/2 pr-3 text-[#94a3b8] hover:text-[#1e40af] transition-colors"
                             title="Toggle show/hide password" onclick="togglePasswordVisibility(event, 'password_confirmation')">
                             <i class="fas fa-eye-slash" id="eye-icon-confirm"></i>
                         </a>
                     </div>
+                    
+                    <!-- Password match indicator -->
+                    <div id="match-indicator" class="mt-2 hidden">
+                        <p class="text-xs flex items-center gap-2">
+                            <i class="fas fa-times-circle text-red-500"></i>
+                            <span class="text-red-500">Password confirmation must match</span>
+                        </p>
+                    </div>
+                    <div id="match-success" class="mt-2 hidden">
+                        <p class="text-xs flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="text-green-500">Password confirmation must match</span>
+                        </p>
+                    </div>
+
                     @error('password_confirmation')
                         <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
                     @enderror
@@ -143,6 +204,45 @@
         </div>
     </div>
 
+    <!-- Password Requirements Modal -->
+    <div id="passwordModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 relative animate-fadeIn">
+            <button onclick="closePasswordModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="mb-4">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <i class="fas fa-lock text-2xl text-[#1e40af]"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 text-center">Password Requirements</h2>
+                <p class="text-sm text-gray-500 text-center mt-1">Your password must meet the following criteria:</p>
+            </div>
+
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <ul class="list-disc list-inside ml-2 space-y-0.5 text-xs">
+                    <li>Must be 8-64 characters long</li>
+                    <li>At least one uppercase letter (A-Z)</li>
+                    <li>At least one lowercase letter (a-z)</li>
+                    <li>At least one number (0-9)</li>
+                    <li>At least one special character (@$!%*#?&)</li>
+                    <li>Password confirmation must match</li>
+                </ul>
+            </div>
+
+            <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p class="text-xs text-blue-800 flex items-start gap-2">
+                    <i class="fas fa-info-circle mt-0.5"></i>
+                    <span>For your security, please create a strong password that includes a mix of characters.</span>
+                </p>
+            </div>
+
+            <button onclick="closePasswordModal()" class="w-full mt-4 bg-[#1e40af] text-white py-2.5 font-semibold rounded-lg hover:bg-[#1d4ed8] transition-colors">
+                Got it!
+            </button>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -163,6 +263,100 @@
             }
         }
 
+        // Modal functions
+        function openPasswordModal() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('passwordModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePasswordModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePasswordModal();
+            }
+        });
+
+        // Password validation
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const preview = document.getElementById('validation-preview');
+            
+            // Show preview when user starts typing
+            if (password.length > 0) {
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+                return;
+            }
+
+            // Validation checks
+            const checks = {
+                length: password.length >= 8 && password.length <= 64,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[@$!%*#?&]/.test(password)
+            };
+
+            // Update UI for each requirement
+            updateRequirement('req-length', checks.length);
+            updateRequirement('req-uppercase', checks.uppercase);
+            updateRequirement('req-lowercase', checks.lowercase);
+            updateRequirement('req-number', checks.number);
+            updateRequirement('req-special', checks.special);
+
+            // Validate password match if confirmation field has value
+            validatePasswordMatch();
+        }
+
+        function updateRequirement(elementId, isMet) {
+            const element = document.getElementById(elementId);
+            const icon = element.querySelector('i');
+            
+            if (isMet) {
+                element.classList.remove('requirement-unmet');
+                element.classList.add('requirement-met');
+                icon.classList.remove('fa-times-circle');
+                icon.classList.add('fa-check-circle');
+            } else {
+                element.classList.remove('requirement-met');
+                element.classList.add('requirement-unmet');
+                icon.classList.remove('fa-check-circle');
+                icon.classList.add('fa-times-circle');
+            }
+        }
+
+        function validatePasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmation = document.getElementById('password_confirmation').value;
+            const matchIndicator = document.getElementById('match-indicator');
+            const matchSuccess = document.getElementById('match-success');
+
+            if (confirmation.length === 0) {
+                matchIndicator.classList.add('hidden');
+                matchSuccess.classList.add('hidden');
+                return;
+            }
+
+            if (password === confirmation) {
+                matchIndicator.classList.add('hidden');
+                matchSuccess.classList.remove('hidden');
+            } else {
+                matchIndicator.classList.remove('hidden');
+                matchSuccess.classList.add('hidden');
+            }
+        }
+
         // Toastr notifications
         @if(Session::has('message'))
         var type = "{{ Session::get('alert-type','info') }}";
@@ -178,6 +372,22 @@
             toastr.error("Please check the form fields and try again.");
         @endif
     </script>
+
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.2s ease-out;
+        }
+    </style>
 </body>
 
 </html>

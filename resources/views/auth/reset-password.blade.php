@@ -36,6 +36,13 @@
         .modal-content {
             animation: slideUp 0.3s ease-out;
         }
+
+        .requirement-met {
+            color: #10b981;
+        }
+        .requirement-unmet {
+            color: #ef4444;
+        }
     </style>
 </head>
 
@@ -83,7 +90,15 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-semibold text-gray-700 text-left mb-1">New Password</label>
+                    <div class="flex items-center justify-between mb-1">
+                        <label for="password" class="block text-sm font-semibold text-gray-700">New Password</label>
+                        <button type="button" 
+                            onclick="openRequirementsModal()" 
+                            class="text-xs text-[#1e40af] hover:text-[#1d4ed8] font-semibold flex items-center gap-1">
+                            <i class="fas fa-info-circle"></i>
+                            Requirements
+                        </button>
+                    </div>
                     <div class="relative">
                         <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10
                                @error('password') border-red-500 @enderror" 
@@ -91,6 +106,7 @@
                             id="password"
                             name="password" 
                             placeholder="Enter a new password"
+                            oninput="validatePassword()"
                             required 
                             autocomplete="new-password" />
                         <a href="#" class="absolute right-0 top-1/2 -translate-y-1/2 pr-3 text-[#94a3b8] hover:text-[#1e40af] transition-colors"
@@ -98,6 +114,34 @@
                             <i class="fas fa-eye-slash" id="eye-icon-pass"></i>
                         </a>
                     </div>
+
+                    <!-- Real-time validation preview -->
+                    <div id="validation-preview" class="mt-2 p-3 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <p class="text-xs font-semibold text-gray-700 mb-2">Password Requirements:</p>
+                        <ul class="space-y-1 text-xs">
+                            <li id="req-length" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Must be 8-64 characters long</span>
+                            </li>
+                            <li id="req-uppercase" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one uppercase letter (A-Z)</span>
+                            </li>
+                            <li id="req-lowercase" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one lowercase letter (a-z)</span>
+                            </li>
+                            <li id="req-number" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one number (0-9)</span>
+                            </li>
+                            <li id="req-special" class="flex items-center gap-2 requirement-unmet">
+                                <i class="fas fa-times-circle"></i>
+                                <span>At least one special character (@$!%*#?&)</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     @error('password')
                         <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
                     @enderror
@@ -112,6 +156,7 @@
                             id="password_confirmation"
                             name="password_confirmation" 
                             placeholder="Confirm the new password"
+                            oninput="validatePasswordMatch()"
                             required 
                             autocomplete="new-password" />
                         <a href="#" class="absolute right-0 top-1/2 -translate-y-1/2 pr-3 text-[#94a3b8] hover:text-[#1e40af] transition-colors"
@@ -119,19 +164,24 @@
                             <i class="fas fa-eye-slash" id="eye-icon-confirm"></i>
                         </a>
                     </div>
+
+                    <!-- Password match indicator -->
+                    <div id="match-indicator" class="mt-2 hidden">
+                        <p class="text-xs flex items-center gap-2">
+                            <i class="fas fa-times-circle text-red-500"></i>
+                            <span class="text-red-500">Password confirmation must match</span>
+                        </p>
+                    </div>
+                    <div id="match-success" class="mt-2 hidden">
+                        <p class="text-xs flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            <span class="text-green-500">Password confirmation must match</span>
+                        </p>
+                    </div>
+
                     @error('password_confirmation')
                         <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
                     @enderror
-                </div>
-
-                <!-- NEW: Password Requirements Button -->
-                <div class="text-left">
-                    <button type="button" 
-                            onclick="openRequirementsModal()" 
-                            class="inline-flex items-center text-sm text-[#1e40af] hover:text-[#1d4ed8] font-semibold transition-colors">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        View Password Requirements
-                    </button>
                 </div>
 
                 <div class="flex items-center justify-center pt-2">
@@ -170,7 +220,7 @@
                 <!-- Modal Header -->
                 <div class="mb-5">
                     <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <i class="fas fa-shield-alt text-2xl text-[#1e40af]"></i>
+                        <i class="fas fa-lock text-2xl text-[#1e40af]"></i>
                     </div>
                     <h2 class="text-xl font-bold text-gray-800 text-center">Password Requirements</h2>
                     <p class="text-sm text-gray-500 text-center mt-1">Your password must meet the following criteria</p>
@@ -178,31 +228,13 @@
 
                 <!-- Requirements List -->
                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                    <ul class="space-y-3">
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <span class="text-sm text-gray-700">Must be <strong>8-64 characters</strong> long</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <span class="text-sm text-gray-700">At least <strong>one uppercase</strong> letter (A-Z)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <span class="text-sm text-gray-700">At least <strong>one lowercase</strong> letter (a-z)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <span class="text-sm text-gray-700">At least <strong>one number</strong> (0-9)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <span class="text-sm text-gray-700">At least <strong>one special character</strong> (@$!%*#?&)</span>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <span class="text-sm text-gray-700">Password confirmation <strong>must match</strong></span>
-                        </li>
+                    <ul class="list-disc list-inside ml-2 space-y-0.5 text-xs">
+                        <li>Must be 8-64 characters long</li>
+                        <li>At least one uppercase letter (A-Z)</li>
+                        <li>At least one lowercase letter (a-z)</li>
+                        <li>At least one number (0-9)</li>
+                        <li>At least one special character (@$!%*#?&)</li>
+                        <li>Password confirmation must match</li>
                     </ul>
                 </div>
 
@@ -258,6 +290,77 @@
                 closeRequirementsModal();
             }
         });
+
+        // Password validation
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const preview = document.getElementById('validation-preview');
+            
+            // Show preview when user starts typing
+            if (password.length > 0) {
+                preview.classList.remove('hidden');
+            } else {
+                preview.classList.add('hidden');
+                return;
+            }
+
+            // Validation checks
+            const checks = {
+                length: password.length >= 8 && password.length <= 64,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[@$!%*#?&]/.test(password)
+            };
+
+            // Update UI for each requirement
+            updateRequirement('req-length', checks.length);
+            updateRequirement('req-uppercase', checks.uppercase);
+            updateRequirement('req-lowercase', checks.lowercase);
+            updateRequirement('req-number', checks.number);
+            updateRequirement('req-special', checks.special);
+
+            // Validate password match if confirmation field has value
+            validatePasswordMatch();
+        }
+
+        function updateRequirement(elementId, isMet) {
+            const element = document.getElementById(elementId);
+            const icon = element.querySelector('i');
+            
+            if (isMet) {
+                element.classList.remove('requirement-unmet');
+                element.classList.add('requirement-met');
+                icon.classList.remove('fa-times-circle');
+                icon.classList.add('fa-check-circle');
+            } else {
+                element.classList.remove('requirement-met');
+                element.classList.add('requirement-unmet');
+                icon.classList.remove('fa-check-circle');
+                icon.classList.add('fa-times-circle');
+            }
+        }
+
+        function validatePasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmation = document.getElementById('password_confirmation').value;
+            const matchIndicator = document.getElementById('match-indicator');
+            const matchSuccess = document.getElementById('match-success');
+
+            if (confirmation.length === 0) {
+                matchIndicator.classList.add('hidden');
+                matchSuccess.classList.add('hidden');
+                return;
+            }
+
+            if (password === confirmation) {
+                matchIndicator.classList.add('hidden');
+                matchSuccess.classList.remove('hidden');
+            } else {
+                matchIndicator.classList.remove('hidden');
+                matchSuccess.classList.add('hidden');
+            }
+        }
 
         // Toastr notifications
         @if(Session::has('message'))
