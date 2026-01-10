@@ -10,6 +10,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
+    
+    <style>
+        /* Modal animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-overlay {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            animation: slideUp 0.3s ease-out;
+        }
+    </style>
 </head>
 
 <body class="bg-[#f0f4f8] min-h-screen flex items-center justify-center relative p-4">
@@ -97,18 +124,14 @@
                     @enderror
                 </div>
 
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left text-sm text-gray-600">
-                    <strong class="block mb-1 text-gray-700">
-                        <i class="fas fa-info-circle mr-2"></i>Password Requirements:
-                    </strong>
-                    <ul class="list-disc list-inside ml-2 space-y-0.5 text-xs">
-                        <li>Must be 8-64 characters long</li>
-                        <li>At least one uppercase letter (A-Z)</li>
-                        <li>At least one lowercase letter (a-z)</li>
-                        <li>At least one number (0-9)</li>
-                        <li>At least one special character (@$!%*#?&)</li>
-                        <li>Password confirmation must match</li>
-                    </ul>
+                <!-- NEW: Password Requirements Button -->
+                <div class="text-left">
+                    <button type="button" 
+                            onclick="openRequirementsModal()" 
+                            class="inline-flex items-center text-sm text-[#1e40af] hover:text-[#1d4ed8] font-semibold transition-colors">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        View Password Requirements
+                    </button>
                 </div>
 
                 <div class="flex items-center justify-center pt-2">
@@ -130,11 +153,79 @@
         </div>
     </div>
 
+    <!-- Password Requirements Modal -->
+    <div id="requirementsModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <!-- Overlay -->
+        <div class="modal-overlay fixed inset-0 bg-black bg-opacity-50 transition-opacity" onclick="closeRequirementsModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="modal-content relative bg-white rounded-xl shadow-2xl max-w-md w-full p-6 border border-gray-100">
+                <!-- Close Button -->
+                <button onclick="closeRequirementsModal()" 
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+
+                <!-- Modal Header -->
+                <div class="mb-5">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-shield-alt text-2xl text-[#1e40af]"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800 text-center">Password Requirements</h2>
+                    <p class="text-sm text-gray-500 text-center mt-1">Your password must meet the following criteria</p>
+                </div>
+
+                <!-- Requirements List -->
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">Must be <strong>8-64 characters</strong> long</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">At least <strong>one uppercase</strong> letter (A-Z)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">At least <strong>one lowercase</strong> letter (a-z)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">At least <strong>one number</strong> (0-9)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">At least <strong>one special character</strong> (@$!%*#?&)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-green-500 mt-0.5 mr-3 flex-shrink-0"></i>
+                            <span class="text-sm text-gray-700">Password confirmation <strong>must match</strong></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Example -->
+                <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p class="text-xs text-gray-600 mb-1"><strong>Example of a strong password:</strong></p>
+                    <code class="text-sm font-mono text-[#1e40af]">MyP@ssw0rd2024!</code>
+                </div>
+
+                <!-- Close Button -->
+                <button onclick="closeRequirementsModal()" 
+                        class="w-full mt-5 bg-[#1e40af] text-white py-2.5 font-semibold rounded-lg hover:bg-[#1d4ed8] transition-colors">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
-        // Password visibility toggle function updated to handle multiple fields
+        // Password visibility toggle function
         function togglePasswordVisibility(event, inputId, iconId) {
             event.preventDefault();
             const passwordInput = document.getElementById(inputId);
@@ -150,6 +241,24 @@
             }
         }
 
+        // Modal functions
+        function openRequirementsModal() {
+            document.getElementById('requirementsModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeRequirementsModal() {
+            document.getElementById('requirementsModal').classList.add('hidden');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeRequirementsModal();
+            }
+        });
+
         // Toastr notifications
         @if(Session::has('message'))
         var type = "{{ Session::get('alert-type','info') }}";
@@ -160,9 +269,7 @@
             case 'error': toastr.error("{{ Session::get('message') }}"); break;
         }
         @endif
-
         
-        // Also show success status from Laravel's password reset
         @if (session('status'))
             toastr.success("{{ session('status') }}");
         @endif
