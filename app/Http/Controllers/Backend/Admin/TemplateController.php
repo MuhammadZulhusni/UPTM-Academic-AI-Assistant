@@ -67,7 +67,7 @@ class TemplateController extends Controller
         $lecturerCount   = $lecturerCountQuery->count();
 
         // 5. Paginate and preserve query string 
-        $templates = $query->paginate(8)->withQueryString(); 
+        $templates = $query->paginate(10)->withQueryString(); 
 
         return view('admin.backend.template.all_template', compact(
             'templates', 

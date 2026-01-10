@@ -64,7 +64,7 @@ class UserTemplateController extends Controller
         }
         
         // Paginate results (only active templates that match the role/filters)
-        $templates = $query->paginate(8)->withQueryString();
+        $templates = $query->paginate(10)->withQueryString();
 
         return view('client.backend.template.all_template', compact('user', 'templates'));
     }
