@@ -265,21 +265,223 @@
         opacity: 0.6 !important;
     }
     
-    /* --- Generated Content Styling --- */
-    .content-title {
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        color: var(--dark-color);
-        padding-top: 0.5rem;
+    /* --- Generated Content Styling (PROFESSIONAL DOCUMENT LAYOUT) --- */
+
+    /* AGGRESSIVE: Force normal weight on EVERYTHING in editor */
+    #editor-v1,
+    #editor-v1 *,
+    #editor-v1 p,
+    #editor-v1 div,
+    #editor-v1 span,
+    #editor-v1 strong,
+    #editor-v1 b,
+    #editor-v1 em,
+    #editor-v1 i,
+    #editor-v1 h1,
+    #editor-v1 h2,
+    #editor-v1 h3,
+    #editor-v1 h4,
+    #editor-v1 h5,
+    #editor-v1 h6,
+    .nk-editor-body,
+    .nk-editor-body *,
+    .content-wrapper,
+    .content-wrapper *,
+    .content-paragraph,
+    .content-paragraph *,
+    .content-heading {
+        font-weight: 400 !important; /* FORCE normal weight everywhere */
+        color: #2c3e50 !important; /* Professional dark gray */
     }
-    
+
+    /* Content wrapper - professional document styling */
+    .content-wrapper {
+        max-width: 100%;
+        padding: 2rem 2.5rem;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* Paragraphs - organized document style */
     .content-paragraph {
-        margin-bottom: 1.25rem;
-        line-height: 1.8;
-        font-size: 1.05rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.75;
+        font-size: 1rem !important;
+        font-weight: 400 !important;
+        color: #2c3e50 !important;
+        text-align: justify;
+        text-justify: inter-word;
+    }
+
+    /* First paragraph - no top margin */
+    .content-wrapper > .content-paragraph:first-child,
+    .content-wrapper > p:first-child {
+        margin-top: 0;
+    }
+
+    /* Last paragraph - reduced bottom margin */
+    .content-wrapper > .content-paragraph:last-child,
+    .content-wrapper > p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Headings - subtle distinction while maintaining uniformity */
+    .content-heading,
+    #editor-v1 h1,
+    #editor-v1 h2,
+    #editor-v1 h3,
+    #editor-v1 h4,
+    #editor-v1 h5,
+    #editor-v1 h6 {
+        font-size: 1rem !important;
+        font-weight: 400 !important;
+        color: #2c3e50 !important;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e8ecef; /* Subtle separator */
+    }
+
+    /* First heading - no top margin */
+    .content-wrapper > .content-heading:first-child,
+    .content-wrapper > h1:first-child,
+    .content-wrapper > h2:first-child,
+    .content-wrapper > h3:first-child {
+        margin-top: 0;
+    }
+
+    /* Professional spacing between sections */
+    .content-paragraph + .content-heading,
+    p + h1, p + h2, p + h3, p + h4 {
+        margin-top: 2.5rem;
+    }
+
+    /* Lists (if AI generates them) */
+    #editor-v1 ul,
+    #editor-v1 ol {
+        margin: 1.5rem 0;
+        padding-left: 2rem;
+        line-height: 1.75;
+    }
+
+    #editor-v1 li {
+        margin-bottom: 0.5rem;
+        font-size: 1rem !important;
+        color: #2c3e50 !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 1.5rem 1.25rem;
+        }
+        
+        .content-paragraph {
+            font-size: 0.95rem !important;
+            text-align: left; /* Remove justify on mobile */
+        }
     }
     
+    /* NEW: AI Suggestion Styles */
+    .ai-suggestion-wrapper {
+        position: relative;
+        margin-top: 0.5rem;
+    }
+
+    .ai-suggest-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #6c757d;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .ai-suggest-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.15);
+    }
+
+    .ai-suggest-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .ai-suggest-btn .spinner-border {
+        width: 14px;
+        height: 14px;
+        border-width: 2px;
+    }
+
+    .suggestions-dropdown {
+        margin-top: 0.75rem;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 0.75rem;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .suggestion-item {
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+    }
+
+    .suggestion-item:hover {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border-color: var(--primary-color);
+        transform: translateX(4px);
+    }
+
+    .suggestion-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .suggestion-icon {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .suggestion-text {
+        flex-grow: 1;
+        color: #495057;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
 </style>
 
 
@@ -316,21 +518,39 @@
                         <div class="form-group mb-4">
                             <label for="{{ $field->title }}" class="form-label">{{ $field->title }}</label>
                             @if ($field->type === 'text')
-                            <input type="text" 
-                                name="{{ str_replace(' ', '_', $field->title) }}" 
-                                id="{{ $field->title }}" 
-                                class="form-control" 
-                                placeholder="Enter {{ $field->title }}"
-                                maxlength="10000"
-                                required>
+                                <input type="text" 
+                                    name="{{ str_replace(' ', '_', $field->title) }}" 
+                                    id="{{ $field->title }}" 
+                                    class="form-control" 
+                                    placeholder="Enter {{ $field->title }}"
+                                    maxlength="10000"
+                                    required>
                             @elseif ($field->type === 'textarea')
-                            <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
-                                id="{{ $field->title }}" 
-                                rows="4" 
-                                class="form-control" 
-                                placeholder="Provide detailed description..."
-                                maxlength="50000"
-                                required></textarea> 
+                                <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
+                                    id="{{ $field->title }}" 
+                                    rows="4" 
+                                    class="form-control ai-textarea" 
+                                    placeholder="Provide detailed description..."
+                                    data-field-name="{{ $field->title }}"
+                                    maxlength="50000"
+                                    required></textarea>
+                                
+                                <!-- NEW: AI Suggestion Button & Container -->
+                                <div class="ai-suggestion-wrapper">
+                                    <button type="button" 
+                                            class="ai-suggest-btn" 
+                                            data-target="{{ $field->title }}"
+                                            disabled>
+                                        <span class="btn-text">Get AI Suggestions</span>
+                                        <span class="btn-loading" style="display: none;">
+                                            <span class="spinner-border" role="status"></span>
+                                        </span>
+                                    </button>
+                                    <div class="suggestions-dropdown" 
+                                         id="suggestions-{{ str_replace(' ', '-', $field->title) }}" 
+                                         style="display: none;">
+                                    </div>
+                                </div>
                             @endif
                             <small class="form-text text-muted">{{ $field->description }}</small>
                         </div>
@@ -625,29 +845,33 @@ function animateCounter(elementId, targetValue) {
 }
 
 function formatContent(output, formData) {
-    let title = 'Generated Content';
+    // Clean the output first: remove ALL markdown formatting
+    let cleanedOutput = output
+        .replace(/\*\*(.+?)\*\*/g, '$1')  // Remove **bold**
+        .replace(/\*(.+?)\*/g, '$1')      // Remove *italic*
+        .replace(/__(.+?)__/g, '$1')      // Remove __bold__
+        .replace(/_(.+?)_/g, '$1')        // Remove _italic_
+        .replace(/`(.+?)`/g, '$1')        // Remove `code`
+        .replace(/~~(.+?)~~/g, '$1');     // Remove ~~strikethrough~~
     
-    for (let [key, value] of formData.entries()) {
-        const lowerKey = key.toLowerCase();
-        if (lowerKey.includes('title') || lowerKey.includes('topic') || lowerKey.includes('keywords')) {
-            if (value && value.trim()) {
-                title = value.trim().substring(0, 100);
-                break;
-            }
-        }
-    }
-
-    const lines = output.split('\n').filter(line => line.trim() !== '');
+    // Split into lines and filter empty ones
+    const lines = cleanedOutput.split('\n').filter(line => line.trim() !== '');
     
-    let html = `<div class="content-wrapper">
-                    <h2 class="content-title">${escapeHtml(title)}</h2>`;
+    // Start with just the wrapper, NO TITLE
+    let html = `<div class="content-wrapper">`;
     
     lines.forEach(line => {
         const trimmedLine = line.trim();
         if (trimmedLine) {
-            // Simple markdown detection for headings
-            if (trimmedLine.startsWith('#') || (trimmedLine.length < 80 && !trimmedLine.endsWith('.'))) {
-                html += `<h3 class="mt-4">${escapeHtml(trimmedLine.replace(/^[#*-]+/, '').trim())}</h3>`;
+            // Detect if it's a heading (starts with # or is short without period)
+            const isHeading = trimmedLine.startsWith('#') || 
+                            (trimmedLine.length < 80 && !trimmedLine.endsWith('.') && 
+                             !trimmedLine.endsWith(',') && !trimmedLine.endsWith(';'));
+            
+            if (isHeading) {
+                // Remove markdown heading markers
+                const headingText = trimmedLine.replace(/^[#*-]+\s*/, '').trim();
+                html += `<h3 class="content-heading">${escapeHtml(headingText)}</h3>`;
             } else {
                 html += `<p class="content-paragraph">${escapeHtml(trimmedLine)}</p>`;
             }
@@ -762,6 +986,228 @@ window.addEventListener('beforeunload', function() {
         clearInterval(window.currentLoadingInterval);
     }
 });
+</script>
+
+<script>
+// NEW: AI Suggestion Feature (OPTIMIZED & BUG-FIXED)
+document.addEventListener('DOMContentLoaded', function() {
+    const textareas = document.querySelectorAll('.ai-textarea');
+    
+    textareas.forEach(textarea => {
+        const fieldName = textarea.dataset.fieldName;
+        const suggestBtn = document.querySelector(`.ai-suggest-btn[data-target="${fieldName}"]`);
+        
+        if (!suggestBtn) {
+            console.warn(`Suggestion button not found for field: ${fieldName}`);
+            return;
+        }
+        
+        // Enable/disable suggest button based on input length
+        textarea.addEventListener('input', function() {
+            const minLength = 3;
+            if (this.value.trim().length >= minLength) {
+                suggestBtn.disabled = false;
+            } else {
+                suggestBtn.disabled = true;
+            }
+        });
+        
+        // Handle suggestion button click
+        suggestBtn.addEventListener('click', async function(e) {
+            e.preventDefault(); // Prevent any default behavior
+            
+            const currentInput = textarea.value.trim();
+            const language = document.getElementById('language').value;
+            
+            if (!language) {
+                showError('Please select a language first');
+                return;
+            }
+            
+            if (currentInput.length < 3) {
+                showError('Please enter at least 3 characters');
+                return;
+            }
+            
+            await fetchAISuggestions(fieldName, currentInput, language);
+        });
+    });
+});
+
+async function fetchAISuggestions(fieldName, currentInput, language) {
+    const suggestBtn = document.querySelector(`.ai-suggest-btn[data-target="${fieldName}"]`);
+    const suggestionsContainer = document.getElementById(`suggestions-${fieldName.replace(/ /g, '-')}`);
+    
+    if (!suggestBtn || !suggestionsContainer) {
+        console.error('Required elements not found');
+        return;
+    }
+    
+    // Show loading state
+    suggestBtn.disabled = true;
+    const btnText = suggestBtn.querySelector('.btn-text');
+    const btnLoading = suggestBtn.querySelector('.btn-loading');
+    
+    if (btnText) btnText.style.display = 'none';
+    if (btnLoading) btnLoading.style.display = 'inline-flex';
+    
+    try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            throw new Error('CSRF token not found');
+        }
+        
+        const response = await fetch('/user/ai/suggestion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken.content,
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                field_name: fieldName,
+                current_input: currentInput,
+                language: language,
+                template_context: document.querySelector('.display-6')?.textContent || ''
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.suggestions && Array.isArray(data.suggestions)) {
+            // Clean suggestions: remove unwanted quotes and numbering
+            const cleanedSuggestions = data.suggestions.map(s => {
+                return s
+                    .replace(/^["'`]+|["'`]+$/g, '') // Remove quotes at start/end
+                    .replace(/^\d+[\.\)]\s*/, '')    // Remove numbering like "1. " or "1) "
+                    .trim();
+            }).filter(s => s.length > 0); // Remove empty strings
+            
+            displaySuggestions(fieldName, cleanedSuggestions);
+        } else {
+            showError(data.message || 'Failed to get suggestions');
+            suggestionsContainer.style.display = 'none';
+        }
+        
+    } catch (error) {
+        console.error('Suggestion error:', error);
+        showError('Failed to fetch suggestions. Please try again.');
+        suggestionsContainer.style.display = 'none';
+    } finally {
+        // Reset button state
+        suggestBtn.disabled = false;
+        if (btnText) btnText.style.display = 'inline';
+        if (btnLoading) btnLoading.style.display = 'none';
+    }
+}
+
+/**
+ * FIXED: Store suggestions in memory instead of data attributes
+ * to avoid issues with special characters and HTML encoding
+ */
+function displaySuggestions(fieldName, suggestions) {
+    const container = document.getElementById(`suggestions-${fieldName.replace(/ /g, '-')}`);
+    const textarea = document.getElementById(fieldName);
+    
+    if (!container || !textarea) {
+        console.error('Container or textarea not found');
+        return;
+    }
+    
+    // Clear previous suggestions
+    container.innerHTML = '';
+    
+    if (!suggestions || suggestions.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center p-3 mb-0">No suggestions available</p>';
+        container.style.display = 'block';
+        return;
+    }
+    
+    // Store suggestions in a Map for safe retrieval
+    const suggestionMap = new Map();
+    
+    suggestions.forEach((suggestion, index) => {
+        const suggestionId = `suggestion-${fieldName.replace(/ /g, '-')}-${index}`;
+        suggestionMap.set(suggestionId, suggestion);
+        
+        // Create suggestion element
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'suggestion-item';
+        suggestionDiv.id = suggestionId;
+        
+        const suggestionText = document.createElement('span');
+        suggestionText.className = 'suggestion-text';
+        suggestionText.textContent = suggestion; // Use textContent to avoid XSS
+        
+        suggestionDiv.appendChild(suggestionText);
+        container.appendChild(suggestionDiv);
+        
+        // Add click handler directly to element
+        suggestionDiv.addEventListener('click', function() {
+            applySuggestion(textarea, container, suggestionId, suggestionMap);
+        });
+    });
+    
+    // Show container with animation
+    container.style.display = 'block';
+}
+
+/**
+ * FIXED: Apply suggestion - REPLACES current text (not append)
+ */
+function applySuggestion(textarea, container, suggestionId, suggestionMap) {
+    try {
+        const suggestion = suggestionMap.get(suggestionId);
+        
+        if (!suggestion) {
+            console.error('Suggestion not found in map');
+            showError('Failed to apply suggestion');
+            return;
+        }
+        
+        // REPLACE current text with suggestion (don't append)
+        textarea.value = suggestion;
+        
+        // Hide suggestions after successful application
+        container.style.display = 'none';
+        
+        // Focus back on textarea and move cursor to end
+        textarea.focus();
+        textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        
+        // Trigger input event to update button states and character count
+        const inputEvent = new Event('input', { bubbles: true });
+        textarea.dispatchEvent(inputEvent);
+        
+        // Show success feedback
+        if (typeof toastr !== 'undefined') {
+            toastr.success('Suggestion applied successfully!');
+        } else {
+            console.log('Suggestion applied:', suggestion);
+        }
+        
+    } catch (error) {
+        console.error('Error applying suggestion:', error);
+        showError('Failed to apply suggestion');
+    }
+}
+
+// Helper function to close suggestions when clicking outside
+document.addEventListener('click', function(e) {
+    const isClickInsideSuggestion = e.target.closest('.suggestions-dropdown');
+    const isClickOnButton = e.target.closest('.ai-suggest-btn');
+    
+    if (!isClickInsideSuggestion && !isClickOnButton) {
+        document.querySelectorAll('.suggestions-dropdown').forEach(dropdown => {
+            dropdown.style.display = 'none';
+        });
+    }
+});
+
 </script>
 
 @endsection

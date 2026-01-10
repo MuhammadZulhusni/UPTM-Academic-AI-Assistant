@@ -171,14 +171,19 @@ public function Dashboard()
         return view('superadmin.superadmin_change_password');
     }
 
-    public function PasswordUpdate(Request $request)
-    {
+public function PasswordUpdate(Request $request)
+{
+    try {
         $user = Auth::user();
 
-        // Step 1: Validate the Current Password is entered
+        // Step 1: Basic validation
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed|min:8',
+            'new_password' => 'required|confirmed|min:8|max:64',
+        ], [
+            'new_password.min' => 'New password must be at least 8 characters.',
+            'new_password.max' => 'New password must not exceed 64 characters.',
+            'new_password.confirmed' => 'New password confirmation does not match.',
         ]);
 
         // Step 2: Check if Current Password is correct
@@ -188,18 +193,62 @@ public function Dashboard()
             ])->withInput();
         }
 
-        // Step 3: Update new password
+        // Step 3: Additional password strength validation with specific messages
+        $newPassword = $request->new_password;
+        $errors = [];
+
+        if (!preg_match('/[a-z]/', $newPassword)) {
+            $errors[] = 'New password must contain at least one lowercase letter (a-z).';
+        }
+        if (!preg_match('/[A-Z]/', $newPassword)) {
+            $errors[] = 'New password must contain at least one uppercase letter (A-Z).';
+        }
+        if (!preg_match('/[0-9]/', $newPassword)) {
+            $errors[] = 'New password must contain at least one number (0-9).';
+        }
+        if (!preg_match('/[@$!%*#?&]/', $newPassword)) {
+            $errors[] = 'New password must contain at least one special character (@$!%*#?&).';
+        }
+
+        if (!empty($errors)) {
+            return back()
+                ->withInput()
+                ->withErrors(['new_password' => $errors]);
+        }
+
+        // Step 4: Check if new password is same as old password
+        if (Hash::check($request->new_password, $user->password)) {
+            return back()->withErrors([
+                'new_password' => 'New password cannot be the same as your current password.',
+            ])->withInput();
+        }
+
+        // Step 5: Update new password
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);
 
         Auth::logout();
 
-        return redirect()->route('login')->with([
-            'message' => 'Password updated successfully! Please login again.',
+        $notification = array(
+            'message' => 'Password updated successfully! Please login again with your new password.',
             'alert-type' => 'success'
-        ]);
+        );
+
+        return redirect()->route('login')->with($notification);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return back()->withErrors($e->validator)->withInput();
+
+    } catch (\Exception $e) {
+        $notification = array(
+            'message' => 'An error occurred while updating password. Please try again.',
+            'alert-type' => 'error'
+        );
+
+        return back()->withInput()->with($notification);
     }
+}
 
     public function Users(Request $request)
     {

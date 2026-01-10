@@ -98,10 +98,16 @@
                 </div>
 
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-3 text-left text-sm text-gray-600">
-                    <strong class="block mb-1 text-gray-700"><i class="fas fa-info-circle mr-2"></i>Password Requirements:</strong>
+                    <strong class="block mb-1 text-gray-700">
+                        <i class="fas fa-info-circle mr-2"></i>Password Requirements:
+                    </strong>
                     <ul class="list-disc list-inside ml-2 space-y-0.5 text-xs">
-                        <li>Minimum 8 characters long</li>
-                        <li>Passwords must match</li>
+                        <li>Must be 8-64 characters long</li>
+                        <li>At least one uppercase letter (A-Z)</li>
+                        <li>At least one lowercase letter (a-z)</li>
+                        <li>At least one number (0-9)</li>
+                        <li>At least one special character (@$!%*#?&)</li>
+                        <li>Password confirmation must match</li>
                     </ul>
                 </div>
 
@@ -155,11 +161,6 @@
         }
         @endif
 
-        // General error message for form validation errors
-        // This is a generic way to show an error if any validation fails
-        @if ($errors->any())
-            toastr.error("Please correct the errors in the form.");
-        @endif
         
         // Also show success status from Laravel's password reset
         @if (session('status'))

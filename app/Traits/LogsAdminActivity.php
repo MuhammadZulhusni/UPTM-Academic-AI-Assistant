@@ -126,41 +126,41 @@ trait LogsAdminActivity
     /**
      * Log document creation
      */
-    protected function logDocumentCreated($document)
-    {
-        $this->logActivity(
-            'document_created',
-            "Created document from template",
-            'document',
-            $document->id
-        );
-    }
+    // protected function logDocumentCreated($document)
+    // {
+    //     $this->logActivity(
+    //         'document_created',
+    //         "Created document from template",
+    //         'document',
+    //         $document->id
+    //     );
+    // }
 
     /**
      * Log document update
      */
-    protected function logDocumentUpdated($document)
-    {
-        $this->logActivity(
-            'document_updated',
-            "Updated document",
-            'document',
-            $document->id
-        );
-    }
+    // protected function logDocumentUpdated($document)
+    // {
+    //     $this->logActivity(
+    //         'document_updated',
+    //         "Updated document",
+    //         'document',
+    //         $document->id
+    //     );
+    // }
 
     /**
      * Log document deletion
      */
-    protected function logDocumentDeleted($documentId)
-    {
-        $this->logActivity(
-            'document_deleted',
-            "Deleted document",
-            'document',
-            $documentId
-        );
-    }
+    // protected function logDocumentDeleted($documentId)
+    // {
+    //     $this->logActivity(
+    //         'document_deleted',
+    //         "Deleted document",
+    //         'document',
+    //         $documentId
+    //     );
+    // }
 
     /**
      * Log admin login

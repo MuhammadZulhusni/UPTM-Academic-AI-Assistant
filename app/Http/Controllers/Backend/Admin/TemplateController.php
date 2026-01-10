@@ -333,20 +333,20 @@ class TemplateController extends Controller
             });
 
             // Log document creation activity
-            if ($generatedContent) {
-                $this->logActivity(
-                    'document_created',
-                    "Generated document from template: {$template->title}",
-                    'document',
-                    $generatedContent->id,
-                    [
-                        'template_title' => $template->title,
-                        'word_count' => $wordCount,
-                        'language' => $validatedData['language'],
-                        'ai_model' => $validatedData['ai_model'],
-                    ]
-                );
-            }
+            // if ($generatedContent) {
+            //     $this->logActivity(
+            //         'document_created',
+            //         "Generated document from template: {$template->title}",
+            //         'document',
+            //         $generatedContent->id,
+            //         [
+            //             'template_title' => $template->title,
+            //             'word_count' => $wordCount,
+            //             'language' => $validatedData['language'],
+            //             'ai_model' => $validatedData['ai_model'],
+            //         ]
+            //     );
+            // }
 
             // Return successful response with generated output
             return response()->json([
@@ -483,5 +483,94 @@ class TemplateController extends Controller
         ];
 
         return redirect()->back()->with($notification);
+    }
+
+    /**
+     * FIXED: AI-powered suggestion for textarea inputs (ACADEMIC FOCUSED)
+     */
+    public function AdmingetAISuggestion(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not authenticated.',
+            ], 401);
+        }
+
+        // Validate request
+        $validated = $request->validate([
+            'field_name' => 'required|string',
+            'current_input' => 'required|string|min:3|max:500',
+            'language' => 'required|string|in:English,Bahasa Melayu',
+            'template_context' => 'nullable|string|max:200'
+        ]);
+
+        try {
+            // Build ACADEMIC-FOCUSED context-aware prompt
+            $isMalay = $validated['language'] === 'Bahasa Melayu';
+            $userRole = ucfirst($user->role); // Student, Lecturer, or Admin
+            
+            if ($isMalay) {
+                $systemPrompt = 'Anda adalah pakar akademik AI yang membantu pelajar dan pensyarah dengan cadangan penulisan akademik berkualiti tinggi dalam Bahasa Melayu. Fokus kepada aspek akademik, penyelidikan, dan pendekatan ilmiah.';
+                
+                $userPrompt = "Pengguna ({$userRole}): \"{$validated['current_input']}\"\n\n";
+                $userPrompt .= "Berikan 3 cadangan akademik yang spesifik dan mendalam (12-20 patah perkataan setiap satu):\n";
+                $userPrompt .= "- Sertakan terminologi akademik yang sesuai\n";
+                $userPrompt .= "- Fokus kepada aspek penyelidikan, analisis, atau teori\n";
+                $userPrompt .= "- Cadangkan sudut pandangan kritikal atau metodologi\n";
+                $userPrompt .= "Hanya berikan 3 cadangan, tiada penjelasan tambahan.";
+            } else {
+                $systemPrompt = 'You are an expert academic AI assistant helping students and lecturers with high-quality academic writing suggestions in English. Focus on scholarly aspects, research perspectives, and scientific approaches.';
+                
+                $userPrompt = "User ({$userRole}): \"{$validated['current_input']}\"\n\n";
+                $userPrompt .= "Provide 3 specific academic suggestions (12-20 words each):\n";
+                $userPrompt .= "- Include appropriate academic terminology\n";
+                $userPrompt .= "- Focus on research aspects, analysis, or theoretical frameworks\n";
+                $userPrompt .= "- Suggest critical perspectives or methodologies\n";
+                $userPrompt .= "Only provide the 3 suggestions, no additional explanation.";
+            }
+
+            // Add template context for more targeted suggestions
+            if (!empty($validated['template_context'])) {
+                $contextNote = $isMalay 
+                    ? "\n\nKonteks template: {$validated['template_context']}"
+                    : "\n\nTemplate context: {$validated['template_context']}";
+                $userPrompt .= $contextNote;
+            }
+
+            // Call OpenAI with optimized settings for academic content
+            $response = OpenAI::chat()->create([
+                'model' => 'gpt-4', // Using GPT-4 for better academic quality
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user', 'content' => $userPrompt] // FIXED: Changed from 'admin' to 'user'
+                ],
+                'max_tokens' => 200,
+                'temperature' => 0.7, // Balanced creativity with academic rigor
+            ]);
+
+            $suggestions = $response->choices[0]->message->content;
+            
+            // Parse suggestions into array (split by line breaks or numbers)
+            $suggestionArray = preg_split('/\n+|\d+\.\s*/', trim($suggestions), -1, PREG_SPLIT_NO_EMPTY);
+            $suggestionArray = array_filter(array_map('trim', $suggestionArray));
+
+            return response()->json([
+                'success' => true,
+                'suggestions' => array_values($suggestionArray)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('AI suggestion error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'field_name' => $validated['field_name']
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate suggestions. Please try again.',
+            ], 500);
+        }
     }
 }
