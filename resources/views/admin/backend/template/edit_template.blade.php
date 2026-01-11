@@ -7,6 +7,46 @@
 
 <!-- Custom Styles for Form Appearance (Copied from Create Page) -->
 <style>
+
+/* --- Back Button Styles --- */
+.back-button-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6c757d;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-back:hover {
+    color: var(--primary-color);
+    background: #f8f9fa;
+    border-color: var(--primary-color);
+    transform: translateX(-3px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+    text-decoration: none;
+}
+
+.btn-back .icon {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+}
+
+.btn-back:hover .icon {
+    transform: translateX(-3px);
+}
 .card-form {
     border-radius: 1rem;
     box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
@@ -41,6 +81,15 @@
 
 <div class="nk-content-inner">
     <div class="nk-content-body">
+
+        <!-- Back Button -->
+        <div class="back-button-wrapper">
+            <a href="{{ route('admin.template') }}" class="btn-back">
+                <em class="icon ni ni-arrow-left"></em>
+                <span>Back to All Templates</span>
+            </a>
+        </div>
+
         <!-- Page Header -->
         <div class="nk-block-head nk-page-head">
             <div class="nk-block-head-content">
