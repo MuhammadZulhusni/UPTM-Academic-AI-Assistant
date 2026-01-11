@@ -25,88 +25,73 @@
                                           (request('category') && request('category') !== 'all') || 
                                           (request('sort') && request('sort') !== 'newest');
                          @endphp
-                         
-                         @if($hasFilters)
-                         <!-- <a href="{{ route('admin.template') }}" 
-                            class="btn btn-outline-secondary" 
-                            title="Reset all filters">
-                             <em class="icon ni ni-reload"></em>
-                         </a> -->
-                         @endif
                      </div>
                  </div>
              </div>
          </div>
 
-         {{-- ACTIVE FILTERS INDICATOR --}}
-         @if($hasFilters)
-         <div class="nk-block mt-3">
-             <div class="alert alert-light border d-flex align-items-center justify-content-between py-2 px-3" role="alert">
-                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                     <span class="text-muted fw-medium">
-                         <em class="icon ni ni-filter-fill me-1"></em>Active Filters:
-                     </span>
-                     
-                     {{-- Search Filter Badge --}}
-                     @if(request('search'))
-                     <span class="badge bg-primary-soft text-primary d-inline-flex align-items-center gap-1 px-2 py-1">
-                         <em class="icon ni ni-search"></em>
-                         <span class="small">Search: "{{ request('search') }}"</span>
-                         <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" 
-                            class="text-primary ms-1 filter-remove-btn" 
-                            style="text-decoration: none;"
-                            title="Remove search filter">
-                             <em class="icon ni ni-cross" style="font-size: 0.75rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                     
-                     {{-- Category Filter Badge --}}
-                     @if(request('category') && request('category') !== 'all')
-                     <span class="badge bg-info text-white d-inline-flex align-items-center gap-1 px-2 py-1">
-                         <em class="icon ni ni-{{ request('category') === 'student' ? 'user' : 'user-check' }}"></em>
-                         <span class="small">{{ ucfirst(request('category')) }}</span>
-                         <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" 
-                            class="text-white ms-1 filter-remove-btn" 
-                            style="text-decoration: none; opacity: 0.9;"
-                            title="Remove category filter">
-                             <em class="icon ni ni-cross" style="font-size: 0.75rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                     
-                     {{-- Sort Filter Badge --}}
-                     @if(request('sort') && request('sort') !== 'newest')
-                     <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1 px-2 py-1">
-                         <em class="icon ni ni-sort"></em>
-                         <span class="small">
-                             @if(request('sort') === 'title')
-                                 Title (A-Z)
-                             @elseif(request('sort') === 'title-desc')
-                                 Title (Z-A)
-                             @else
-                                 {{ ucfirst(request('sort')) }}
-                             @endif
-                         </span>
-                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" 
-                            class="text-dark ms-1 filter-remove-btn" 
-                            style="text-decoration: none; opacity: 0.7;"
-                            title="Remove sort filter">
-                             <em class="icon ni ni-cross" style="font-size: 0.75rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                 </div>
-                 
-                 {{-- Clear All Button --}}
-                 <a href="{{ route('admin.template') }}" 
-                    class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
-                     <em class="icon ni ni-cross-circle"></em>
-                     <span class="d-none d-sm-inline">Clear All</span>
-                 </a>
-             </div>
-         </div>
-         @endif
+        {{-- ACTIVE FILTERS SECTION - PROFESSIONAL DESIGN --}}
+        @if($hasFilters)
+        <div class="nk-block mt-3">
+            <div class="active-filters-professional">
+                <div class="filters-header-pro">
+                    <div class="filters-title">
+                        <em class="icon ni ni-filter-fill"></em>
+                        <span>{{ collect([request('search'), request('category') != 'all' ? request('category') : null, request('sort') != 'newest' ? request('sort') : null])->filter()->count() }} Active Filter(s)</span>
+                    </div>
+                    <a href="{{ route('admin.template') }}" class="btn-clear-filters">
+                        <em class="icon ni ni-cross-circle"></em>
+                        <span>Clear All</span>
+                    </a>
+                </div>
+                
+                <div class="filters-body-pro">
+                    {{-- Search Filter --}}
+                    @if(request('search'))
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Search</div>
+                        <div class="filter-tag-value">{{ request('search') }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="filter-tag-remove" title="Remove search filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Category Filter --}}
+                    @if(request('category') && request('category') !== 'all')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Category</div>
+                        <div class="filter-tag-value">{{ ucfirst(request('category')) }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" class="filter-tag-remove" title="Remove category filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Sort Filter --}}
+                    @if(request('sort') && request('sort') !== 'newest')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Sort</div>
+                        <div class="filter-tag-value">
+                            @if(request('sort') === 'oldest')
+                                Oldest
+                            @elseif(request('sort') === 'title')
+                                A-Z
+                            @elseif(request('sort') === 'title-desc')
+                                Z-A
+                            @else
+                                {{ ucfirst(request('sort')) }}
+                            @endif
+                        </div>
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" class="filter-tag-remove" title="Remove sort filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
           
         @if (auth()->user()->role === 'admin')
         <div class="nk-block">
@@ -355,87 +340,87 @@
 
 {{-- FILTER MODAL (MODIFIED FOR BACKEND PAGINATION/FILTERING) --}}
 <div class="modal fade" id="templateFilterModal" tabindex="-1" aria-labelledby="templateFilterModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      
-      {{-- 1. WRAP IN GET FORM: Action points to the base route (replace with your actual route name) --}}
-      <form id="templateFilterForm" action="{{ route('admin.template') }}" method="GET">
-      <div class="modal-header">
-        <h5 class="modal-title" id="templateFilterModalLabel">Filter Templates</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
         
-        {{-- HIDDEN INPUT to hold the selected Category value --}}
-        <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
-
-        {{-- HIDDEN INPUT to hold the selected Sort value --}}
-        <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
-        
-        <div class="mb-4">
-            <h6 class="text-muted mb-2">Search by Title or Description</h6>
-             <div class="form-group mb-0">
-                 <div class="form-control-wrap">
-                     <div class="form-control-icon start text-light">
-                         <em class="icon ni ni-search"></em>
-                     </div>
-                     {{-- 2. ADD NAME ATTRIBUTE AND SET CURRENT VALUE --}}
-                     <input type="text" 
-                            class="form-control" 
-                            placeholder="Search templates..." 
-                            id="searchInput" 
-                            name="search" 
-                            value="{{ request('search') }}">
-                 </div>
-             </div>
+        {{-- 1. WRAP IN GET FORM: Action points to the base route (replace with your actual route name) --}}
+        <form id="templateFilterForm" action="{{ route('admin.template') }}" method="GET">
+        <div class="modal-header">
+            <h5 class="modal-title" id="templateFilterModalLabel">Filter Templates</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+            
+            {{-- HIDDEN INPUT to hold the selected Category value --}}
+            <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
 
-        @if (auth()->user()->role === 'admin')
-        <div class="mb-4">
-            <h6 class="text-muted mb-2">Category</h6>
-            {{-- Category Buttons --}}
-            <div class="btn-group category-segment-control w-100" role="group" id="categoryFilter">
-                {{-- 3. APPLY ACTIVE CLASS BASED ON CURRENT REQUEST --}}
-                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category', 'all') == 'all' ? 'active' : '' }}" data-value="all">
-                    <em class="icon ni ni-grid-sq me-1"></em> All
-                </button>
-                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'student' ? 'active' : '' }}" data-value="student">
-                    <em class="icon ni ni-user me-1"></em> Student
-                </button>
-                <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'lecturer' ? 'active' : '' }}" data-value="lecturer">
-                    <em class="icon ni ni-user-check me-1"></em> Lecturer
-                </button>
+            {{-- HIDDEN INPUT to hold the selected Sort value --}}
+            <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
+            
+            <div class="mb-4">
+                <h6 class="text-muted mb-2">Search by Title or Description</h6>
+                <div class="form-group mb-0">
+                    <div class="form-control-wrap">
+                        <div class="form-control-icon start text-light">
+                            <em class="icon ni ni-search"></em>
+                        </div>
+                        {{-- 2. ADD NAME ATTRIBUTE AND SET CURRENT VALUE --}}
+                        <input type="text" 
+                                class="form-control" 
+                                placeholder="Search templates..." 
+                                id="searchInput" 
+                                name="search" 
+                                value="{{ request('search') }}">
+                    </div>
+                </div>
             </div>
-        </div>
-        @endif
 
-        <div class="mb-0">
-             <h6 class="text-muted mb-2">Sort By</h6>
-             {{-- Sort Buttons --}}
-             <div class="btn-group sort-segment-control w-100" role="group" id="sortFilter">
-                 {{-- 3. APPLY ACTIVE CLASS BASED ON CURRENT REQUEST --}}
-                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort', 'newest') == 'newest' ? 'active' : '' }}" data-value="newest">
-                     <em class="icon ni ni-clock me-1"></em> Newest
-                 </button>
-                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title' ? 'active' : '' }}" data-value="title">
-                     <em class="icon ni ni-text me-1"></em> Title (A-Z)
-                 </button>
-                 <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title-desc' ? 'active' : '' }}" data-value="title-desc">
-                     <em class="icon ni ni-text-a me-1"></em> Title (Z-A)
-                 </button>
-             </div>
-        </div>
+            @if (auth()->user()->role === 'admin')
+            <div class="mb-4">
+                <h6 class="text-muted mb-2">Category</h6>
+                {{-- Category Buttons --}}
+                <div class="btn-group category-segment-control w-100" role="group" id="categoryFilter">
+                    {{-- 3. APPLY ACTIVE CLASS BASED ON CURRENT REQUEST --}}
+                    <button type="button" class="btn btn-outline-primary segment-btn {{ request('category', 'all') == 'all' ? 'active' : '' }}" data-value="all">
+                        <em class="icon ni ni-grid-sq me-1"></em> All
+                    </button>
+                    <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'student' ? 'active' : '' }}" data-value="student">
+                        <em class="icon ni ni-user me-1"></em> Student
+                    </button>
+                    <button type="button" class="btn btn-outline-primary segment-btn {{ request('category') == 'lecturer' ? 'active' : '' }}" data-value="lecturer">
+                        <em class="icon ni ni-user-check me-1"></em> Lecturer
+                    </button>
+                </div>
+            </div>
+            @endif
 
-      </div>
-      <div class="modal-footer justify-content-between">
-        {{-- Reset button now redirects to the clean base route --}}
-        <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ route('admin.template') }}'">Reset Filters</button>
-        {{-- Changed to submit button to activate the form --}}
-        <button type="submit" class="btn btn-primary">Apply & View</button>
-      </div>
-      </form>
+            <div class="mb-0">
+                <h6 class="text-muted mb-2">Sort By</h6>
+                {{-- Sort Buttons --}}
+                <div class="btn-group sort-segment-control w-100" role="group" id="sortFilter">
+                    {{-- 3. APPLY ACTIVE CLASS BASED ON CURRENT REQUEST --}}
+                    <button type="button" class="btn btn-outline-info segment-btn {{ request('sort', 'newest') == 'newest' ? 'active' : '' }}" data-value="newest">
+                        <em class="icon ni ni-clock me-1"></em> Newest
+                    </button>
+                    <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title' ? 'active' : '' }}" data-value="title">
+                        <em class="icon ni ni-text me-1"></em> Title (A-Z)
+                    </button>
+                    <button type="button" class="btn btn-outline-info segment-btn {{ request('sort') == 'title-desc' ? 'active' : '' }}" data-value="title-desc">
+                        <em class="icon ni ni-text-a me-1"></em> Title (Z-A)
+                    </button>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer justify-content-between">
+            {{-- Reset button now redirects to the clean base route --}}
+            <button type="button" class="btn btn-outline-light" onclick="window.location.href = '{{ route('admin.template') }}'">Reset Filters</button>
+            {{-- Changed to submit button to activate the form --}}
+            <button type="submit" class="btn btn-primary">Apply & View</button>
+        </div>
+        </form>
+        </div>
     </div>
-  </div>
 </div>
 {{-- END FILTER MODAL --}}
 
@@ -484,59 +469,9 @@
     font-size: 1rem;
 }
 
-/* Filter Badge Styles */
-.bg-primary-soft {
-    background-color: rgba(101, 118, 255, 0.1) !important;
-}
-
-.bg-info-soft {
-    background-color: rgba(13, 202, 240, 0.1) !important;
-}
-
-.bg-success-soft {
-    background-color: rgba(25, 135, 84, 0.1) !important;
-}
-
-.bg-warning-soft {
-    background-color: rgba(255, 193, 7, 0.1) !important;
-}
-
-/* High contrast for Category and Sort badges in active filters */
-.badge.bg-info {
-    background-color: #0dcaf0 !important;
-}
-
-.badge.bg-warning {
-    background-color: #ffc107 !important;
-}
-
 .badge {
     font-weight: 500;
     border-radius: 6px;
-}
-
-/* Filter remove button hover effect */
-.filter-remove-btn:hover {
-    opacity: 1 !important;
-    transform: scale(1.15);
-    transition: all 0.2s ease;
-}
-
-/* Active Filter Alert */
-.alert {
-    border-radius: 10px;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* --- Other Styles --- */
@@ -603,33 +538,6 @@
 .modal-footer {
     border-top: none;
     padding: 1.5rem;
-}
-
-.template-item {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 1;
-    transform: translateZ(0) scale(1);
-    will-change: opacity, transform;
-}
-
-.template-item.hiding {
-    opacity: 0;
-    transform: translateZ(0) scale(0.95);
-    pointer-events: none;
-}
-
-.template-item.hidden {
-    display: none !important;
-}
-
-@keyframes sortComplete {
-    0% { transform: translateZ(0) scale(1) translateY(0); }
-    50% { transform: translateZ(0) scale(1.02) translateY(-4px); }
-    100% { transform: translateZ(0) scale(1) translateY(0); }
-}
-
-.template-item.sort-complete {
-    animation: sortComplete 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .card {
@@ -744,6 +652,177 @@
 .pagination-minimal .page-link,
 .pagination-minimal .page-item.active .page-link {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Professional Active Filters Design */
+.active-filters-professional {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.3s ease-out;
+}
+
+.filters-header-pro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1.25rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.filters-title em {
+    font-size: 1rem;
+    color: #6366f1;
+}
+
+.btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    background: transparent;
+    color: #dc2626;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+.btn-clear-filters em {
+    font-size: 0.875rem;
+}
+
+.filters-body-pro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+
+.filter-tag-pro {
+    display: inline-flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.filter-tag-pro:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.filter-tag-label {
+    padding: 0.5rem 0.75rem;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-right: 1px solid #cbd5e1;
+}
+
+.filter-tag-value {
+    padding: 0.5rem 0.75rem;
+    color: #1e293b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filter-tag-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 100%;
+    background: transparent;
+    color: #94a3b8;
+    border-left: 1px solid #cbd5e1;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.filter-tag-remove:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.filter-tag-remove em {
+    font-size: 0.875rem;
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filters-header-pro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filters-body-pro {
+        padding: 0.875rem 1rem 1rem;
+    }
+    
+    .filter-tag-pro {
+        width: 100%;
+    }
+    
+    .filter-tag-value {
+        flex: 1;
+        max-width: none;
+    }
+}
+
+/* Ensure compatibility with existing styles */
+.nk-block {
+    position: relative;
 }
 </style>
 

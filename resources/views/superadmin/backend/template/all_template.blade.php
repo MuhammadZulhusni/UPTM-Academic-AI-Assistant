@@ -27,102 +27,84 @@
                                           (request('status') && request('status') !== 'all') || 
                                           (request('sort') && request('sort') !== 'newest');
                          @endphp
-                         
-                         @if($hasFilters)
-                         <!-- <a href="{{ route('superadmin.template') }}" 
-                            class="btn btn-outline-secondary" 
-                            title="Reset all filters">
-                             <em class="icon ni ni-reload"></em>
-                         </a> -->
-                         @endif
                      </div>
                  </div>
              </div>
          </div>
 
-         {{-- ACTIVE FILTERS INDICATOR --}}
-         @if($hasFilters)
-         <div class="nk-block mt-3">
-             <div class="alert alert-light border d-flex align-items-center justify-content-between py-2 px-3" role="alert">
-                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                     <span class="text-dark fw-semibold">
-                         <em class="icon ni ni-filter-fill me-1"></em>Active Filters:
-                     </span>
-                     
-                     {{-- Search Filter Badge --}}
-                     @if(request('search'))
-                     <span class="badge bg-primary text-white d-inline-flex align-items-center gap-1 px-3 py-2">
-                         <em class="icon ni ni-search"></em>
-                         <span class="small fw-medium">Search: "{{ request('search') }}"</span>
-                         <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" 
-                            class="text-white ms-1 filter-remove-btn" 
-                            style="text-decoration: none; opacity: 0.9;"
-                            title="Remove search filter">
-                             <em class="icon ni ni-cross-circle" style="font-size: 0.875rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                     
-                     {{-- Category Filter Badge --}}
-                     @if(request('category') && request('category') !== 'all')
-                     <span class="badge bg-info text-white d-inline-flex align-items-center gap-1 px-3 py-2">
-                         <em class="icon ni ni-{{ request('category') === 'student' ? 'user' : 'user-check' }}"></em>
-                         <span class="small fw-medium">{{ ucfirst(request('category')) }}</span>
-                         <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" 
-                            class="text-white ms-1 filter-remove-btn" 
-                            style="text-decoration: none; opacity: 0.9;"
-                            title="Remove category filter">
-                             <em class="icon ni ni-cross-circle" style="font-size: 0.875rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                     
-                     {{-- Status Filter Badge --}}
-                     @if(request('status') && request('status') !== 'all')
-                     <span class="badge bg-success text-white d-inline-flex align-items-center gap-1 px-3 py-2">
-                         <em class="icon ni ni-{{ request('status') === 'active' ? 'check-circle' : 'cross-circle' }}"></em>
-                         <span class="small fw-medium">{{ ucfirst(request('status')) }}</span>
-                         <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" 
-                            class="text-white ms-1 filter-remove-btn" 
-                            style="text-decoration: none; opacity: 0.9;"
-                            title="Remove status filter">
-                             <em class="icon ni ni-cross-circle" style="font-size: 0.875rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                     
-                     {{-- Sort Filter Badge --}}
-                     @if(request('sort') && request('sort') !== 'newest')
-                     <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1 px-3 py-2">
-                         <em class="icon ni ni-sort"></em>
-                         <span class="small fw-medium">
-                             @if(request('sort') === 'title')
-                                 Title (A-Z)
-                             @elseif(request('sort') === 'title-desc')
-                                 Title (Z-A)
-                             @else
-                                 {{ ucfirst(request('sort')) }}
-                             @endif
-                         </span>
-                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" 
-                            class="text-dark ms-1 filter-remove-btn" 
-                            style="text-decoration: none; opacity: 0.7;"
-                            title="Remove sort filter">
-                             <em class="icon ni ni-cross-circle" style="font-size: 0.875rem;"></em>
-                         </a>
-                     </span>
-                     @endif
-                 </div>
-                 
-                 {{-- Clear All Button --}}
-                 <a href="{{ route('superadmin.template') }}" 
-                    class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
-                     <em class="icon ni ni-cross-circle"></em>
-                     <span class="d-none d-sm-inline">Clear All</span>
-                 </a>
-             </div>
-         </div>
-         @endif
+        {{-- ACTIVE FILTERS SECTION --}}
+        @if($hasFilters)
+        <div class="nk-block mt-3">
+            <div class="active-filters-professional">
+                <div class="filters-header-pro">
+                    <div class="filters-title">
+                        <em class="icon ni ni-filter-fill"></em>
+                        <span>{{ collect([request('search'), request('category') != 'all' ? request('category') : null, request('status') != 'all' ? request('status') : null, request('sort') != 'newest' ? request('sort') : null])->filter()->count() }} Active Filter(s)</span>
+                    </div>
+                    <a href="{{ route('superadmin.template') }}" class="btn-clear-filters">
+                        <em class="icon ni ni-cross-circle"></em>
+                        <span>Clear All</span>
+                    </a>
+                </div>
+                
+                <div class="filters-body-pro">
+                    {{-- Search Filter --}}
+                    @if(request('search'))
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Search</div>
+                        <div class="filter-tag-value">{{ request('search') }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="filter-tag-remove" title="Remove search filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Category Filter --}}
+                    @if(request('category') && request('category') !== 'all')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Category</div>
+                        <div class="filter-tag-value">{{ ucfirst(request('category')) }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" class="filter-tag-remove" title="Remove category filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Status Filter --}}
+                    @if(request('status') && request('status') !== 'all')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Status</div>
+                        <div class="filter-tag-value">{{ ucfirst(request('status')) }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="filter-tag-remove" title="Remove status filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Sort Filter --}}
+                    @if(request('sort') && request('sort') !== 'newest')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Sort</div>
+                        <div class="filter-tag-value">
+                            @if(request('sort') === 'oldest')
+                                Oldest
+                            @elseif(request('sort') === 'title')
+                                A-Z
+                            @elseif(request('sort') === 'title-desc')
+                                Z-A
+                            @else
+                                {{ ucfirst(request('sort')) }}
+                            @endif
+                        </div>
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" class="filter-tag-remove" title="Remove sort filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
           
         @if (auth()->user()->role === 'superadmin')
         <div class="nk-block">
@@ -589,51 +571,9 @@
 .badge.bg-warning {
     background-color: #ffc107 !important;
 }
-
-/* Soft backgrounds for non-active filter badges */
-.bg-primary-soft {
-    background-color: rgba(101, 118, 255, 0.1) !important;
-}
-
-.bg-info-soft {
-    background-color: rgba(13, 202, 240, 0.1) !important;
-}
-
-.bg-success-soft {
-    background-color: rgba(25, 135, 84, 0.1) !important;
-}
-
-.bg-warning-soft {
-    background-color: rgba(255, 193, 7, 0.1) !important;
-}
-
 .badge {
     font-weight: 500;
     border-radius: 6px;
-}
-
-/* Filter remove button hover effect */
-.filter-remove-btn:hover {
-    opacity: 1 !important;
-    transform: scale(1.15);
-    transition: all 0.2s ease;
-}
-
-/* Active Filter Alert */
-.alert {
-    border-radius: 10px;
-    animation: slideDown 0.3s ease-out;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 
 /* --- Other Styles --- */
@@ -710,33 +650,6 @@
 .modal-footer {
     border-top: none;
     padding: 1.5rem;
-}
-
-.template-item {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 1;
-    transform: translateZ(0) scale(1);
-    will-change: opacity, transform;
-}
-
-.template-item.hiding {
-    opacity: 0;
-    transform: translateZ(0) scale(0.95);
-    pointer-events: none;
-}
-
-.template-item.hidden {
-    display: none !important;
-}
-
-@keyframes sortComplete {
-    0% { transform: translateZ(0) scale(1) translateY(0); }
-    50% { transform: translateZ(0) scale(1.02) translateY(-4px); }
-    100% { transform: translateZ(0) scale(1) translateY(0); }
-}
-
-.template-item.sort-complete {
-    animation: sortComplete 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .card {
@@ -871,6 +784,177 @@
 
 .template-card .btn:hover {
     transform: scale(1.05);
+}
+
+/* Professional Active Filters Design */
+.active-filters-professional {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.3s ease-out;
+}
+
+.filters-header-pro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1.25rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.filters-title em {
+    font-size: 1rem;
+    color: #6366f1;
+}
+
+.btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    background: transparent;
+    color: #dc2626;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+.btn-clear-filters em {
+    font-size: 0.875rem;
+}
+
+.filters-body-pro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+
+.filter-tag-pro {
+    display: inline-flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.filter-tag-pro:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.filter-tag-label {
+    padding: 0.5rem 0.75rem;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-right: 1px solid #cbd5e1;
+}
+
+.filter-tag-value {
+    padding: 0.5rem 0.75rem;
+    color: #1e293b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filter-tag-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 100%;
+    background: transparent;
+    color: #94a3b8;
+    border-left: 1px solid #cbd5e1;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.filter-tag-remove:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.filter-tag-remove em {
+    font-size: 0.875rem;
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filters-header-pro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filters-body-pro {
+        padding: 0.875rem 1rem 1rem;
+    }
+    
+    .filter-tag-pro {
+        width: 100%;
+    }
+    
+    .filter-tag-value {
+        flex: 1;
+        max-width: none;
+    }
+}
+
+/* Ensure compatibility with existing styles */
+.nk-block {
+    position: relative;
 }
 </style>
 
