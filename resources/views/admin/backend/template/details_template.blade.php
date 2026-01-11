@@ -1,5 +1,7 @@
 @extends('admin.dashboard')
 @section('admin')
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
  
 <style>
     :root {
@@ -677,8 +679,8 @@
                                 <ul class="dropdown-menu dropdown-menu-end mt-2">
                                     <li><a href="#" class="dropdown-item" id="copy-text">
                                         <em class="icon ni ni-copy me-2"></em>Copy Text</a></li>
-                                    <li><a href="#" class="dropdown-item" id="download-txt">
-                                        <em class="icon ni ni-file-text me-2"></em>Download TXT</a></li>
+                                        <li><a href="#" class="dropdown-item" id="download-pdf">
+                                            <em class="icon ni ni-file-pdf me-2"></em>Download PDF</a></li>
                                 </ul>          
                             </div>
                         </div>
@@ -986,12 +988,153 @@ function handleExport(action) {
         case 'copy-text':
             copyToClipboard(content);
             break;
-        case 'download-txt':
-            downloadFile(content, `${fileName}.txt`, 'text/plain');
+        case 'download-pdf':
+            downloadPDF(editor, fileName);
             break;
     }
 }
 
+// NEW: Download as organized PDF function
+async function downloadPDF(editor, fileName) {
+    try {
+        // Check if jsPDF is loaded
+        if (typeof window.jspdf === 'undefined') {
+            showError('PDF library not loaded. Please refresh the page.');
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        // PDF Configuration
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 20;
+        const maxWidth = pageWidth - (margin * 2);
+        let yPosition = margin;
+        const lineHeight = 7;
+        const paragraphSpacing = 10;
+        const headingSpacing = 12;
+
+        // Title from template
+        const templateTitle = document.querySelector('.nk-editor-title h4')?.textContent?.trim() || 'Generated Content';
+        
+        // Add header with title
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'normal');
+        const titleLines = doc.splitTextToSize(templateTitle, maxWidth);
+        doc.text(titleLines, margin, yPosition);
+        yPosition += (titleLines.length * 8) + 5;
+
+        // Add date and time
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(100);
+        const generatedDate = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        doc.text(`Generated on: ${generatedDate}`, margin, yPosition);
+        yPosition += 8;
+
+        // Add separator line
+        doc.setDrawColor(200);
+        doc.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 10;
+
+        // Reset text color for content
+        doc.setTextColor(0);
+
+        // Process content - get all paragraphs and headings
+        const contentWrapper = editor.querySelector('.content-wrapper');
+        if (!contentWrapper) {
+            showError('No content to export');
+            return;
+        }
+
+        const elements = contentWrapper.children;
+
+        for (let i = 0; i < elements.length; i++) {
+            const element = elements[i];
+            const text = element.textContent.trim();
+
+            if (!text) continue;
+
+            // Check if we need a new page
+            if (yPosition > pageHeight - margin - 20) {
+                doc.addPage();
+                yPosition = margin;
+            }
+
+            if (element.classList.contains('content-heading') || element.tagName.match(/^H[1-6]$/)) {
+                // Handle headings
+                doc.setFontSize(12);
+                doc.setFont(undefined, 'normal');
+                
+                const headingLines = doc.splitTextToSize(text, maxWidth);
+                doc.text(headingLines, margin, yPosition);
+                yPosition += (headingLines.length * lineHeight) + headingSpacing;
+                
+            } else {
+                // Handle paragraphs
+                doc.setFontSize(11);
+                doc.setFont(undefined, 'normal');
+                
+                const paragraphLines = doc.splitTextToSize(text, maxWidth);
+                
+                // Check if paragraph will fit on current page
+                const paragraphHeight = paragraphLines.length * lineHeight + paragraphSpacing;
+                if (yPosition + paragraphHeight > pageHeight - margin) {
+                    doc.addPage();
+                    yPosition = margin;
+                }
+                
+                doc.text(paragraphLines, margin, yPosition, {
+                    align: 'justify',
+                    maxWidth: maxWidth
+                });
+                yPosition += paragraphHeight;
+            }
+        }
+
+        // Add footer on each page
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.setFont(undefined, 'normal');
+            
+            // Page number
+            const pageText = `Page ${i} of ${totalPages}`;
+            const pageTextWidth = doc.getTextWidth(pageText);
+            doc.text(pageText, pageWidth - margin - pageTextWidth, pageHeight - 10);
+            
+            // System name on left
+            doc.text('UPTM Academic AI Assistant', margin, pageHeight - 10);
+        }
+
+        // Save the PDF
+        doc.save(`${fileName}.pdf`);
+        
+        if (typeof toastr !== 'undefined') {
+            toastr.success('PDF downloaded successfully!');
+        }
+        
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        showError('Failed to generate PDF. Please try again.');
+    }
+}
+
+// Keep existing functions unchanged
 async function copyToClipboard(text) {
     try {
         if (navigator.clipboard) {
@@ -1013,29 +1156,21 @@ async function copyToClipboard(text) {
     }
 }
 
-function downloadFile(content, fileName, mimeType) {
-    try {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showSuccessMessage();
-    } catch (err) {
-        showError('Failed to download file');
+function showSuccessMessage() {
+    if (typeof toastr !== 'undefined') {
+        toastr.success('Content copied successfully!');
+    } else {
+        console.log('Success: Content copied successfully!');
     }
 }
 
-window.addEventListener('beforeunload', function() {
-    if (window.currentLoadingInterval) {
-        clearInterval(window.currentLoadingInterval);
+function showError(message) {
+    if (typeof toastr !== 'undefined') {
+        toastr.error(message);
+    } else {
+        alert(message);
     }
-});
+}
 </script>
 
 <script>
