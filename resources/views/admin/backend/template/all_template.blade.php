@@ -10,15 +10,103 @@
                      <p class="text-muted">Simplify your task by using templates provided</p>
                  </div>
                  
-                 {{--  MODAL TRIGGER BUTTON  --}}
+                 {{--  FILTER CONTROLS  --}}
                  <div class="nk-block-head-content mt-4">
-                     <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
-                         <em class="icon ni ni-filter me-1"></em>
-                         <span>Filter & Search</span>
-                     </button>
+                     <div class="d-flex gap-2 align-items-center flex-wrap">
+                         {{-- Filter Button --}}
+                         <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
+                             <em class="icon ni ni-filter me-1"></em>
+                             <span>Filter & Search</span>
+                         </button>
+                         
+                         {{-- Reset Button (only show when filters are active) --}}
+                         @php
+                             $hasFilters = request('search') || 
+                                          (request('category') && request('category') !== 'all') || 
+                                          (request('sort') && request('sort') !== 'newest');
+                         @endphp
+                         
+                         @if($hasFilters)
+                         <!-- <a href="{{ route('admin.template') }}" 
+                            class="btn btn-outline-secondary" 
+                            title="Reset all filters">
+                             <em class="icon ni ni-reload"></em>
+                         </a> -->
+                         @endif
+                     </div>
                  </div>
              </div>
          </div>
+
+         {{-- ACTIVE FILTERS INDICATOR --}}
+         @if($hasFilters)
+         <div class="nk-block mt-3">
+             <div class="alert alert-light border d-flex align-items-center justify-content-between py-2 px-3" role="alert">
+                 <div class="d-flex align-items-center gap-2 flex-wrap">
+                     <span class="text-muted fw-medium">
+                         <em class="icon ni ni-filter-fill me-1"></em>Active Filters:
+                     </span>
+                     
+                     {{-- Search Filter Badge --}}
+                     @if(request('search'))
+                     <span class="badge bg-primary-soft text-primary d-inline-flex align-items-center gap-1 px-2 py-1">
+                         <em class="icon ni ni-search"></em>
+                         <span class="small">Search: "{{ request('search') }}"</span>
+                         <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" 
+                            class="text-primary ms-1 filter-remove-btn" 
+                            style="text-decoration: none;"
+                            title="Remove search filter">
+                             <em class="icon ni ni-cross" style="font-size: 0.75rem;"></em>
+                         </a>
+                     </span>
+                     @endif
+                     
+                     {{-- Category Filter Badge --}}
+                     @if(request('category') && request('category') !== 'all')
+                     <span class="badge bg-info text-white d-inline-flex align-items-center gap-1 px-2 py-1">
+                         <em class="icon ni ni-{{ request('category') === 'student' ? 'user' : 'user-check' }}"></em>
+                         <span class="small">{{ ucfirst(request('category')) }}</span>
+                         <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" 
+                            class="text-white ms-1 filter-remove-btn" 
+                            style="text-decoration: none; opacity: 0.9;"
+                            title="Remove category filter">
+                             <em class="icon ni ni-cross" style="font-size: 0.75rem;"></em>
+                         </a>
+                     </span>
+                     @endif
+                     
+                     {{-- Sort Filter Badge --}}
+                     @if(request('sort') && request('sort') !== 'newest')
+                     <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1 px-2 py-1">
+                         <em class="icon ni ni-sort"></em>
+                         <span class="small">
+                             @if(request('sort') === 'title')
+                                 Title (A-Z)
+                             @elseif(request('sort') === 'title-desc')
+                                 Title (Z-A)
+                             @else
+                                 {{ ucfirst(request('sort')) }}
+                             @endif
+                         </span>
+                         <a href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" 
+                            class="text-dark ms-1 filter-remove-btn" 
+                            style="text-decoration: none; opacity: 0.7;"
+                            title="Remove sort filter">
+                             <em class="icon ni ni-cross" style="font-size: 0.75rem;"></em>
+                         </a>
+                     </span>
+                     @endif
+                 </div>
+                 
+                 {{-- Clear All Button --}}
+                 <a href="{{ route('admin.template') }}" 
+                    class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1">
+                     <em class="icon ni ni-cross-circle"></em>
+                     <span class="d-none d-sm-inline">Clear All</span>
+                 </a>
+             </div>
+         </div>
+         @endif
           
         @if (auth()->user()->role === 'admin')
         <div class="nk-block">
@@ -396,6 +484,61 @@
     font-size: 1rem;
 }
 
+/* Filter Badge Styles */
+.bg-primary-soft {
+    background-color: rgba(101, 118, 255, 0.1) !important;
+}
+
+.bg-info-soft {
+    background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+.bg-success-soft {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+.bg-warning-soft {
+    background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+/* High contrast for Category and Sort badges in active filters */
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.badge {
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+/* Filter remove button hover effect */
+.filter-remove-btn:hover {
+    opacity: 1 !important;
+    transform: scale(1.15);
+    transition: all 0.2s ease;
+}
+
+/* Active Filter Alert */
+.alert {
+    border-radius: 10px;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* --- Other Styles --- */
 .category-segment-control .btn,
 .sort-segment-control .btn {
@@ -553,7 +696,7 @@
     transition: all 0.2s ease;
     background-color: #fff;
     display: flex;
-    align-items-center;
+    align-items: center;
 }
 
 .pagination-minimal .page-link:hover {
