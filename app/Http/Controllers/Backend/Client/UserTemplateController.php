@@ -26,14 +26,13 @@ class UserTemplateController extends Controller
         // Start query based on user role
         $query = Template::query();
         
-        // 🔑 NEW: Apply the filter to show ONLY active templates (is_active = 1)
+        // 🔑 Apply the filter to show ONLY active templates (is_active = 1)
         $query->where('is_active', 1);
         
         // If admin, allow category filter, otherwise filter by user role
         if ($user->role === 'admin') {
             // Admin can see all active templates or filter by category
             if ($request->filled('category') && $request->category !== 'all') {
-                // The is_active filter is maintained here
                 $query->where('category', ucfirst($request->category));
             }
         } else {
@@ -44,27 +43,29 @@ class UserTemplateController extends Controller
         // Search filter (title or description)
         if ($request->filled('search')) {
             $search = $request->search;
-            // The is_active filter is maintained here
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
                 ->orWhere('description', 'like', "%{$search}%");
             });
         }
         
-        // Sort filter - FIX: Use strict comparison and proper order
+        // Sort filter - Added 'oldest' option
         $sort = $request->get('sort', 'newest');
         
         if ($sort === 'title') {
             $query->orderBy('title', 'asc');
         } elseif ($sort === 'title-desc') {
             $query->orderBy('title', 'desc');
+        } elseif ($sort === 'oldest') {
+            // 🆕 NEW: Oldest first
+            $query->orderBy('created_at', 'asc');
         } else {
             // Default: newest first
             $query->orderBy('created_at', 'desc');
         }
         
-        // Paginate results (only active templates that match the role/filters)
-        $templates = $query->paginate(8)->withQueryString();
+        // Paginate results
+        $templates = $query->paginate(10)->withQueryString();
 
         return view('client.backend.template.all_template', compact('user', 'templates'));
     }

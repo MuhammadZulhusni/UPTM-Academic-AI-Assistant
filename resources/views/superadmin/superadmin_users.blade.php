@@ -379,7 +379,7 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-end border-0 px-4 py-3">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <!-- <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button> -->
                     <button type="submit" class="btn btn-primary rounded-pill">Save Changes</button>
                 </div>
             </form>

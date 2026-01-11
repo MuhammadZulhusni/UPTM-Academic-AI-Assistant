@@ -63,7 +63,7 @@ class SuperAdminTemplateController extends Controller
         $lecturerCount   = (clone $query)->where('category', 'Lecturer')->count();
 
         // 6. Paginate and preserve query string 
-        $templates = $query->paginate(8)->withQueryString(); 
+        $templates = $query->paginate(10)->withQueryString(); 
 
         return view('superadmin.backend.template.all_template', compact(
             'templates', 

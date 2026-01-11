@@ -20,7 +20,7 @@
                     </li>
                 </ul> -->
             </div>
-            <div class="nk-footer-copyright fs-6 px-3"> &copy; 2025 All Rights Reserved to <a href="#">UPTM</a>. </div>
+            <div class="nk-footer-copyright fs-6 px-3"> &copy; 2025 All Rights Reserved to <a>UPTM</a>. </div>
         </div>
     </div>
 </div>

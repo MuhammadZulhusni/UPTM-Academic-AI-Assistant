@@ -20,6 +20,57 @@
             </div>
         </div>
 
+        {{-- Active Filters --}}
+        @if(request('search') || (request('category') && request('category') != 'all') || (request('sort') && request('sort') != 'newest'))
+        <div class="active-filters-section mb-4">
+            <div class="filters-header">
+                <span class="filters-count">{{ collect([request('search'), request('category') != 'all' ? request('category') : null, request('sort') != 'newest' ? request('sort') : null])->filter()->count() }} Filter(s) Applied</span>
+                <a href="{{ route('user.template') }}" class="btn-clear-all">
+                    Clear All
+                </a>
+            </div>
+            <div class="filters-list">
+                @if(request('search'))
+                <div class="filter-item">
+                    <div class="filter-label-text">Search</div>
+                    <div class="filter-value">{{ request('search') }}</div>
+                    <a href="{{ route('user.template', array_filter(request()->except('search'))) }}" class="filter-remove-btn" title="Remove filter">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                @endif
+
+                @if(request('category') && request('category') != 'all')
+                <div class="filter-item">
+                    <div class="filter-label-text">Category</div>
+                    <div class="filter-value">{{ ucfirst(request('category')) }}</div>
+                    <a href="{{ route('user.template', array_filter(request()->except('category'))) }}" class="filter-remove-btn" title="Remove filter">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                @endif
+
+                @if(request('sort') && request('sort') != 'newest')
+                <div class="filter-item">
+                    <div class="filter-label-text">Sort</div>
+                    <div class="filter-value">
+                        @if(request('sort') == 'oldest')
+                            Oldest
+                        @elseif(request('sort') == 'title')
+                            A-Z
+                        @else
+                            Z-A
+                        @endif
+                    </div>
+                    <a href="{{ route('user.template', array_filter(request()->except('sort'))) }}" class="filter-remove-btn" title="Remove filter">
+                        <em class="icon ni ni-cross"></em>
+                    </a>
+                </div>
+                @endif
+            </div>
+        </div>
+        @endif
+
         {{-- Stats Cards (Admin Only) --}}
         @if(auth()->user()->role === 'admin')
         @php
@@ -165,7 +216,7 @@
                     <div class="filter-group mb-0">
                         <label>Sort By</label>
                         <div class="button-group">
-                            @foreach(['newest' => 'Newest', 'title' => 'A-Z', 'title-desc' => 'Z-A'] as $val => $label)
+                            @foreach(['newest' => 'Newest', 'oldest' => 'Oldest', 'title' => 'A-Z', 'title-desc' => 'Z-A'] as $val => $label)
                             <label class="btn-radio">
                                 <input type="radio" name="sort" value="{{ $val }}" {{ request('sort', 'newest') == $val ? 'checked' : '' }}>
                                 <span>{{ $label }}</span>
@@ -209,6 +260,102 @@
 
 .animate-fade-in { animation: fadeIn 0.5s ease; }
 .animate-slide-up { animation: slideUp 0.6s ease; }
+
+/* Active Filters Section */
+.active-filters-section {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    animation: slideUp 0.4s ease;
+}
+
+.filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-count {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.btn-clear-all {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #6366f1;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.btn-clear-all:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+
+.filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-item {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    gap: 0.625rem;
+    transition: all 0.2s ease;
+}
+
+.filter-item:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filter-label-text {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.filter-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1e293b;
+    padding: 0 0.5rem;
+    border-left: 1px solid #e2e8f0;
+}
+
+.filter-remove-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    color: #94a3b8;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 0.75rem;
+}
+
+.filter-remove-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
 
 /* Stats Cards */
 .stat-card {
@@ -569,6 +716,16 @@
     
     .modern-pagination li:not(.active):not(:first-child):not(:last-child) {
         display: none;
+    }
+
+    .filters-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .filter-item {
+        width: 100%;
     }
 }
 </style>

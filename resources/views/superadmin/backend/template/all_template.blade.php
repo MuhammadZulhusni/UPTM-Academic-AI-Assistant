@@ -11,15 +11,100 @@
                      <p class="text-muted">Simplify your task by using templates provided</p>
                  </div>
                  
-                 {{--  MODAL TRIGGER BUTTON  --}}
+                 {{--  FILTER CONTROLS  --}}
                  <div class="nk-block-head-content mt-4">
-                     <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
-                         <em class="icon ni ni-filter me-1"></em>
-                         <span>Filter & Search</span>
-                     </button>
+                     <div class="d-flex gap-2 align-items-center flex-wrap">
+                         {{-- Filter Button --}}
+                         <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
+                             <em class="icon ni ni-filter me-1"></em>
+                             <span>Filter & Search</span>
+                         </button>
+                         
+                         {{-- Reset Button (only show when filters are active) --}}
+                         @php
+                             $hasFilters = request('search') || 
+                                          (request('category') && request('category') !== 'all') || 
+                                          (request('status') && request('status') !== 'all') || 
+                                          (request('sort') && request('sort') !== 'newest');
+                         @endphp
+                     </div>
                  </div>
              </div>
          </div>
+
+        {{-- ACTIVE FILTERS SECTION --}}
+        @if($hasFilters)
+        <div class="nk-block mt-3">
+            <div class="active-filters-professional">
+                <div class="filters-header-pro">
+                    <div class="filters-title">
+                        <em class="icon ni ni-filter-fill"></em>
+                        <span>{{ collect([request('search'), request('category') != 'all' ? request('category') : null, request('status') != 'all' ? request('status') : null, request('sort') != 'newest' ? request('sort') : null])->filter()->count() }} Active Filter(s)</span>
+                    </div>
+                    <a href="{{ route('superadmin.template') }}" class="btn-clear-filters">
+                        <em class="icon ni ni-cross-circle"></em>
+                        <span>Clear All</span>
+                    </a>
+                </div>
+                
+                <div class="filters-body-pro">
+                    {{-- Search Filter --}}
+                    @if(request('search'))
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Search</div>
+                        <div class="filter-tag-value">{{ request('search') }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['search' => null]) }}" class="filter-tag-remove" title="Remove search filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Category Filter --}}
+                    @if(request('category') && request('category') !== 'all')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Category</div>
+                        <div class="filter-tag-value">{{ ucfirst(request('category')) }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" class="filter-tag-remove" title="Remove category filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Status Filter --}}
+                    @if(request('status') && request('status') !== 'all')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Status</div>
+                        <div class="filter-tag-value">{{ ucfirst(request('status')) }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="filter-tag-remove" title="Remove status filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Sort Filter --}}
+                    @if(request('sort') && request('sort') !== 'newest')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Sort</div>
+                        <div class="filter-tag-value">
+                            @if(request('sort') === 'oldest')
+                                Oldest
+                            @elseif(request('sort') === 'title')
+                                A-Z
+                            @elseif(request('sort') === 'title-desc')
+                                Z-A
+                            @else
+                                {{ ucfirst(request('sort')) }}
+                            @endif
+                        </div>
+                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}" class="filter-tag-remove" title="Remove sort filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
           
         @if (auth()->user()->role === 'superadmin')
         <div class="nk-block">
@@ -470,9 +555,31 @@
     font-size: 1rem;
 }
 
+/* Filter Badge Styles - High Contrast for Active Filters */
+.badge.bg-primary {
+    background-color: #0d6efd !important;
+}
+
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+}
+.badge {
+    font-weight: 500;
+    border-radius: 6px;
+}
+
 /* --- Other Styles --- */
 .category-segment-control .btn,
-.sort-segment-control .btn {
+.sort-segment-control .btn,
+.status-segment-control .btn {
     border-radius: 8px !important;
     font-weight: 500;
     transition: all 0.2s ease;
@@ -481,7 +588,8 @@
 }
 
 .category-segment-control,
-.sort-segment-control {
+.sort-segment-control,
+.status-segment-control {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
@@ -497,6 +605,14 @@
 .sort-segment-control .segment-btn.active {
     background-color: var(--bs-info);
     border-color: var(--bs-info);
+    color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.status-segment-control .segment-btn.active {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
     color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transform: translateY(-1px);
@@ -534,33 +650,6 @@
 .modal-footer {
     border-top: none;
     padding: 1.5rem;
-}
-
-.template-item {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    opacity: 1;
-    transform: translateZ(0) scale(1);
-    will-change: opacity, transform;
-}
-
-.template-item.hiding {
-    opacity: 0;
-    transform: translateZ(0) scale(0.95);
-    pointer-events: none;
-}
-
-.template-item.hidden {
-    display: none !important;
-}
-
-@keyframes sortComplete {
-    0% { transform: translateZ(0) scale(1) translateY(0); }
-    50% { transform: translateZ(0) scale(1.02) translateY(-4px); }
-    100% { transform: translateZ(0) scale(1) translateY(0); }
-}
-
-.template-item.sort-complete {
-    animation: sortComplete 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .card {
@@ -603,7 +692,8 @@
 
 @media (max-width: 767.98px) {
     .category-segment-control .btn,
-    .sort-segment-control .btn {
+    .sort-segment-control .btn,
+    .status-segment-control .btn {
         padding: 0.5rem 0.5rem;
     }
     
@@ -627,7 +717,7 @@
     transition: all 0.2s ease;
     background-color: #fff;
     display: flex;
-    align-items-center;
+    align-items: center;
 }
 
 .pagination-minimal .page-link:hover {
@@ -694,6 +784,177 @@
 
 .template-card .btn:hover {
     transform: scale(1.05);
+}
+
+/* Professional Active Filters Design */
+.active-filters-professional {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.3s ease-out;
+}
+
+.filters-header-pro {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.875rem 1.25rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filters-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.filters-title em {
+    font-size: 1rem;
+    color: #6366f1;
+}
+
+.btn-clear-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    background: transparent;
+    color: #dc2626;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-clear-filters:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+.btn-clear-filters em {
+    font-size: 0.875rem;
+}
+
+.filters-body-pro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+}
+
+.filter-tag-pro {
+    display: inline-flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.filter-tag-pro:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.filter-tag-label {
+    padding: 0.5rem 0.75rem;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-right: 1px solid #cbd5e1;
+}
+
+.filter-tag-value {
+    padding: 0.5rem 0.75rem;
+    color: #1e293b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.filter-tag-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 100%;
+    background: transparent;
+    color: #94a3b8;
+    border-left: 1px solid #cbd5e1;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.filter-tag-remove:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.filter-tag-remove em {
+    font-size: 0.875rem;
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filters-header-pro {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .btn-clear-filters {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filters-body-pro {
+        padding: 0.875rem 1rem 1rem;
+    }
+    
+    .filter-tag-pro {
+        width: 100%;
+    }
+    
+    .filter-tag-value {
+        flex: 1;
+        max-width: none;
+    }
+}
+
+/* Ensure compatibility with existing styles */
+.nk-block {
+    position: relative;
 }
 </style>
 

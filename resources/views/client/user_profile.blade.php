@@ -62,7 +62,7 @@
                                         <label for="email">Email Address</label>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <div class="form-floating">
                                         <input type="text" name="phone" class="form-control" id="phone" 
                                                value="{{ $profileData->phone }}" placeholder="Enter phone number">
@@ -75,7 +75,7 @@
                                                value="{{ $profileData->address }}" placeholder="Enter address">
                                         <label for="address">Address</label>
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="col-12 d-flex justify-content-end gap-2">
                                     <button type="button" class="btn btn-outline-secondary px-4" onclick="resetForm()">
                                         <em class="icon ni ni-redo me-1"></em> Reset
