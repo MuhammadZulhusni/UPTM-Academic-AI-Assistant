@@ -34,6 +34,38 @@
             </div>
         </div>
         
+        {{-- Active Sort Filter Indicator --}}
+        @if(request('sort') && request('sort') !== 'newest')
+        <div class="mb-3">
+            <div class="active-filter-indicator">
+                <div class="filter-indicator-header">
+                    <div class="filter-indicator-icon">
+                        <i class="bi bi-funnel-fill"></i>
+                    </div>
+                    <span class="filter-indicator-text">Active Sort Filter</span>
+                    <a href="{{ route('superadmin.document') }}" class="btn-clear-filter">
+                        <i class="bi bi-x-circle"></i>
+                        <span>Clear</span>
+                    </a>
+                </div>
+                <div class="filter-indicator-body">
+                    <div class="filter-tag">
+                        <div class="filter-tag-icon">
+                            <i class="bi bi-{{ request('sort') === 'oldest' ? 'clock' : 'clock-fill' }}"></i>
+                        </div>
+                        <div class="filter-tag-content">
+                            <span class="filter-tag-label">Sort Order</span>
+                            <span class="filter-tag-value">{{ request('sort') === 'oldest' ? 'Oldest First' : 'Newest First' }}</span>
+                        </div>
+                        <a href="{{ route('superadmin.document') }}" class="filter-tag-remove" title="Remove sort">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 @if(count($document) > 0) {{-- Check if there are any documents --}}
@@ -826,6 +858,169 @@ function downloadPDF() {
     .btn-sm {
         padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
+    }
+}
+
+/* Active Filter Indicator Styles */
+.active-filter-indicator {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filter-indicator-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.filter-indicator-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.875rem;
+}
+
+.filter-indicator-text {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    flex: 1;
+}
+
+.btn-clear-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    background: transparent;
+    color: #dc2626;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-clear-filter:hover {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #991b1b;
+}
+
+.filter-indicator-body {
+    padding: 1rem 1.25rem;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 0.625rem 0.875rem;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filter-tag:hover {
+    border-color: #94a3b8;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.filter-tag-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+    font-size: 1rem;
+}
+
+.filter-tag-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    flex: 1;
+}
+
+.filter-tag-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.filter-tag-value {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.filter-tag-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    color: #94a3b8;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.filter-tag-remove:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .filter-indicator-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .btn-clear-filter {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .filter-tag {
+        width: 100%;
     }
 }
 </style>

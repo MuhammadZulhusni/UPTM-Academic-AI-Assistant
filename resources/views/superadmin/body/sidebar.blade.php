@@ -81,11 +81,11 @@
                                     <span class="nk-menu-text">Manage All Users</span>
                                 </a>
                             </li>
-                            <li class="nk-menu-item">
+                            <!-- <li class="nk-menu-item">
                                 <a href="{{ route('superadmin.reset.password') }}" class="nk-menu-link">
                                     <span class="nk-menu-text">Reset User Password</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nk-menu-item">
                                 <a href="{{ route('superadmin.create.user') }}" class="nk-menu-link">
                                     <span class="nk-menu-text">Add New User</span>

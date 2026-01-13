@@ -80,12 +80,12 @@
                                 <th class="tb-col d-none d-lg-table-cell">
                                     <div class="fs-13px text-base fw-semibold">Email</div>
                                 </th>
-                                <th class="tb-col d-none d-md-table-cell">
+                                <!-- <th class="tb-col d-none d-md-table-cell">
                                     <div class="fs-13px text-base fw-semibold">Phone</div>
                                 </th>
                                 <th class="tb-col d-none d-sm-table-cell">
                                     <div class="fs-13px text-muted">Address</div>
-                                </th>
+                                </th> -->
                                 <th class="tb-col d-none d-md-table-cell">
                                     <div class="fs-13px text-base fw-semibold">Role</div>
                                 </th>
@@ -110,12 +110,12 @@
                                         <div class="fs-7 text-muted">
                                             <i class="bi bi-envelope me-1"></i> {{ $user->email }}
                                         </div>
-                                        <div class="fs-7 text-muted">
+                                        <!-- <div class="fs-7 text-muted">
                                             <i class="bi bi-phone me-1"></i> {{ $user->phone ?? 'N/A' }}
                                         </div>
                                         <div class="fs-7 text-muted text-truncate">
                                             <i class="bi bi-geo-alt me-1"></i> {{ $user->address ?? 'N/A' }}
-                                        </div>
+                                        </div> -->
                                         <div class="mt-1">
                                             <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-2 py-1 small">
                                                 {{ ucfirst($user->role) }}
@@ -130,12 +130,12 @@
                                 <td class="tb-col d-none d-lg-table-cell" data-label="Email">
                                     <div class="fs-6 fw-medium text-dark text-truncate">{{ $user->email }}</div>
                                 </td>
-                                <td class="tb-col d-none d-md-table-cell" data-label="Phone">
+                                <!-- <td class="tb-col d-none d-md-table-cell" data-label="Phone">
                                     <div class="fs-13px text-muted">{{ $user->phone ?? 'N/A' }}</div>
                                 </td>
                                 <td class="tb-col d-none d-sm-table-cell" data-label="Address">
                                     <div class="fs-13px text-muted">{{ $user->address ?? 'N/A' }}</div>
-                                </td>
+                                </td> -->
                                 <td class="tb-col d-none d-md-table-cell" data-label="Role">
                                     <div class="fs-13px text-muted">{{ ucfirst($user->role) }}</div>
                                 </td>
