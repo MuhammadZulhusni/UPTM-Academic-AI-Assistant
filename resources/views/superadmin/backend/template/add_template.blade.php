@@ -33,7 +33,6 @@
 
 .input-field-row {
     transition: all 0.3s ease;
-    /* Using animation for the first load of dynamic fields */
     animation: fadeIn 0.5s ease-out; 
 }
 
@@ -42,9 +41,8 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Custom style for the guide card */
 .card-guide {
-    background-color: #f0f8ff; /* Light blue background for attention */
+    background-color: #f0f8ff;
     border: 1px solid #b3e0ff;
 }
 
@@ -70,7 +68,7 @@
                 <h5 class="mb-0 text-dark fw-bold">Template Details and Configuration</h5>
             </div>
             <div class="card-body p-4">
-                <form action="{{ route('superadmin.store.template') }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('superadmin.store.template') }}" method="post" enctype="multipart/form-data" id="templateForm">
                     @csrf   
 
                     <!-- Section 1: Template Metadata -->
@@ -123,9 +121,6 @@
                         <div class="card bg-light border-0 p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <label class="form-label fw-bold mb-0 fs-6">Define Input Parameters</label>
-                                <!-- <button type="button" class="btn btn-outline-primary btn-add-field btn-sm" id="add-field">
-                                    <i class="bi bi-plus me-1"></i> Add Field
-                                </button> -->
                             </div>
                             <small class="text-muted mb-3">These fields capture user data that will be inserted into your custom prompt code.</small>
 
@@ -150,10 +145,6 @@
                                     <input type="hidden" name="input_fields[0][is_required]" value="1">
 
                                     <div class="col-md-3 d-flex align-items-end">
-                                         <!-- Disabled button for the mandatory first field -->
-                                        <!-- <button type="button" class="btn btn-outline-secondary btn-sm w-100" disabled>
-                                            <i class="bi bi-lock"></i> Default Field
-                                        </button> -->
                                     </div>
                                 </div> 
                             </div>
@@ -173,12 +164,6 @@
                                         <span class="guide-tip">Use Variables:</span> Insert the user input from Section 2 into your prompt using curly braces `{}`. The variable name MUST exactly match the Field Title (Variable Name) you defined (e.g., if you created a field named `topic`, use `{topic}`).
                                     </div>
                                 </li>
-                                <!-- <li class="d-flex align-items-start mb-2">
-                                    <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
-                                    <div>
-                                        <span class="guide-tip">Define Output Language/Tone:</span> The system automatically provides the output language via the variable `{language}`. Use this variable in your prompt to instruct the AI (e.g., "Ensure the entire output is written in {language}."). 
-                                    </div>
-                                </li> -->
                                 <li class="d-flex align-items-start mb-2">
                                     <i class="bi bi-check-circle-fill text-success me-2 mt-1"></i>
                                     <div>
@@ -215,7 +200,10 @@
                     </div>
                     
                     <!-- Form Submission -->
-                    <div class="d-flex justify-content-end mt-4">
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <button type="button" class="btn btn-outline-secondary btn-md px-3 elegant-bt" id="resetBtn">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reset Form
+                        </button>
                         <button type="submit" class="btn btn-primary btn-lg px-5">
                             <i class="bi bi-save me-1"></i> Save Template
                         </button>
@@ -230,7 +218,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<!-- JavaScript for Dynamic Fields -->
+<!-- JavaScript for Dynamic Fields and Reset -->
 <script>    
 $(document).ready(function() {
     let fieldIndex = 1; 
@@ -270,8 +258,31 @@ $(document).ready(function() {
 
     // Logic to Remove an Input Field (Event delegation required)
     $(document).on('click', '.remove-field', function() {
-        // Find the closest parent with class 'input-field-row' and remove it
         $(this).closest('.input-field-row').remove();
+    });
+
+    // Reset Button Logic
+    $('#resetBtn').click(function() {
+        // Reset the form
+        $('#templateForm')[0].reset();
+        
+        // Remove all dynamically added fields (keep only the first default field)
+        $('.input-field-row').not(':first').remove();
+        
+        // Clear the first field's inputs
+        $('#input_fields_0_title').val('');
+        $('#input_fields_0_description').val('');
+        
+        // Reset fieldIndex counter
+        fieldIndex = 1;
+        
+        // Show toastr notification
+        toastr.info("Form has been reset. Please fill in the template details again.");
+        
+        // Scroll to top of form
+        $('html, body').animate({
+            scrollTop: $('#templateForm').offset().top - 100
+        }, 500);
     });
 });
 </script>

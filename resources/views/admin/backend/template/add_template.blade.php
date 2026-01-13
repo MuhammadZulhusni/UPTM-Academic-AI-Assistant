@@ -215,7 +215,10 @@
                     </div>
                     
                     <!-- Form Submission -->
-                    <div class="d-flex justify-content-end mt-4">
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <button type="button" class="btn btn-outline-secondary btn-md px-3 elegant-bt" id="resetBtn">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Reset Form
+                        </button>
                         <button type="submit" class="btn btn-primary btn-lg px-5">
                             <i class="bi bi-save me-1"></i> Save Template
                         </button>
@@ -272,6 +275,33 @@ $(document).ready(function() {
     $(document).on('click', '.remove-field', function() {
         // Find the closest parent with class 'input-field-row' and remove it
         $(this).closest('.input-field-row').remove();
+    });
+
+    // Reset Button Logic
+    $('#resetBtn').click(function() {
+        // Get the form element
+        const form = $(this).closest('form')[0];
+        
+        // Reset the form
+        form.reset();
+        
+        // Remove all dynamically added fields (keep only the first default field)
+        $('.input-field-row').not(':first').remove();
+        
+        // Clear the first field's inputs
+        $('#input_fields_0_title').val('');
+        $('#input_fields_0_description').val('');
+        
+        // Reset fieldIndex counter
+        fieldIndex = 1;
+        
+        // Show toastr notification
+        toastr.info("Form has been reset. Please fill in the template details again.");
+        
+        // Scroll to top of form
+        $('html, body').animate({
+            scrollTop: $('.card-form').offset().top - 100
+        }, 500);
     });
 });
 </script>
