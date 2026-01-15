@@ -154,7 +154,7 @@ class SuperAdminDocumentController extends Controller
     public function ManualDocumentCleanup(Request $request)
     {
         $request->validate([
-            'days' => 'required|integer|min:7|max:365',
+            'days' => 'required|integer|min:1|max:365',
         ]);
 
         try {

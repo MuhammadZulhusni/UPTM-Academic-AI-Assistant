@@ -28,7 +28,7 @@
         color: var(--dark-color);
         margin-bottom: 0.25rem;
     }
-
+    
     /* --- Back Button Styles --- */
     .back-button-wrapper {
         margin-bottom: 1.5rem;
@@ -69,73 +69,98 @@
         transform: translateX(-3px);
     }
     
-    
     /* --- Main Structure & Layout --- */
-    
     .page-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
     }
 
-    .main-content-card {
+    /* --- Input Panel (Top Section) --- */
+    .input-panel-card {
+        background-color: var(--card-bg);
         border: none;
-        border-radius: 16px; 
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        background-color: var(--card-bg);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .input-panel-header {
         display: flex;
-        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--panel-bg);
     }
 
-    /* --- Control Panel (Left Side - Form) --- */
-    .control-panel {
-        background-color: var(--panel-bg); 
-        border-radius: 16px 0 0 16px; 
-        padding: 30px;
-        border-right: 1px solid var(--border-color);
-        position: relative;
+    .input-panel-header .icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
     }
 
-    @media (min-width: 992px) {
-        .control-panel {
-            min-height: 100%;
-        }
-        .form-sticky-wrap {
-            position: sticky;
-            top: 2rem;
-        }
+    .input-panel-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark-color);
     }
 
+    /* Form Grid Layout */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
 
-    /* --- Editor Panel (Right Side) --- */
-    .editor-panel-wrap {
-        padding: 30px;
-        flex-grow: 1;
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    /* --- Output Panel (Bottom Section) --- */
+    .output-panel-card {
         background-color: var(--card-bg);
-        border-radius: 0 16px 16px 0;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
     }
 
     .nk-editor {
-        position: relative; 
-        border: 1px solid var(--border-color);
-        border-radius: 12px; 
-        overflow: hidden;
+        position: relative;
         background-color: var(--card-bg);
-        height: 100%; 
         display: flex;
         flex-direction: column;
-        min-height: 600px;
+        min-height: 700px;
     }
 
     .nk-editor-header {
-        background-color: #f0f3f7;
-        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 1.25rem 1.75rem;
         border-bottom: 1px solid var(--border-color);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .nk-editor-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .nk-editor-title .icon {
+        font-size: 1.5rem;
+        color: var(--primary-color);
     }
 
     .nk-editor-title h4 {
+        margin: 0;
         font-weight: 600;
         color: var(--dark-color);
         font-size: 1.15rem;
@@ -143,12 +168,13 @@
 
     .nk-editor-main {
         flex-grow: 1;
-        overflow-y: auto; 
+        overflow-y: auto;
+        background-color: #fafbfc;
     }
 
     .nk-editor-body {
-        padding: 1.5rem; 
-        line-height: 1.7;
+        padding: 2rem;
+        min-height: 500px;
     }
 
     /* --- Form Elements --- */
@@ -156,50 +182,84 @@
         font-weight: 600;
         color: var(--dark-color);
         margin-bottom: 0.5rem;
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label .badge {
+        font-size: 0.7rem;
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
     }
     
     .form-control, .form-select {
         border-radius: 8px;
         padding: 0.75rem 1rem;
-        border: 1px solid #ced4da;
+        border: 1.5px solid #e5e7eb;
         box-shadow: none;
-        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        transition: all 0.2s ease-in-out;
+        background-color: #fafbfc;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        background-color: #ffffff;
     }
 
-    /* --- Buttons & Export --- */
+    /* --- Buttons & Actions --- */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        padding-top: 1.5rem;
+        border-top: 2px solid var(--panel-bg);
+    }
+
     .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        border: none;
         font-weight: 600;
         border-radius: 10px;
-        padding: 0.75rem 1.5rem;
-        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-        transition: all 0.2s ease-in-out;
+        padding: 0.85rem 2rem;
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .btn-primary:hover {
-        background-color: var(--primary-hover);
-        border-color: var(--primary-hover);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.35);
+    }
+
+    .btn-outline-secondary {
+        border: 1.5px solid #dee2e6;
+        color: #6c757d;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #f8f9fa;
+        border-color: #6c757d;
+        color: #495057;
     }
     
-    /* --- Loading Overlay & Animations (Organized Position) --- */
+    /* --- Loading Overlay --- */
     .loading-overlay {
         position: absolute;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        border-radius: 12px; 
-        background: rgba(255, 255, 255, 0.98); 
-        backdrop-filter: blur(3px); 
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(5px);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -208,20 +268,19 @@
         transition: opacity 0.4s ease;
     }
 
-    /* *** REFINED LOADING SPINNER CONTAINER *** */
     .loading-spinner {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 20px; /* Increased vertical spacing between elements */
+        gap: 20px;
         text-align: center;
     }
 
     .spinner {
-        width: 48px;
-        height: 48px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--primary-color);
+        width: 56px;
+        height: 56px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid var(--primary-color);
         border-radius: 50%;
         animation: spin 1s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
     }
@@ -231,7 +290,6 @@
         100% { transform: rotate(360deg); }
     }
     
-    /* *** REFINED PROGRESS BAR & TEXT *** */
     .loading-spinner > p {
         font-size: 1.2rem;
         font-weight: 700;
@@ -242,8 +300,8 @@
     .progress-bar {
         position: relative;
         overflow: hidden;
-        width: 250px; /* Increased width for better visual impact */
-        height: 8px; /* Slightly thicker */
+        width: 280px;
+        height: 8px;
         background: #e9ecef;
         border-radius: 4px;
         margin-top: 10px;
@@ -265,19 +323,19 @@
     }
     
     .typing-indicator {
-        margin-top: 15px; /* Added spacing below the progress bar */
+        margin-top: 15px;
         display: flex;
         align-items: center;
+        gap: 0.5rem;
         color: var(--secondary-color);
     }
     
     .typing-indicator .dot {
-        width: 8px; /* Slightly smaller dots */
+        width: 8px;
         height: 8px;
         background-color: var(--primary-color);
         animation: typingDots 1.4s infinite ease-in-out both;
         border-radius: 50%;
-        margin: 0 4px;
     }
     
     .typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
@@ -289,249 +347,321 @@
         40% { transform: scale(1); opacity: 1; }
     }
 
-
-    /* --- Placeholder & Icons --- */
+    /* --- Placeholder --- */
     .placeholder-content {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         text-align: center;
-        min-height: 400px;
+        min-height: 450px;
         padding: 20px;
-        color: #adb5bd; 
+        color: #adb5bd;
     }
     
-    .ni-edit-alt {
-        color: #d1d9e2 !important;
-        font-size: 6rem !important; 
-        opacity: 0.6 !important;
+    .placeholder-content .icon {
+        font-size: 5rem;
+        color: #d1d9e2;
+        opacity: 0.5;
+        margin-bottom: 1.5rem;
+    }
+
+    .placeholder-content h5 {
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .placeholder-content p {
+        color: #adb5bd;
+        font-size: 0.95rem;
     }
     
-    /* --- Generated Content Styling (PROFESSIONAL DOCUMENT LAYOUT) --- */
-
-    /* AGGRESSIVE: Force normal weight on EVERYTHING in editor */
-    #editor-v1,
-    #editor-v1 *,
-    #editor-v1 p,
-    #editor-v1 div,
-    #editor-v1 span,
-    #editor-v1 strong,
-    #editor-v1 b,
-    #editor-v1 em,
-    #editor-v1 i,
-    #editor-v1 h1,
-    #editor-v1 h2,
-    #editor-v1 h3,
-    #editor-v1 h4,
-    #editor-v1 h5,
-    #editor-v1 h6,
-    .nk-editor-body,
-    .nk-editor-body *,
-    .content-wrapper,
-    .content-wrapper *,
-    .content-paragraph,
-    .content-paragraph *,
-    .content-heading {
-        font-weight: 400 !important; /* FORCE normal weight everywhere */
-        color: #2c3e50 !important; /* Professional dark gray */
-    }
-
-    /* Content wrapper - professional document styling */
+    /* ========================================
+       DYNAMIC CONTENT STYLING
+       Same text size and weight, balanced spacing
+       ======================================== */
+    
     .content-wrapper {
         max-width: 100%;
-        padding: 2rem 2.5rem;
+        padding: 2.5rem;
         background: #ffffff;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        font-family: var(--font-family-base);
+        color: #2c3e50;
+        line-height: 1.7;
     }
 
-    /* Paragraphs - organized document style */
-    .content-paragraph {
-        margin-bottom: 1.5rem;
-        line-height: 1.75;
-        font-size: 1rem !important;
-        font-weight: 400 !important;
-        color: #2c3e50 !important;
-        text-align: justify;
-        text-justify: inter-word;
-    }
-
-    /* First paragraph - no top margin */
-    .content-wrapper > .content-paragraph:first-child,
-    .content-wrapper > p:first-child {
-        margin-top: 0;
-    }
-
-    /* Last paragraph - reduced bottom margin */
-    .content-wrapper > .content-paragraph:last-child,
-    .content-wrapper > p:last-child {
-        margin-bottom: 0;
-    }
-
-    /* Headings - subtle distinction while maintaining uniformity */
+    /* All content types - same size and weight */
+    .content-main-title,
+    .content-section-header,
+    .content-subtopic,
     .content-heading,
-    #editor-v1 h1,
-    #editor-v1 h2,
-    #editor-v1 h3,
-    #editor-v1 h4,
-    #editor-v1 h5,
-    #editor-v1 h6 {
-        font-size: 1rem !important;
-        font-weight: 400 !important;
-        color: #2c3e50 !important;
-        margin-top: 2rem;
+    .content-label,
+    .content-paragraph,
+    .content-list-item {
+        font-size: 1rem;
+        font-weight: 400;
+        color: #2c3e50;
+        line-height: 1.7;
+        padding: 0;
+        border: none;
+        text-align: left;
+    }
+
+    /* Balanced margins - not too short, not too long */
+    .content-main-title {
+        margin-top: 1.5rem;
         margin-bottom: 1rem;
-        line-height: 1.6;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #e8ecef; /* Subtle separator */
     }
 
-    /* First heading - no top margin */
-    .content-wrapper > .content-heading:first-child,
-    .content-wrapper > h1:first-child,
-    .content-wrapper > h2:first-child,
-    .content-wrapper > h3:first-child {
-        margin-top: 0;
+    .content-section-header {
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
     }
 
-    /* Professional spacing between sections */
-    .content-paragraph + .content-heading,
-    p + h1, p + h2, p + h3, p + h4 {
-        margin-top: 2.5rem;
+    .content-subtopic {
+        margin-top: 1.25rem;
+        margin-bottom: 0.75rem;
     }
 
-    /* Lists (if AI generates them) */
-    #editor-v1 ul,
-    #editor-v1 ol {
-        margin: 1.5rem 0;
-        padding-left: 2rem;
-        line-height: 1.75;
+    .content-heading {
+        margin-top: 1rem;
+        margin-bottom: 0.75rem;
     }
 
-    #editor-v1 li {
+    .content-label {
+        margin-top: 1rem;
         margin-bottom: 0.5rem;
-        font-size: 1rem !important;
-        color: #2c3e50 !important;
+    }
+
+    .content-paragraph {
+        margin-bottom: 0.875rem;
+    }
+
+    .content-list-item {
+        margin-bottom: 0.625rem;
+    }
+
+    /* Spacers for organized sections */
+    .content-spacer {
+        height: 1rem;
+    }
+
+    .content-spacer-large {
+        height: 1.5rem;
+    }
+
+    /* Remove margins from first/last elements */
+    .content-wrapper > *:first-child {
+        margin-top: 0 !important;
+    }
+
+    .content-wrapper > *:last-child {
+        margin-bottom: 0 !important;
     }
 
     /* Responsive adjustments */
     @media (max-width: 768px) {
         .content-wrapper {
-            padding: 1.5rem 1.25rem;
+            padding: 1.75rem 1.25rem;
         }
         
-        .content-paragraph {
-            font-size: 0.95rem !important;
-            text-align: left; /* Remove justify on mobile */
+        .content-paragraph,
+        .content-main-title,
+        .content-section-header,
+        .content-subtopic,
+        .content-heading,
+        .content-label,
+        .content-list-item {
+            font-size: 0.95rem;
         }
     }
-    
-    /* NEW: AI Suggestion Styles */
-    .ai-suggestion-wrapper {
-        position: relative;
-        margin-top: 0.5rem;
+
+    /* --- Statistics Bar --- */
+    .stats-bar {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 0.75rem 0;
     }
 
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .stat-item .icon {
+        font-size: 1.1rem;
+        color: var(--primary-color);
+    }
+
+    .stat-value {
+        font-weight: 700;
+        color: var(--dark-color);
+        font-size: 1rem;
+    }
+
+    /* ========================================
+       AI SUGGESTION STYLES
+       ======================================== */
     .ai-suggest-btn {
         display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 0.9rem;
-        font-size: 0.85rem;
+        gap: 0.6rem;
+        padding: 0.65rem 1.25rem;
+        font-size: 0.875rem;
         font-weight: 600;
-        color: #6c757d;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
+        color: #6b7280;
+        background: linear-gradient(135deg, #fafbfc 0%, #f3f4f6 100%);
+        border: 1.5px solid #e5e7eb;
+        border-radius: 12px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-suggest-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .ai-suggest-btn:hover:not(:disabled)::before {
+        left: 100%;
     }
 
     .ai-suggest-btn:hover:not(:disabled) {
-        background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0,123,255,0.15);
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        border-color: #93c5fd;
+        color: #3b82f6;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.15);
     }
 
     .ai-suggest-btn:disabled {
-        opacity: 0.6;
+        opacity: 0.5;
         cursor: not-allowed;
     }
 
-    .ai-suggest-btn .spinner-border {
-        width: 14px;
-        height: 14px;
-        border-width: 2px;
-    }
-
     .suggestions-dropdown {
-        margin-top: 0.75rem;
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        padding: 0.75rem;
-        animation: slideDown 0.3s ease;
+        margin-top: 1rem;
+        background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        padding: 1.25rem;
+        animation: slideDownFade 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        max-height: 650px;
+        overflow-y: auto;
     }
 
-    @keyframes slideDown {
+    @keyframes slideDownFade {
         from {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-16px) scale(0.98);
         }
         to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
     }
 
-    .suggestion-item {
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.5rem;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
+    .bloom-suggestion {
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 0.875rem;
+        background: #ffffff;
+        border: 1.5px solid #f3f4f6;
+        border-left: 4px solid #d1d5db;
+        border-radius: 12px;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .bloom-suggestion:hover {
+        transform: translateX(8px) translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        border-color: currentColor;
+        background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    }
+
+    .suggestion-content {
         display: flex;
-        align-items: start;
-        gap: 0.75rem;
-    }
-
-    .suggestion-item:hover {
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border-color: var(--primary-color);
-        transform: translateX(4px);
-    }
-
-    .suggestion-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .suggestion-icon {
-        color: var(--primary-color);
-        font-size: 1.1rem;
-        flex-shrink: 0;
-        margin-top: 2px;
+        flex-direction: column;
+        gap: 0.625rem;
     }
 
     .suggestion-text {
-        flex-grow: 1;
-        color: #495057;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        color: #374151;
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        font-weight: 500;
     }
-    
+
+    .bloom-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 0.375rem 0.875rem;
+        background: currentColor;
+        color: #ffffff;
+        border-radius: 20px;
+        align-self: flex-start;
+        opacity: 0.9;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .bloom-suggestion:hover .bloom-badge {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons button {
+            width: 100%;
+        }
+
+        .stats-bar {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .nk-editor-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
 </style>
 
 
 <div class="nk-content-inner">
     <div class="nk-content-body page-container">
-
+        
         <!-- Back Button -->
         <div class="back-button-wrapper">
             <a href="{{ route('admin.template') }}" class="btn-back">
@@ -540,168 +670,215 @@
             </a>
         </div>
         
+        <!-- Page Header -->
         <div class="nk-block-head nk-page-head mb-4">
-            <div class="nk-block-head-between">
-                <div class="nk-block-head-content">
-                    <h2 class="display-6">{{ $template->title }}</h2>
-                    <p class="text-muted">{{ $template->description }}</p>
-                </div>
+            <div class="nk-block-head-content">
+                <h2 class="display-6">{{ $template->title }}</h2>
+                <p class="text-muted">{{ $template->description }}</p>
             </div>
         </div>
         
-        <div class="main-content-card row gx-0">
-            
-            <div class="col-lg-4 control-panel">
-                <div class="form-sticky-wrap">
-
-                    <form id="generateForm" action="{{ route('content.generate', $template->id) }}" method="post">
-                        @csrf  
-
-                        <div class="form-group mb-4">
-                            <label for="language" class="form-label">Language</label>
-                            <select name="language" class="form-select" id="language" required>
-                                <option value="">Select Language</option>
-                                <option value="English">English</option>
-                                <option value="Bahasa Melayu">Bahasa Melayu</option>
-                            </select>
-                        </div>  
-                        
-                        @foreach ($template->inputFields as $field)
-                        <div class="form-group mb-4">
-                            <label for="{{ $field->title }}" class="form-label">{{ $field->title }}</label>
-                            @if ($field->type === 'text')
-                                <input type="text" 
-                                    name="{{ str_replace(' ', '_', $field->title) }}" 
-                                    id="{{ $field->title }}" 
-                                    class="form-control" 
-                                    placeholder="Enter {{ $field->title }}"
-                                    maxlength="10000"
-                                    required>
-                            @elseif ($field->type === 'textarea')
-                                <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
-                                    id="{{ $field->title }}" 
-                                    rows="4" 
-                                    class="form-control ai-textarea" 
-                                    placeholder="Provide detailed description..."
-                                    data-field-name="{{ $field->title }}"
-                                    maxlength="50000"
-                                    required></textarea>
-                                
-                                <!-- NEW: AI Suggestion Button & Container -->
-                                <div class="ai-suggestion-wrapper">
-                                    <button type="button" 
-                                            class="ai-suggest-btn" 
-                                            data-target="{{ $field->title }}"
-                                            disabled>
-                                        <span class="btn-text">Get AI Suggestions</span>
-                                        <span class="btn-loading" style="display: none;">
-                                            <span class="spinner-border" role="status"></span>
-                                        </span>
-                                    </button>
-                                    <div class="suggestions-dropdown" 
-                                         id="suggestions-{{ str_replace(' ', '-', $field->title) }}" 
-                                         style="display: none;">
-                                    </div>
-                                </div>
-                            @endif
-                            <small class="form-text text-muted">{{ $field->description }}</small>
-                        </div>
-                        @endforeach
-
-                        <div class="form-group mb-4">
-                            <label for="ai_model" class="form-label">AI Model</label>
-                            <select name="ai_model" class="form-select" id="ai_model">
-                                <option value="gpt-3.5-turbo" selected>OpenAI | GPT-3.5-turbo (Faster)</option>
-                                <option value="gpt-4">OpenAI | GPT 4 (Higher Quality)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group mb-4">
-                            <label for="result_length" class="form-label">Result Length (words)</label>
-                            <input type="number" name="result_length" class="form-control" 
-                                   id="result_length" value="100" min="1" max="5000" required>
-                            <small class="form-text text-muted">Set the desired length for the output.</small>
-                        </div>
-                        
-                        <div class="d-grid gap-2 pt-2 pb-4">
-                            <button type="submit" class="btn btn-primary" id="generateBtn">
-                                <span class="btn-text">Generate Content</span>
-                                <span class="btn-loading" style="display: none;">
-                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                                    Generating...
-                                </span>
-                            </button> 
-                        </div>
-                    </form>
-                </div>
+        <!-- INPUT PANEL (TOP) -->
+        <div class="input-panel-card">
+            <div class="input-panel-header">
+                <em class="icon ni ni-edit-fill"></em>
+                <h3>Input Configuration</h3>
             </div>
-            
-            <div class="col-lg-8 editor-panel-wrap">
-                <div class="nk-editor">
-                    
-                    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
-                        <div class="loading-spinner">
-                            <div class="spinner"></div>
-                            <p>AI is crafting your content...</p>
-                            
-                            <div class="progress-bar">
-                                <div class="progress-fill"></div>
-                            </div>
-                            
-                            <div class="typing-indicator">
-                                <div class="dot"></div>
-                                <div class="dot"></div>
-                                <div class="dot"></div>
-                                <span class="ms-3 text-dark fw-bold" id="loadingText">Analyzing request...</span>
-                            </div>
-                        </div>
+
+            <form id="generateForm" action="{{ route('content.generate', $template->id) }}" method="post">
+                @csrf
+
+                <div class="form-grid">
+                    <!-- Language Selection -->
+                    <div class="form-group">
+                        <label for="language" class="form-label">
+                            <em class="icon ni ni-globe"></em>
+                            Language
+                            <span class="badge bg-primary">Required</span>
+                        </label>
+                        <select name="language" class="form-select" id="language" required>
+                            <option value="">Select Language</option>
+                            <option value="English">English</option>
+                            <option value="Bahasa Melayu">Bahasa Melayu</option>
+                        </select>
                     </div>
 
-                    <div class="nk-editor-header">
-                        <div class="nk-editor-title">
-                            <h4 class="me-3 mb-0 line-clamp-1">{{ $template->title }} Output</h4>
+                    <!-- AI Model Selection -->
+                    <div class="form-group">
+                        <label for="ai_model" class="form-label">
+                            <em class="icon ni ni-cpu"></em>
+                            AI Model
+                        </label>
+                        <select name="ai_model" class="form-select" id="ai_model">
+                            <option value="gpt-3.5-turbo" selected>OpenAI GPT-3.5 Turbo (Faster)</option>
+                            <option value="gpt-4">OpenAI GPT-4 (Higher Quality)</option>
+                        </select>
+                    </div>
+
+                    <!-- Result Length -->
+                    <!-- <div class="form-group">
+                        <label for="result_length" class="form-label">
+                            <em class="icon ni ni-text"></em>
+                            Result Length (words)
+                        </label>
+                        <input type="number" name="result_length" class="form-control" 
+                               id="result_length" value="100" min="1" max="5000" required>
+                        <small class="form-text text-muted">Recommended: 100-500 words</small>
+                    </div> -->
+                </div>
+
+                <!-- Dynamic Template Fields -->
+                @foreach ($template->inputFields as $field)
+                <div class="form-group form-group-full">
+                    <label for="{{ $field->title }}" class="form-label">
+                        {{ $field->title }}
+                        <span class="badge bg-primary">Required</span>
+                    </label>
+                    
+                    @if ($field->type === 'text')
+                        <input type="text" 
+                            name="{{ str_replace(' ', '_', $field->title) }}" 
+                            id="{{ $field->title }}" 
+                            class="form-control" 
+                            placeholder="Enter {{ $field->title }}"
+                            maxlength="10000"
+                            required>
+                    @elseif ($field->type === 'textarea')
+                        <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
+                            id="{{ $field->title }}" 
+                            rows="5" 
+                            class="form-control ai-textarea" 
+                            placeholder="Provide detailed description..."
+                            data-field-name="{{ $field->title }}"
+                            maxlength="50000"
+                            required></textarea>
+                        
+                        <!-- AI Suggestion Button -->
+                        <div class="ai-suggestion-wrapper mt-3">
+                            <button type="button" 
+                                    class="ai-suggest-btn" 
+                                    data-target="{{ $field->title }}"
+                                    disabled>
+                                <em class="icon ni ni-spark-fill"></em>
+                                <span class="btn-text">Get AI Suggestions</span>
+                                <span class="btn-loading" style="display: none;">
+                                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                                </span>
+                            </button>
+                            <div class="suggestions-dropdown" 
+                                 id="suggestions-{{ str_replace(' ', '-', $field->title) }}" 
+                                 style="display: none;">
+                            </div>
                         </div>
-                        <div class="nk-editor-tools d-flex align-items-center mt-2 mt-sm-0">
-                            <ul class="d-inline-flex gap gx-3 gx-lg-4 pe-4 pe-lg-5 mb-0 list-unstyled">
+                    @endif
+                    
+                    <small class="form-text text-muted">{{ $field->description }}</small>
+                </div>
+                @endforeach
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-outline-secondary" onclick="document.getElementById('generateForm').reset();">
+                        Reset Form
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="generateBtn">
+                        <span class="btn-text">
+                            Generate Content
+                        </span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="spinner-border spinner-border-sm me-2 mt-1" role="status"></span>
+                            Generating...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- OUTPUT PANEL (BOTTOM) -->
+        <div class="output-panel-card">
+            <div class="nk-editor">
+                
+                <!-- Loading Overlay -->
+                <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>AI is crafting your content...</p>
+                        
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        
+                        <div class="typing-indicator">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <span class="ms-3 text-dark fw-bold" id="loadingText">Analyzing request...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Editor Header -->
+                <div class="nk-editor-header">
+                    <div class="nk-editor-title">
+                        <em class="icon ni ni-file-text"></em>
+                        <h4>{{ $template->title }} Output</h4>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <!-- Statistics -->
+                        <div class="stats-bar">
+                            <div class="stat-item">
+                                <em class="icon ni ni-text"></em>
+                                <span>Words: <span class="stat-value" id="word-count">0</span></span>
+                            </div>
+                            <div class="stat-item">
+                                <em class="icon ni ni-edit"></em>
+                                <span>Characters: <span class="stat-value" id="char-count">0</span></span>
+                            </div>
+                        </div>
+
+                        <!-- Export Dropdown -->
+                        <div class="dropdown">
+                            <button class="btn btn-md btn-light rounded-pill" type="button" data-bs-toggle="dropdown">
+                                <em class="icon ni ni-download"></em>
+                                <span>Export</span>
+                                <em class="icon ni ni-chevron-down"></em>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
-                                    <span class="sub-text text-nowrap">Words <span class="text-dark fw-bold" id="word-count">0</span></span>
+                                    <a href="#" class="dropdown-item" id="copy-text">
+                                        <em class="icon ni ni-copy"></em>
+                                        Copy Text
+                                    </a>
                                 </li>
                                 <li>
-                                    <span class="sub-text text-nowrap">Characters <span class="text-dark fw-bold" id="char-count">0</span></span>
+                                    <a href="#" class="dropdown-item" id="download-pdf">
+                                        <em class="icon ni ni-file-pdf"></em>
+                                        Download PDF
+                                    </a>
                                 </li>
                             </ul>
-                            <div class="dropdown">
-                                <button class="btn btn-md btn-light rounded-pill" type="button" data-bs-toggle="dropdown">
-                                    <em class="icon ni ni-download me-1"></em>
-                                    <span>Export</span>
-                                    <em class="icon ni ni-chevron-down ms-1"></em>
-                                </button> 
-                                <ul class="dropdown-menu dropdown-menu-end mt-2">
-                                    <li><a href="#" class="dropdown-item" id="copy-text">
-                                        <em class="icon ni ni-copy me-2"></em>Copy Text</a></li>
-                                        <li><a href="#" class="dropdown-item" id="download-pdf">
-                                            <em class="icon ni ni-file-pdf me-2"></em>Download PDF</a></li>
-                                </ul>          
-                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="nk-editor-main">
-                        <div class="nk-editor-body">
-                            <div id="editor-v1">
-                                <div class="placeholder-content">
-                                    <em class="icon ni ni-edit-alt"></em>
-                                    <p class="mt-3 h5">Your generated content will appear here...</p>
-                                    <small class="text-muted">Fill out the control panel form and click "Generate Content" to begin</small>
-                                </div>
+                <!-- Editor Body -->
+                <div class="nk-editor-main">
+                    <div class="nk-editor-body">
+                        <div id="editor-v1">
+                            <div class="placeholder-content">
+                                <em class="icon ni ni-edit-alt"></em>
+                                <h5>Ready to Generate Content</h5>
+                                <p>Fill out the form above and click "Generate Content" to begin</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
-</div> 
+</div>
 
 <script>
 // --- JAVASCRIPT LOGIC (FIXED) ---
@@ -895,49 +1072,160 @@ function animateCounter(elementId, targetValue) {
     }
 }
 
+// UPDATED formatContent function to match Documents modal format
 function formatContent(output, formData) {
-    // Clean the output first: remove ALL markdown formatting
-    let cleanedOutput = output
-        .replace(/\*\*(.+?)\*\*/g, '$1')  // Remove **bold**
-        .replace(/\*(.+?)\*/g, '$1')      // Remove *italic*
-        .replace(/__(.+?)__/g, '$1')      // Remove __bold__
-        .replace(/_(.+?)_/g, '$1')        // Remove _italic_
-        .replace(/`(.+?)`/g, '$1')        // Remove `code`
-        .replace(/~~(.+?)~~/g, '$1');     // Remove ~~strikethrough~~
+    if (!output) return "";
+
+    // Step 1: Clean the text
+    let text = output.trim();
+    text = text.replace(/\r\n/g, "\n");
     
-    // Split into lines and filter empty ones
-    const lines = cleanedOutput.split('\n').filter(line => line.trim() !== '');
+    // Remove all markdown formatting
+    text = text
+        .replace(/\*\*\*(.+?)\*\*\*/g, '$1')
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/__(.+?)__/g, '$1')
+        .replace(/_(.+?)_/g, '$1')
+        .replace(/`(.+?)`/g, '$1')
+        .replace(/~~(.+?)~~/g, '$1')
+        .replace(/^#{1,6}\s+/gm, '')
+        .replace(/\t/g, ' ')
+        .replace(/ {3,}/g, ' ')
+        .trim();
     
-    // Start with just the wrapper, NO TITLE
-    let html = `<div class="content-wrapper">`;
+    // Step 2: Remove extra blank lines (max 2 consecutive)
+    text = text.replace(/\n{3,}/g, "\n\n");
     
-    lines.forEach(line => {
-        const trimmedLine = line.trim();
-        if (trimmedLine) {
-            // Detect if it's a heading (starts with # or is short without period)
-            const isHeading = trimmedLine.startsWith('#') || 
-                            (trimmedLine.length < 80 && !trimmedLine.endsWith('.') && 
-                             !trimmedLine.endsWith(',') && !trimmedLine.endsWith(';'));
-            
-            if (isHeading) {
-                // Remove markdown heading markers
-                const headingText = trimmedLine.replace(/^[#*-]+\s*/, '').trim();
-                html += `<h3 class="content-heading">${escapeHtml(headingText)}</h3>`;
-            } else {
-                html += `<p class="content-paragraph">${escapeHtml(trimmedLine)}</p>`;
+    // Step 3: Convert markdown-style headings
+    text = text.replace(/^#\s?(.*)$/gm, "<h2 class='doc-h2'>$1</h2>");
+    text = text.replace(/^##\s?(.*)$/gm, "<h3 class='doc-h3'>$1</h3>");
+    text = text.replace(/^###\s?(.*)$/gm, "<h4 class='doc-h4'>$1</h4>");
+    
+    // Step 4: Handle bullet points and numbered lists
+    text = text.replace(/^\s*[-•]\s+(.*)$/gm, "<li>$1</li>");
+    text = text.replace(/^\s*\d+\.\s+(.*)$/gm, "<li>$1</li>");
+    
+    // Step 5: Wrap consecutive list items in ul tags
+    text = text.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul class='doc-list'>$1</ul>");
+    
+    // Step 6: Handle bold and italic (if any remain)
+    text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+    
+    // Step 7: Split into paragraphs by double newlines
+    let parts = text.split(/\n{2,}/);
+    
+    // Step 8: Clean and filter paragraphs
+    parts = parts
+        .map(p => p.trim())
+        .filter(p => p.length > 0);
+    
+    // Step 9: Wrap in paragraph tags (skip if already has HTML tags)
+    let html = parts
+        .map(p => {
+            // Don't wrap if it's already a heading or list
+            if (p.startsWith('<h') || p.startsWith('<ul')) {
+                return p;
             }
-        }
-    });
+            return `<p class="doc-paragraph">${p}</p>`;
+        })
+        .join("");
     
-    html += '</div>';
     return html;
 }
-
 
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+/* ========================================
+   DOCUMENT CONTENT STYLES (Match Documents Modal)
+   ======================================== */
+const documentStyles = `
+<style>
+    /* Match the exact styles from Documents modal */
+    #editor-v1 .doc-paragraph {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #2c3e50;
+    }
+    
+    #editor-v1 .doc-paragraph:last-child {
+        margin-bottom: 0 !important;
+    }
+    
+    #editor-v1 .doc-h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+        line-height: 1.3;
+    }
+    
+    #editor-v1 .doc-h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-top: 1.25rem;
+        margin-bottom: 0.625rem;
+        line-height: 1.3;
+    }
+    
+    #editor-v1 .doc-h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #4a5568;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+    
+    #editor-v1 .doc-list {
+        margin: 0.75rem 0;
+        padding-left: 1.5rem;
+        list-style-type: disc;
+    }
+    
+    #editor-v1 .doc-list li {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: #2c3e50;
+    }
+    
+    #editor-v1 .doc-list li:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* Remove the old content-wrapper styles */
+    #editor-v1 .content-wrapper {
+        max-width: 100%;
+        padding: 2rem;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #2c3e50;
+        line-height: 1.7;
+    }
+</style>
+`;
+
+// Inject the styles into the document
+if (!document.getElementById('document-content-styles')) {
+    const styleElement = document.createElement('div');
+    styleElement.id = 'document-content-styles';
+    styleElement.innerHTML = documentStyles;
+    document.head.appendChild(styleElement.querySelector('style'));
 }
 
 function showSuccessMessage() {
@@ -993,8 +1281,6 @@ function handleExport(action) {
             break;
     }
 }
-
-// NEW: Download as organized PDF function
 async function downloadPDF(editor, fileName) {
     try {
         // Check if jsPDF is loaded
@@ -1010,119 +1296,302 @@ async function downloadPDF(editor, fileName) {
             format: 'a4'
         });
 
-        // PDF Configuration
+        // PDF Configuration - Clean Margins
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
-        const margin = 20;
+        const margin = 25;              // 2.5cm margins all around
         const maxWidth = pageWidth - (margin * 2);
         let yPosition = margin;
-        const lineHeight = 7;
-        const paragraphSpacing = 10;
-        const headingSpacing = 12;
 
-        // Title from template
+        // Closer spacing - more compact but still readable
+        const normalLineHeight = 6;
+        const paragraphGap = 6;         // Gap between paragraphs
+        const h2Gap = 12;               // Gap before H2
+        const h2BottomGap = 8;          // Gap after H2
+        const h3Gap = 10;               // Gap before H3
+        const h3BottomGap = 6;          // Gap after H3
+        const h4Gap = 8;                // Gap before H4
+        const h4BottomGap = 5;          // Gap after H4
+        const listItemGap = 3;          // Gap between list items
+        const listBottomGap = 6;        // Gap after list
+
+        // Extract template title
         const templateTitle = document.querySelector('.nk-editor-title h4')?.textContent?.trim() || 'Generated Content';
         
-        // Add header with title
+        // ==========================================
+        // TITLE PAGE
+        // ==========================================
+        
+        doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
-        doc.setFont(undefined, 'normal');
-        const titleLines = doc.splitTextToSize(templateTitle, maxWidth);
-        doc.text(titleLines, margin, yPosition);
-        yPosition += (titleLines.length * 8) + 5;
-
-        // Add date and time
-        doc.setFontSize(9);
-        doc.setFont(undefined, 'normal');
-        doc.setTextColor(100);
+        
+        const titleLines = doc.splitTextToSize(templateTitle, maxWidth - 20);
+        const titleStartY = pageHeight / 3;
+        
+        titleLines.forEach((line, index) => {
+            const lineWidth = doc.getTextWidth(line);
+            const xPos = (pageWidth - lineWidth) / 2;
+            doc.text(line, xPos, titleStartY + (index * 10));
+        });
+        
+        const dividerY = titleStartY + (titleLines.length * 10) + 12;
+        doc.setLineWidth(0.5);
+        doc.line(margin + 20, dividerY, pageWidth - margin - 20, dividerY);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
         const generatedDate = new Date().toLocaleString('en-US', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: 'numeric'
         });
-        doc.text(`Generated on: ${generatedDate}`, margin, yPosition);
-        yPosition += 8;
-
-        // Add separator line
-        doc.setDrawColor(200);
-        doc.line(margin, yPosition, pageWidth - margin, yPosition);
-        yPosition += 10;
-
-        // Reset text color for content
-        doc.setTextColor(0);
-
-        // Process content - get all paragraphs and headings
-        const contentWrapper = editor.querySelector('.content-wrapper');
-        if (!contentWrapper) {
-            showError('No content to export');
-            return;
-        }
-
-        const elements = contentWrapper.children;
-
-        for (let i = 0; i < elements.length; i++) {
-            const element = elements[i];
-            const text = element.textContent.trim();
-
-            if (!text) continue;
-
-            // Check if we need a new page
-            if (yPosition > pageHeight - margin - 20) {
-                doc.addPage();
-                yPosition = margin;
+        const dateText = `Generated on ${generatedDate}`;
+        const dateWidth = doc.getTextWidth(dateText);
+        doc.text(dateText, (pageWidth - dateWidth) / 2, dividerY + 15);
+        
+        doc.setFontSize(10);
+        const systemText = 'UPTM Academic AI Assistant';
+        const systemWidth = doc.getTextWidth(systemText);
+        doc.text(systemText, (pageWidth - systemWidth) / 2, pageHeight - margin - 10);
+        
+        // Start new page for content
+        doc.addPage();
+        yPosition = margin;
+        
+        // ==========================================
+        // CONTENT PAGES - CLEAN LAYOUT
+        // ==========================================
+        
+        const contentElements = editor.querySelectorAll('.doc-paragraph, .doc-h2, .doc-h3, .doc-h4, .doc-list');
+        
+        if (contentElements.length === 0) {
+            // Fallback: get all text content
+            const allText = editor.innerText || editor.textContent || '';
+            if (!allText.trim()) {
+                showError('No content to export');
+                return;
             }
-
-            if (element.classList.contains('content-heading') || element.tagName.match(/^H[1-6]$/)) {
-                // Handle headings
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'normal');
+            
+            const paragraphs = allText.split('\n\n').filter(p => p.trim());
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+            
+            paragraphs.forEach((para, index) => {
+                const paraText = para.trim();
                 
-                const headingLines = doc.splitTextToSize(text, maxWidth);
-                doc.text(headingLines, margin, yPosition);
-                yPosition += (headingLines.length * lineHeight) + headingSpacing;
+                // Add gap between paragraphs
+                if (index > 0) {
+                    yPosition += paragraphGap;
+                }
                 
-            } else {
-                // Handle paragraphs
-                doc.setFontSize(11);
-                doc.setFont(undefined, 'normal');
+                // Check page break
+                const lines = doc.splitTextToSize(paraText, maxWidth);
+                const estimatedHeight = lines.length * normalLineHeight;
                 
-                const paragraphLines = doc.splitTextToSize(text, maxWidth);
-                
-                // Check if paragraph will fit on current page
-                const paragraphHeight = paragraphLines.length * lineHeight + paragraphSpacing;
-                if (yPosition + paragraphHeight > pageHeight - margin) {
+                if (yPosition + estimatedHeight > pageHeight - margin) {
                     doc.addPage();
                     yPosition = margin;
                 }
                 
-                doc.text(paragraphLines, margin, yPosition, {
-                    align: 'justify',
+                // Print paragraph (left-aligned, no indent)
+                doc.text(lines, margin, yPosition, {
+                    align: 'left',
                     maxWidth: maxWidth
                 });
-                yPosition += paragraphHeight;
-            }
+                
+                yPosition += lines.length * normalLineHeight;
+            });
+            
+        } else {
+            // Process structured content
+            let isFirstElement = true;
+            
+            contentElements.forEach((element, index) => {
+                const text = element.textContent.trim();
+                if (!text) return;
+                
+                const isH2 = element.classList.contains('doc-h2');
+                const isH3 = element.classList.contains('doc-h3');
+                const isH4 = element.classList.contains('doc-h4');
+                const isList = element.classList.contains('doc-list');
+                const isParagraph = element.classList.contains('doc-paragraph');
+                
+                // H2 Heading
+                if (isH2) {
+                    // Add gap before (except first element)
+                    if (!isFirstElement && yPosition > margin) {
+                        yPosition += h2Gap;
+                    }
+                    
+                    // Check page break
+                    if (yPosition > pageHeight - margin - 40) {
+                        doc.addPage();
+                        yPosition = margin;
+                    }
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(14);
+                    
+                    const headingLines = doc.splitTextToSize(text, maxWidth);
+                    doc.text(headingLines, margin, yPosition);
+                    
+                    yPosition += headingLines.length * 7 + h2BottomGap;
+                    isFirstElement = false;
+                }
+                
+                // H3 Heading
+                else if (isH3) {
+                    if (!isFirstElement) {
+                        yPosition += h3Gap;
+                    }
+                    
+                    if (yPosition > pageHeight - margin - 35) {
+                        doc.addPage();
+                        yPosition = margin;
+                    }
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(12);
+                    
+                    const headingLines = doc.splitTextToSize(text, maxWidth);
+                    doc.text(headingLines, margin, yPosition);
+                    
+                    yPosition += headingLines.length * 6.5 + h3BottomGap;
+                    isFirstElement = false;
+                }
+                
+                // H4 Heading
+                else if (isH4) {
+                    if (!isFirstElement) {
+                        yPosition += h4Gap;
+                    }
+                    
+                    if (yPosition > pageHeight - margin - 30) {
+                        doc.addPage();
+                        yPosition = margin;
+                    }
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(11);
+                    
+                    const headingLines = doc.splitTextToSize(text, maxWidth);
+                    doc.text(headingLines, margin, yPosition);
+                    
+                    yPosition += headingLines.length * 6 + h4BottomGap;
+                    isFirstElement = false;
+                }
+                
+                // List Items
+                else if (isList) {
+                    const listItems = element.querySelectorAll('li');
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(11);
+                    
+                    const bulletX = margin + 5;
+                    const textX = margin + 12;
+                    const listWidth = maxWidth - 12;
+                    
+                    listItems.forEach((li, idx) => {
+                        const itemText = li.textContent.trim();
+                        const itemLines = doc.splitTextToSize(itemText, listWidth);
+                        
+                        // Check page break
+                        const estimatedHeight = itemLines.length * normalLineHeight + listItemGap;
+                        if (yPosition + estimatedHeight > pageHeight - margin) {
+                            doc.addPage();
+                            yPosition = margin;
+                        }
+                        
+                        // Draw bullet
+                        doc.circle(bulletX, yPosition - 2, 0.8, 'F');
+                        
+                        // Print text
+                        doc.text(itemLines, textX, yPosition, {
+                            align: 'left',
+                            maxWidth: listWidth
+                        });
+                        
+                        yPosition += itemLines.length * normalLineHeight;
+                        
+                        // Gap between items
+                        if (idx < listItems.length - 1) {
+                            yPosition += listItemGap;
+                        }
+                    });
+                    
+                    yPosition += listBottomGap;
+                    isFirstElement = false;
+                }
+                
+                // Regular Paragraph
+                else if (isParagraph) {
+                    // Add gap before paragraph
+                    if (!isFirstElement) {
+                        yPosition += paragraphGap;
+                    }
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(11);
+                    
+                    const paraLines = doc.splitTextToSize(text, maxWidth);
+                    
+                    // Check page break
+                    const estimatedHeight = paraLines.length * normalLineHeight;
+                    if (yPosition + estimatedHeight > pageHeight - margin) {
+                        doc.addPage();
+                        yPosition = margin;
+                    }
+                    
+                    // Print paragraph (left-aligned, no indent)
+                    doc.text(paraLines, margin, yPosition, {
+                        align: 'left',
+                        maxWidth: maxWidth
+                    });
+                    
+                    yPosition += paraLines.length * normalLineHeight;
+                    isFirstElement = false;
+                }
+            });
         }
-
-        // Add footer on each page
+        
+        // ==========================================
+        // PAGE NUMBERS AND HEADERS
+        // ==========================================
         const totalPages = doc.internal.getNumberOfPages();
+        
         for (let i = 1; i <= totalPages; i++) {
             doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setTextColor(150);
-            doc.setFont(undefined, 'normal');
             
-            // Page number
-            const pageText = `Page ${i} of ${totalPages}`;
-            const pageTextWidth = doc.getTextWidth(pageText);
-            doc.text(pageText, pageWidth - margin - pageTextWidth, pageHeight - 10);
+            // Skip title page
+            if (i === 1) continue;
             
-            // System name on left
-            doc.text('UPTM Academic AI Assistant', margin, pageHeight - 10);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(100);
+            
+            // Header
+            const shortTitle = templateTitle.length > 80 
+                ? templateTitle.substring(0, 77) + '...' 
+                : templateTitle;
+            doc.text(shortTitle, margin, 15);
+            
+            // Header line
+            doc.setLineWidth(0.3);
+            doc.line(margin, 17, pageWidth - margin, 17);
+            
+            // Page number (centered)
+            const pageNum = `${i - 1}`;
+            const pageNumWidth = doc.getTextWidth(pageNum);
+            doc.text(pageNum, (pageWidth - pageNumWidth) / 2, pageHeight - 15);
         }
-
-        // Save the PDF
-        doc.save(`${fileName}.pdf`);
+        
+        doc.setTextColor(0);
+        
+        // Save PDF
+        const sanitizedFileName = fileName.replace(/[^a-z0-9\s\-_.]/gi, '_').replace(/\s+/g, '_');
+        doc.save(`${sanitizedFileName}.pdf`);
         
         if (typeof toastr !== 'undefined') {
             toastr.success('PDF downloaded successfully!');
@@ -1130,7 +1599,7 @@ async function downloadPDF(editor, fileName) {
         
     } catch (error) {
         console.error('PDF generation error:', error);
-        showError('Failed to generate PDF. Please try again.');
+        showError('Failed to generate PDF: ' + error.message);
     }
 }
 
@@ -1171,6 +1640,65 @@ function showError(message) {
         alert(message);
     }
 }
+
+// ========================================
+// RESET BUTTON FUNCTIONALITY
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    const resetBtn = document.querySelector('.btn-outline-secondary');
+    const generateForm = document.getElementById('generateForm');
+    
+    if (resetBtn && generateForm) {
+        resetBtn.addEventListener('click', function() {
+            // Reset the form
+            generateForm.reset();
+            
+            // Clear the output editor
+            const editor = document.getElementById('editor-v1');
+            if (editor) {
+                editor.innerHTML = `
+                    <div class="placeholder-content">
+                        <em class="icon ni ni-edit-alt"></em>
+                        <h5>Ready to Generate Content</h5>
+                        <p>Fill out the form above and click "Generate Content" to begin</p>
+                    </div>
+                `;
+            }
+            
+            // Reset word and character counts
+            const wordCount = document.getElementById('word-count');
+            const charCount = document.getElementById('char-count');
+            if (wordCount) wordCount.textContent = '0';
+            if (charCount) charCount.textContent = '0';
+            
+            // Clear any validation errors
+            const invalidFields = generateForm.querySelectorAll('.is-invalid');
+            invalidFields.forEach(field => field.classList.remove('is-invalid'));
+            
+            // Hide all AI suggestion dropdowns
+            document.querySelectorAll('.suggestions-dropdown').forEach(dropdown => {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+            });
+            
+            // Disable all AI suggestion buttons (they need input to enable)
+            document.querySelectorAll('.ai-suggest-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // Show toastr notification
+            if (typeof toastr !== 'undefined') {
+                toastr.info('Form has been reset. Please fill in the template details again.');
+            }
+            
+            // Scroll to top of form
+            const inputPanel = document.querySelector('.input-panel-card');
+            if (inputPanel) {
+                inputPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    }
+});
 </script>
 
 <script>
@@ -1243,7 +1771,7 @@ async function fetchAISuggestions(fieldName, currentInput, language) {
             throw new Error('CSRF token not found in page');
         }
         
-        const response = await fetch('{{ route("admin.ai.suggestion") }}', {
+        const response = await fetch('{{ route("ai.suggestion") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1292,8 +1820,7 @@ async function fetchAISuggestions(fieldName, currentInput, language) {
 }
 
 /**
- * FIXED: Store suggestions in memory instead of data attributes
- * to avoid issues with special characters and HTML encoding
+ * Display suggestions with aesthetic soft color design
  */
 function displaySuggestions(fieldName, suggestions) {
     const container = document.getElementById(`suggestions-${fieldName.replace(/ /g, '-')}`);
@@ -1313,6 +1840,94 @@ function displaySuggestions(fieldName, suggestions) {
         return;
     }
     
+    // Soft Aesthetic Color Palette for Bloom's Taxonomy
+    const bloomLevels = {
+        'REMEMBER': { 
+            color: '#60a5fa', // Soft blue
+            bg: '#eff6ff',
+            border: '#bfdbfe',
+            label: 'Level 1: Remember',
+            labelMalay: 'Tahap 1: Ingat'
+        },
+        'INGAT': { 
+            color: '#60a5fa',
+            bg: '#eff6ff',
+            border: '#bfdbfe',
+            label: 'Tahap 1: Ingat',
+            labelMalay: 'Tahap 1: Ingat'
+        },
+        'UNDERSTAND': { 
+            color: '#a78bfa', // Soft purple
+            bg: '#f5f3ff',
+            border: '#ddd6fe',
+            label: 'Level 2: Understand',
+            labelMalay: 'Tahap 2: Faham'
+        },
+        'FAHAM': { 
+            color: '#a78bfa',
+            bg: '#f5f3ff',
+            border: '#ddd6fe',
+            label: 'Tahap 2: Faham',
+            labelMalay: 'Tahap 2: Faham'
+        },
+        'APPLY': { 
+            color: '#34d399', // Soft green
+            bg: '#ecfdf5',
+            border: '#a7f3d0',
+            label: 'Level 3: Apply',
+            labelMalay: 'Tahap 3: Aplikasi'
+        },
+        'APLIKASI': { 
+            color: '#34d399',
+            bg: '#ecfdf5',
+            border: '#a7f3d0',
+            label: 'Tahap 3: Aplikasi',
+            labelMalay: 'Tahap 3: Aplikasi'
+        },
+        'ANALYZE': { 
+            color: '#fbbf24', // Soft amber
+            bg: '#fffbeb',
+            border: '#fde68a',
+            label: 'Level 4: Analyze',
+            labelMalay: 'Tahap 4: Analisis'
+        },
+        'ANALISIS': { 
+            color: '#fbbf24',
+            bg: '#fffbeb',
+            border: '#fde68a',
+            label: 'Tahap 4: Analisis',
+            labelMalay: 'Tahap 4: Analisis'
+        },
+        'EVALUATE': { 
+            color: '#f87171', // Soft red
+            bg: '#fef2f2',
+            border: '#fecaca',
+            label: 'Level 5: Evaluate',
+            labelMalay: 'Tahap 5: Nilai'
+        },
+        'NILAI': { 
+            color: '#f87171',
+            bg: '#fef2f2',
+            border: '#fecaca',
+            label: 'Tahap 5: Nilai',
+            labelMalay: 'Tahap 5: Nilai'
+        },
+        'CREATE': { 
+            color: '#2dd4bf', // Soft teal
+            bg: '#f0fdfa',
+            border: '#99f6e4',
+            label: 'Level 6: Create',
+            labelMalay: 'Tahap 6: Cipta'
+        },
+        'CIPTA': { 
+            color: '#2dd4bf',
+            bg: '#f0fdfa',
+            border: '#99f6e4',
+            label: 'Tahap 6: Cipta',
+            labelMalay: 'Tahap 6: Cipta'
+        }
+    };
+    
     // Store suggestions in a Map for safe retrieval
     const suggestionMap = new Map();
     
@@ -1320,20 +1935,61 @@ function displaySuggestions(fieldName, suggestions) {
         const suggestionId = `suggestion-${fieldName.replace(/ /g, '-')}-${index}`;
         suggestionMap.set(suggestionId, suggestion);
         
+        // Extract Bloom's level from suggestion [LEVEL: NAME] or [TAHAP: NAME]
+        const levelMatch = suggestion.match(/\[(LEVEL|TAHAP):\s*(REMEMBER|UNDERSTAND|APPLY|ANALYZE|EVALUATE|CREATE|INGAT|FAHAM|APLIKASI|ANALISIS|NILAI|CIPTA)\]/i);
+        const bloomLevel = levelMatch ? levelMatch[2].toUpperCase() : null;
+        const suggestionText = levelMatch ? suggestion.replace(/\s*\[(LEVEL|TAHAP):[^\]]+\]$/i, '').trim() : suggestion;
+        
+        // Get Bloom's configuration
+        const bloomConfig = bloomLevel && bloomLevels[bloomLevel] ? bloomLevels[bloomLevel] : null;
+        
         // Create suggestion element
         const suggestionDiv = document.createElement('div');
-        suggestionDiv.className = 'suggestion-item';
+        suggestionDiv.className = 'bloom-suggestion';
         suggestionDiv.id = suggestionId;
         
-        const suggestionText = document.createElement('span');
-        suggestionText.className = 'suggestion-text';
-        suggestionText.textContent = suggestion; // Use textContent to avoid XSS
+        // Apply aesthetic Bloom's level styling
+        if (bloomConfig) {
+            suggestionDiv.style.background = bloomConfig.bg;
+            suggestionDiv.style.borderLeftColor = bloomConfig.color;
+            suggestionDiv.style.borderColor = bloomConfig.border;
+            suggestionDiv.style.color = bloomConfig.color;
+        }
         
-        suggestionDiv.appendChild(suggestionText);
+        // Create content wrapper
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'suggestion-content';
+        
+        // Main suggestion text
+        const mainText = document.createElement('div');
+        mainText.className = 'suggestion-text';
+        mainText.textContent = suggestionText;
+        mainText.style.color = '#374151'; // Override to maintain text readability
+        
+        // Aesthetic Bloom's level badge
+        if (bloomConfig) {
+            const badge = document.createElement('div');
+            badge.className = 'bloom-badge';
+            badge.style.background = bloomConfig.color;
+            badge.textContent = bloomConfig.label;
+            
+            contentWrapper.appendChild(mainText);
+            contentWrapper.appendChild(badge);
+        } else {
+            contentWrapper.appendChild(mainText);
+        }
+        
+        suggestionDiv.appendChild(contentWrapper);
         container.appendChild(suggestionDiv);
         
-        // Add click handler directly to element
+        // Add click handler with smooth feedback
         suggestionDiv.addEventListener('click', function() {
+            // Add click animation
+            this.style.transform = 'translateX(6px) translateY(-1px) scale(0.99)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+            
             applySuggestion(textarea, container, suggestionId, suggestionMap);
         });
     });
@@ -1394,4 +2050,5 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+
 @endsection

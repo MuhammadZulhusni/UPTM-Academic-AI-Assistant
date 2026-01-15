@@ -456,13 +456,15 @@ body {
 
         <div class="templates">
             @foreach ($templates as $template)
-            <a href="{{ route('user.details.template', $template->id) }}" class="template">
-                <div class="template-icon">
-                    <img src="{{ asset('upload/template/' . $template->icon) }}" alt="{{ $template->title }}">
-                </div>
-                <h3>{{ $template->title }}</h3>
-                <p>{{ $template->description }}</p>
-            </a>
+                @if($template->is_active == 1) {{-- Only show active templates --}}
+                    <a href="{{ route('user.details.template', $template->id) }}" class="template">
+                        <div class="template-icon">
+                            <img src="{{ asset('upload/template/' . $template->icon) }}" alt="{{ $template->title }}">
+                        </div>
+                        <h3>{{ $template->title }}</h3>
+                        <p>{{ $template->description }}</p>
+                    </a>
+                @endif
             @endforeach
         </div>
     </div>

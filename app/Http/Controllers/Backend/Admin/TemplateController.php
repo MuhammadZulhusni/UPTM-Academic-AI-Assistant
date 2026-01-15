@@ -22,9 +22,6 @@ class TemplateController extends Controller
     public function AdminTemplate(Request $request){
         // Start the query with the base model
         $query = Template::query();
-
-        // Filter to show ONLY active templates (is_active = 1)
-        $query->where('is_active', 1);
         
         // 1. Apply Sorting (Order By) 
         $sort = $request->input('sort', 'newest'); // Default to 'newest'
@@ -226,41 +223,29 @@ class TemplateController extends Controller
 
     public function AdminContentGenerate(Request $request, $id)
     {
-        // Step 1: Authenticate user and validate static inputs
+        // Step 1: Authenticate user
         $user = Auth::user();
         if (!$user) {
-            // If user not logged in, return error
             return response()->json([
                 'success' => false,
                 'message' => 'User not authenticated.',
             ], 401);
         }
 
-        // Validate basic request inputs
+        // Validate basic request inputs (REMOVED result_length)
         $validatedData = $request->validate([
-            'language' => 'required|string|in:English,Bahasa Melayu', // must be one of these two
-            'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',   // must be valid OpenAI model
-            'result_length' => 'required|integer|min:1|max:1000',     // limit between 1–1000 words
+            'language' => 'required|string|in:English,Bahasa Melayu',
+            'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
         ]);
 
-        // Step 2: Check user word usage limit
-        $estimatedWordCount = $validatedData['result_length'];
-        if ($user->current_word_usage !== null && ($user->words_used + $estimatedWordCount) > $user->current_word_usage) {
-            // If word usage exceeds limit, stop and return error
-            return response()->json([
-                'success' => false,
-                'message' => 'Word limit exceeded',
-            ], 400);
-        }
-
-        // Step 3: Fetch template and validate dynamic input fields
+        // Step 2: Fetch template and validate dynamic input fields
         $template = Template::with(['inputFields' => function ($query) {
-            $query->select('id', 'template_id', 'title'); // load only needed columns
+            $query->select('id', 'template_id', 'title');
         }])
-        ->select('id', 'prompt', 'title') // select only necessary template columns (added 'title' for logging)
-        ->findOrFail($id); // find template by ID or fail if not found
+        ->select('id', 'prompt')
+        ->findOrFail($id);
 
-        // Build dynamic validation rules based on template input fields
+        // Build dynamic validation rules
         $dynamicRules = [];
         $fieldNames = [];
         foreach ($template->inputFields as $field) {
@@ -269,39 +254,37 @@ class TemplateController extends Controller
             $fieldNames[] = $fieldName;
         }
 
-        // Validate all dynamic fields together
         $request->validate($dynamicRules);
-
-        // Get only dynamic data that was validated
         $inputData = $request->only($fieldNames);
 
-        // Step 4: Build AI prompt with input replacements
+        // Step 3: Build AI prompt with input replacements
         $replacements = [];
         foreach ($inputData as $key => $value) {
-            // Replace placeholders like {field_name} and {field name}
             $replacements['{' . $key . '}'] = $value;
             $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
         }
-        $replacements['{result_length}'] = $validatedData['result_length'];
+        // REMOVED: result_length replacement
 
-        // Replace all placeholders in template prompt
         $prompt = strtr($template->prompt, $replacements);
 
-        // Build final messages with language-specific rules
+        // Build messages without length constraint
         $messages = $this->buildLanguageSpecificMessages($validatedData, $prompt);
 
-        // Step 5: Send request to OpenAI API and get generated output
+        // Step 4: Send request to OpenAI API
         try {
+            // Determine appropriate max_tokens based on model
+            $maxTokens = $validatedData['ai_model'] === 'gpt-4' ? 4096 : 3000;
+            
             $response = OpenAI::chat()->create([
                 'model' => $validatedData['ai_model'],
                 'messages' => $messages,
-                'max_tokens' => min(4000, $validatedData['result_length'] * 2),
+                'max_tokens' => $maxTokens, // Allow full response
                 'temperature' => 0.7,
             ]);
 
             $output = $response->choices[0]->message->content;
 
-            // Step 6: Validate output language to match user selection
+            // Validate output language
             $languageCheck = $this->validateOutputLanguage($output, $validatedData['language']);
             if (!$languageCheck['valid']) {
                 Log::warning('Generated content language mismatch', [
@@ -314,14 +297,11 @@ class TemplateController extends Controller
             // Count words in generated content
             $wordCount = str_word_count($output);
 
-            // Step 7: Save generated content and update user usage (word) in database
-            $generatedContent = null;
-            DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount, &$generatedContent) {
-                // Increase user's used words
+            // Step 5: Save generated content and update user usage
+            DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
                 User::where('id', $user->id)->increment('words_used', $wordCount);
 
-                // Save the generated content record
-                $generatedContent = GeneratedContent::create([
+                GeneratedContent::create([
                     'user_id' => $user->id,
                     'template_id' => $template->id,
                     'input' => json_encode($inputData, JSON_UNESCAPED_UNICODE),
@@ -332,30 +312,12 @@ class TemplateController extends Controller
                 ]);
             });
 
-            // Log document creation activity
-            // if ($generatedContent) {
-            //     $this->logActivity(
-            //         'document_created',
-            //         "Generated document from template: {$template->title}",
-            //         'document',
-            //         $generatedContent->id,
-            //         [
-            //             'template_title' => $template->title,
-            //             'word_count' => $wordCount,
-            //             'language' => $validatedData['language'],
-            //             'ai_model' => $validatedData['ai_model'],
-            //         ]
-            //     );
-            // }
-
-            // Return successful response with generated output
             return response()->json([
                 'success' => true,
                 'output' => $output,
                 'language_confidence' => $languageCheck['confidence'] ?? null
             ]);
 
-        // Step 8: Error handling for OpenAI and general exceptions
         } catch (\OpenAI\Exceptions\ErrorException $e) {
             Log::error('OpenAI API error: ' . $e->getMessage(), [
                 'user_id' => $user->id,
@@ -381,90 +343,85 @@ class TemplateController extends Controller
         }
     }
 
+/**
+ * Build language-specific messages for OpenAI API (UPDATED - No length constraint)
+ */
+private function buildLanguageSpecificMessages($validatedData, $prompt)
+{
+    $messages = [];
+    $isMalay = $validatedData['language'] === 'Bahasa Melayu';
+    $isGPT4 = $validatedData['ai_model'] === 'gpt-4';
 
-    /**
-     * Build language-specific messages for OpenAI API
-     */
-    private function buildLanguageSpecificMessages($validatedData, $prompt)
-    {
-        $messages = [];
-        $isMalay = $validatedData['language'] === 'Bahasa Melayu';
-        $isGPT4 = $validatedData['ai_model'] === 'gpt-4';
-
-        // Add system message for better language control
-        if ($isMalay) {
-            $systemMessage = $isGPT4 
-                ? 'Anda adalah pembantu AI yang MESTI menjawab dalam Bahasa Melayu sahaja. Jangan sekali-kali menggunakan bahasa Inggeris dalam jawapan anda.'
-                : 'WAJIB: Anda MESTI menulis dalam Bahasa Melayu SAHAJA. Jangan campur atau guna bahasa Inggeris langsung. Ini sangat penting.';
-                
-            $messages[] = ['role' => 'system', 'content' => $systemMessage];
-        }
-
-        // Build user prompt with strong language instructions
-        if ($isMalay) {
-            $lengthInstruction = $isGPT4 
-                ? "Sasaran kira-kira {$validatedData['result_length']} patah perkataan dalam Bahasa Melayu."
-                : "PENTING: Tulis tepat {$validatedData['result_length']} patah perkataan dalam Bahasa Melayu sahaja.";
-                
-            $finalPrompt = "ARAHAN UTAMA: Jawab dalam Bahasa Melayu sahaja. {$prompt} {$lengthInstruction}";
-        } else {
-            $finalPrompt = "INSTRUCTION: Respond in English only. {$prompt} Aim for approximately {$validatedData['result_length']} words.";
-        }
-
-        $messages[] = ['role' => 'user', 'content' => $finalPrompt];
-
-        return $messages;
+    // Add system message for better language control
+    if ($isMalay) {
+        $systemMessage = $isGPT4 
+            ? 'Anda adalah pembantu AI yang MESTI menjawab dalam Bahasa Melayu sahaja. Jangan sekali-kali menggunakan bahasa Inggeris dalam jawapan anda. Berikan jawapan yang lengkap dan komprehensif.'
+            : 'WAJIB: Anda MESTI menulis dalam Bahasa Melayu SAHAJA. Jangan campur atau guna bahasa Inggeris langsung. Berikan jawapan yang lengkap dan terperinci.';
+            
+        $messages[] = ['role' => 'system', 'content' => $systemMessage];
+    } else {
+        $systemMessage = 'You are a helpful AI assistant. Provide complete, comprehensive, and well-structured responses in English.';
+        $messages[] = ['role' => 'system', 'content' => $systemMessage];
     }
 
-    /**
-     * Validate if the output matches the requested language
-     */
-    private function validateOutputLanguage($output, $requestedLanguage)
-    {
-        if ($requestedLanguage === 'English') {
-            return ['valid' => true, 'confidence' => 100]; // Skip validation for English
-        }
+    // Build user prompt WITHOUT length instructions
+    if ($isMalay) {
+        $finalPrompt = "ARAHAN UTAMA: Jawab dalam Bahasa Melayu sahaja dengan lengkap dan terperinci. {$prompt}";
+    } else {
+        $finalPrompt = "INSTRUCTION: Respond in English only with complete and comprehensive information. {$prompt}";
+    }
 
-        // Simple Malay language detection
-        $malayWords = ['dan', 'atau', 'ini', 'itu', 'dengan', 'untuk', 'dari', 'ke', 'pada', 'di', 'yang', 'adalah', 'akan', 'telah', 'boleh', 'tidak', 'dalam', 'kepada', 'sebagai', 'juga'];
-        $englishWords = ['the', 'and', 'or', 'this', 'that', 'with', 'for', 'from', 'to', 'in', 'of', 'is', 'are', 'was', 'were', 'will', 'would', 'can', 'could', 'not'];
+    $messages[] = ['role' => 'user', 'content' => $finalPrompt];
 
-        $outputLower = strtolower($output);
-        $totalWords = str_word_count($outputLower);
-        
-        if ($totalWords === 0) {
-            return ['valid' => false, 'confidence' => 0];
-        }
+    return $messages;
+}
 
-        $malayCount = 0;
-        $englishCount = 0;
+/**
+ * Validate if the output matches the requested language (UNCHANGED)
+ */
+private function validateOutputLanguage($output, $requestedLanguage)
+{
+    if ($requestedLanguage === 'English') {
+        return ['valid' => true, 'confidence' => 100];
+    }
 
-        foreach ($malayWords as $word) {
-            $malayCount += substr_count($outputLower, ' ' . $word . ' ') + 
+    $malayWords = ['dan', 'atau', 'ini', 'itu', 'dengan', 'untuk', 'dari', 'ke', 'pada', 'di', 'yang', 'adalah', 'akan', 'telah', 'boleh', 'tidak', 'dalam', 'kepada', 'sebagai', 'juga'];
+    $englishWords = ['the', 'and', 'or', 'this', 'that', 'with', 'for', 'from', 'to', 'in', 'of', 'is', 'are', 'was', 'were', 'will', 'would', 'can', 'could', 'not'];
+
+    $outputLower = strtolower($output);
+    $totalWords = str_word_count($outputLower);
+    
+    if ($totalWords === 0) {
+        return ['valid' => false, 'confidence' => 0];
+    }
+
+    $malayCount = 0;
+    $englishCount = 0;
+
+    foreach ($malayWords as $word) {
+        $malayCount += substr_count($outputLower, ' ' . $word . ' ') + 
+                    (strpos($outputLower, $word . ' ') === 0 ? 1 : 0) +
+                    (substr($outputLower, -strlen(' ' . $word)) === ' ' . $word ? 1 : 0);
+    }
+
+    foreach ($englishWords as $word) {
+        $englishCount += substr_count($outputLower, ' ' . $word . ' ') + 
                         (strpos($outputLower, $word . ' ') === 0 ? 1 : 0) +
                         (substr($outputLower, -strlen(' ' . $word)) === ' ' . $word ? 1 : 0);
-        }
-
-        foreach ($englishWords as $word) {
-            $englishCount += substr_count($outputLower, ' ' . $word . ' ') + 
-                            (strpos($outputLower, $word . ' ') === 0 ? 1 : 0) +
-                            (substr($outputLower, -strlen(' ' . $word)) === ' ' . $word ? 1 : 0);
-        }
-
-        $malayConfidence = ($malayCount / $totalWords) * 100;
-        $englishConfidence = ($englishCount / $totalWords) * 100;
-
-        // Consider it valid Malay if Malay confidence > English confidence and Malay confidence > 10%
-        $isValidMalay = $malayConfidence > $englishConfidence && $malayConfidence > 10;
-
-        return [
-            'valid' => $isValidMalay,
-            'confidence' => round($malayConfidence, 2),
-            'malay_words' => $malayCount,
-            'english_words' => $englishCount
-        ];
     }
 
+    $malayConfidence = ($malayCount / $totalWords) * 100;
+    $englishConfidence = ($englishCount / $totalWords) * 100;
+
+    $isValidMalay = $malayConfidence > $englishConfidence && $malayConfidence > 10;
+
+    return [
+        'valid' => $isValidMalay,
+        'confidence' => round($malayConfidence, 2),
+        'malay_words' => $malayCount,
+        'english_words' => $englishCount
+    ];
+}
     public function DeleteTemplate($id)
     {
         // Find the template by its ID
@@ -486,9 +443,9 @@ class TemplateController extends Controller
     }
 
     /**
-     * FIXED: AI-powered suggestion for textarea inputs (ACADEMIC FOCUSED)
+     * AI-powered suggestion for textarea inputs (BLOOM'S TAXONOMY FRAMEWORK)
      */
-    public function AdmingetAISuggestion(Request $request)
+    public function AISuggestion(Request $request)
     {
         $user = Auth::user();
         if (!$user) {
@@ -507,28 +464,44 @@ class TemplateController extends Controller
         ]);
 
         try {
-            // Build ACADEMIC-FOCUSED context-aware prompt
+            // Build ACADEMIC-FOCUSED context-aware prompt with Bloom's Taxonomy
             $isMalay = $validated['language'] === 'Bahasa Melayu';
-            $userRole = ucfirst($user->role); // Student, Lecturer, or Admin
+            $userRole = ucfirst($user->role);
             
             if ($isMalay) {
-                $systemPrompt = 'Anda adalah pakar akademik AI yang membantu pelajar dan pensyarah dengan cadangan penulisan akademik berkualiti tinggi dalam Bahasa Melayu. Fokus kepada aspek akademik, penyelidikan, dan pendekatan ilmiah.';
+                $systemPrompt = 'Anda adalah pakar akademik AI yang membantu pelajar dan pensyarah dengan cadangan penulisan akademik berkualiti tinggi dalam Bahasa Melayu menggunakan kerangka Taksonomi Bloom. Cadangan anda mestilah profesional, terstruktur, dan sesuai untuk konteks akademik.';
                 
                 $userPrompt = "Pengguna ({$userRole}): \"{$validated['current_input']}\"\n\n";
-                $userPrompt .= "Berikan 3 cadangan akademik yang spesifik dan mendalam (12-20 patah perkataan setiap satu):\n";
-                $userPrompt .= "- Sertakan terminologi akademik yang sesuai\n";
-                $userPrompt .= "- Fokus kepada aspek penyelidikan, analisis, atau teori\n";
-                $userPrompt .= "- Cadangkan sudut pandangan kritikal atau metodologi\n";
-                $userPrompt .= "Hanya berikan 3 cadangan, tiada penjelasan tambahan.";
+                $userPrompt .= "Hasilkan 6 cadangan akademik yang spesifik dan profesional (15-25 patah perkataan setiap satu) berdasarkan 6 tahap Taksonomi Bloom secara berurutan:\n\n";
+                $userPrompt .= "TAHAP 1 - INGAT (REMEMBER): Cadangan yang memfokuskan kepada pengulangan fakta, definisi, atau pengecaman konsep asas.\n";
+                $userPrompt .= "TAHAP 2 - FAHAM (UNDERSTAND): Cadangan yang memfokuskan kepada penjelasan maksud, interpretasi, atau rumusan idea.\n";
+                $userPrompt .= "TAHAP 3 - APLIKASI (APPLY): Cadangan yang memfokuskan kepada penggunaan teori dalam konteks praktikal atau penyelesaian masalah.\n";
+                $userPrompt .= "TAHAP 4 - ANALISIS (ANALYZE): Cadangan yang memfokuskan kepada pemeriksaan mendalam, perbandingan, atau penguraian hubungan antara elemen.\n";
+                $userPrompt .= "TAHAP 5 - NILAI (EVALUATE): Cadangan yang memfokuskan kepada penilaian kritikal, justifikasi keputusan, atau pertimbangan kekuatan dan kelemahan.\n";
+                $userPrompt .= "TAHAP 6 - CIPTA (CREATE): Cadangan yang memfokuskan kepada inovasi, sintesis idea baharu, atau reka bentuk penyelesaian kreatif.\n\n";
+                $userPrompt .= "ARAHAN FORMAT:\n";
+                $userPrompt .= "- Setiap cadangan mesti diakhiri dengan label tahap dalam format: [TAHAP: NAMA]\n";
+                $userPrompt .= "- Contoh: \"Cadangan anda di sini [TAHAP: INGAT]\"\n";
+                $userPrompt .= "- Gunakan bahasa akademik yang formal dan profesional\n";
+                $userPrompt .= "- Setiap cadangan mesti berbeza dan membina antara satu sama lain\n";
+                $userPrompt .= "- Berikan hanya 6 cadangan tanpa sebarang penjelasan tambahan";
             } else {
-                $systemPrompt = 'You are an expert academic AI assistant helping students and lecturers with high-quality academic writing suggestions in English. Focus on scholarly aspects, research perspectives, and scientific approaches.';
+                $systemPrompt = 'You are an expert academic AI assistant helping students and lecturers with high-quality academic writing suggestions in English using Bloom\'s Taxonomy framework. Your suggestions must be professional, structured, and appropriate for academic contexts.';
                 
                 $userPrompt = "User ({$userRole}): \"{$validated['current_input']}\"\n\n";
-                $userPrompt .= "Provide 3 specific academic suggestions (12-20 words each):\n";
-                $userPrompt .= "- Include appropriate academic terminology\n";
-                $userPrompt .= "- Focus on research aspects, analysis, or theoretical frameworks\n";
-                $userPrompt .= "- Suggest critical perspectives or methodologies\n";
-                $userPrompt .= "Only provide the 3 suggestions, no additional explanation.";
+                $userPrompt .= "Generate 6 specific and professional academic suggestions (15-25 words each) based on the 6 levels of Bloom's Taxonomy in sequential order:\n\n";
+                $userPrompt .= "LEVEL 1 - REMEMBER: Suggestion focusing on recalling facts, definitions, or identifying basic concepts.\n";
+                $userPrompt .= "LEVEL 2 - UNDERSTAND: Suggestion focusing on explaining meaning, interpreting, or summarizing ideas.\n";
+                $userPrompt .= "LEVEL 3 - APPLY: Suggestion focusing on using theory in practical contexts or problem-solving scenarios.\n";
+                $userPrompt .= "LEVEL 4 - ANALYZE: Suggestion focusing on in-depth examination, comparison, or breaking down relationships between elements.\n";
+                $userPrompt .= "LEVEL 5 - EVALUATE: Suggestion focusing on critical assessment, justifying decisions, or weighing strengths and weaknesses.\n";
+                $userPrompt .= "LEVEL 6 - CREATE: Suggestion focusing on innovation, synthesizing new ideas, or designing creative solutions.\n\n";
+                $userPrompt .= "FORMAT INSTRUCTIONS:\n";
+                $userPrompt .= "- Each suggestion must end with the level label in format: [LEVEL: NAME]\n";
+                $userPrompt .= "- Example: \"Your suggestion here [LEVEL: REMEMBER]\"\n";
+                $userPrompt .= "- Use formal and professional academic language\n";
+                $userPrompt .= "- Each suggestion must be distinct and build upon each other\n";
+                $userPrompt .= "- Provide only the 6 suggestions without any additional explanation";
             }
 
             // Add template context for more targeted suggestions
@@ -541,13 +514,13 @@ class TemplateController extends Controller
 
             // Call OpenAI with optimized settings for academic content
             $response = OpenAI::chat()->create([
-                'model' => 'gpt-4', // Using GPT-4 for better academic quality
+                'model' => 'gpt-4',
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => $userPrompt] // FIXED: Changed from 'admin' to 'user'
+                    ['role' => 'user', 'content' => $userPrompt]
                 ],
-                'max_tokens' => 200,
-                'temperature' => 0.7, // Balanced creativity with academic rigor
+                'max_tokens' => 500,
+                'temperature' => 0.7,
             ]);
 
             $suggestions = $response->choices[0]->message->content;

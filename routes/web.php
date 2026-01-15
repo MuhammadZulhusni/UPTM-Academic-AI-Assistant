@@ -39,7 +39,7 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
         Route::get('/edit/user/document/{id}', 'EditUserDocument')->name('edit.user.document');
         Route::post('/user/update/document/{id}', 'UserUpdateDocument')->name('user.update.document');
         Route::delete('/delete/user/document/{id}', 'DeleteUserDocument')->name('delete.user.document');
-        Route::post('/user/ai/suggestion', 'getAISuggestion')->name('user.ai.suggestion');
+        Route::post('/ai/suggestion', 'AISuggestion')->name('user.ai.suggestion');
     });
 });
 
@@ -66,7 +66,7 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
         Route::get('/details/template/{id}', 'DetailsTemplate')->name('details.template');
         Route::post('/content/generate/{id}', 'AdminContentGenerate')->name('content.generate');
         Route::post('/templates/delete/{id}', 'DeleteTemplate')->name('delete.template');
-        Route::post('/ai/suggestion', 'AdmingetAISuggestion')->name('admin.ai.suggestion');
+        Route::post('/ai/suggestion', 'AISuggestion')->name('ai.suggestion');
     });
 
     Route::controller(DocumentController::class)->group(function () {
