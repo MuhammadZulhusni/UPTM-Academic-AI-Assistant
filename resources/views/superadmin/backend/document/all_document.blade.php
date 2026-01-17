@@ -1042,12 +1042,15 @@ function downloadPDF() {
                 <p class="text-muted">Do you really want to delete this document? This process cannot be undone.</p>
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0 gap-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteDocumentForm" method="POST">
                     @csrf 
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>

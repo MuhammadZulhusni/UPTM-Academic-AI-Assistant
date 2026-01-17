@@ -975,11 +975,14 @@
                 <p class="text-muted">Do you really want to delete this template? This process cannot be undone.</p>
             </div>
             <div class="modal-footer justify-content-center mt-1 border-0">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteTemplateForm" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
