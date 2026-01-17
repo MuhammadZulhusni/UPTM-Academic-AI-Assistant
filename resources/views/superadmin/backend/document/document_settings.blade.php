@@ -227,9 +227,9 @@
                     <button type="button" class="btn btn-danger btn-lg" id="confirmDocDeleteBtn">
                         <i class="bi bi-trash me-2"></i>Yes, Delete Permanently
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <!-- <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                         <i class="bi bi-x-circle me-2"></i>Cancel
-                    </button>
+                    </button> -->
                 </div>
             </div>
         </div>
