@@ -840,16 +840,18 @@
                     <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                 </svg>
                 <h5 class="fw-bold">Are you sure?</h5>
-                <p class="text-muted">Do you really want to delete this template? This process cannot be undone.</p>
+                <p class="text-muted mb-3">Do you really want to delete this template? This process cannot be undone.</p>
             </div>
             <div class="modal-footer justify-content-center border-0 pt-0 gap-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form id="deleteTemplateForm" method="POST">
                     @csrf
-                    {{-- Use GET method for simplicity, or change route to POST/DELETE --}}
                     {{-- @method('DELETE') --}}
                     <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
