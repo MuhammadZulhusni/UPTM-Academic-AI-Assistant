@@ -13,7 +13,7 @@ class TestDocumentsSeeder extends Seeder
     public function run(): void
     {
         // Get a user and template 
-        $user = User::find(28);
+        $user = User::find(1);
         $template = Template::first();
 
         if (!$user || !$template) {
