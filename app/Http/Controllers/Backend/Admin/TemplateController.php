@@ -24,46 +24,48 @@ class TemplateController extends Controller
         $query = Template::query();
         
         // 1. Apply Sorting (Order By) 
-        $sort = $request->input('sort', 'newest'); // Default to 'newest'
+        $sort = $request->input('sort', 'newest');
         
         if ($sort === 'title') {
             $query->orderBy('title', 'asc');
         } elseif ($sort === 'title-desc') {
             $query->orderBy('title', 'desc');
         } else {
-            $query->latest(); // Default: Newest first
+            $query->latest();
         }
 
         // 2. Apply Category Filter 
         $category = $request->input('category');
         if ($category && $category !== 'all') {
-            // The where('is_active', 1) filter is still applied here
             $query->where('category', ucfirst($category));
         }
 
-        // 3. Apply Search Filter 
+        // 3. Apply Status Filter 
+        $status = $request->input('status', 'all'); // Default to 'all'
+        if ($status === 'active') {
+            $query->where('is_active', 1);
+        } elseif ($status === 'inactive') {
+            $query->where('is_active', 0);
+        }
+        // If 'all', don't add any is_active constraint
+
+        // 4. Apply Search Filter 
         $search = $request->input('search');
         if ($search) {
             $searchTerm = '%' . $search . '%';
-            // The where('is_active', 1) filter is still applied here
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', $searchTerm)
                 ->orWhere('description', 'like', $searchTerm);
             });
         }
 
-        // 4. Get totals (without pagination)
-        // IMPORTANT: Cloned queries must also maintain the where('is_active', 1) constraint
-        $totalTemplates  = $query->count(); // Total templates with applied filters
+        // 5. Get totals
+        $totalTemplates = $query->count();
+        
+        $studentCount = (clone $query)->where('category', 'Student')->count();
+        $lecturerCount = (clone $query)->where('category', 'Lecturer')->count();
 
-        // Clone the query *after* applying the is_active filter
-        $studentCountQuery = (clone $query)->where('category', 'Student');
-        $lecturerCountQuery = (clone $query)->where('category', 'Lecturer');
-
-        $studentCount    = $studentCountQuery->count();
-        $lecturerCount   = $lecturerCountQuery->count();
-
-        // 5. Paginate and preserve query string 
+        // 6. Paginate
         $templates = $query->paginate(10)->withQueryString(); 
 
         return view('admin.backend.template.all_template', compact(
@@ -545,5 +547,23 @@ private function validateOutputLanguage($output, $requestedLanguage)
                 'message' => 'Failed to generate suggestions. Please try again.',
             ], 500);
         }
+    }
+
+    /**
+     * Toggle template active status
+     * This method enables or disables a template
+     */
+    public function toggleStatus($id)
+    {
+        $template = Template::findOrFail($id);
+
+        // Toggle status
+        $template->is_active = !$template->is_active;
+        $template->save();
+
+        return redirect()->back()->with([
+            'message' => 'Template status updated successfully',
+            'alert-type' => 'success'
+        ]);
     }
 }

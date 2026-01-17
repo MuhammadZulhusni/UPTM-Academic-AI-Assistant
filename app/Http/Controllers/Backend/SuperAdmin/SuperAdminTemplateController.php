@@ -392,7 +392,7 @@ class SuperAdminTemplateController extends Controller
         ]);
 
         try {
-            // Build ACADEMIC-FOCUSED context-aware prompt with Bloom's Taxonomy
+            // prompt with Bloom's Taxonomy
             $isMalay = $validated['language'] === 'Bahasa Melayu';
             $userRole = ucfirst($user->role);
             
