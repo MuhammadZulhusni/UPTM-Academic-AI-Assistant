@@ -67,6 +67,7 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
         Route::post('/content/generate/{id}', 'AdminContentGenerate')->name('content.generate');
         Route::post('/templates/delete/{id}', 'DeleteTemplate')->name('delete.template');
         Route::post('/ai/suggestion', 'AISuggestion')->name('ai.suggestion');
+        Route::post('/templates/toggle/{id}', 'toggleStatus')->name('admin.template.toggle');
     });
 
     Route::controller(DocumentController::class)->group(function () {

@@ -23,7 +23,8 @@
                          @php
                              $hasFilters = request('search') || 
                                           (request('category') && request('category') !== 'all') || 
-                                          (request('sort') && request('sort') !== 'newest');
+                                          (request('sort') && request('sort') !== 'newest') ||
+                                          (request('status') && request('status') !== 'all');
                          @endphp
                      </div>
                  </div>
@@ -37,7 +38,7 @@
                 <div class="filters-header-pro">
                     <div class="filters-title">
                         <em class="icon ni ni-filter-fill"></em>
-                        <span>{{ collect([request('search'), request('category') != 'all' ? request('category') : null, request('sort') != 'newest' ? request('sort') : null])->filter()->count() }} Active Filter(s)</span>
+                        <span>{{ collect([request('search'), request('category') != 'all' ? request('category') : null, request('sort') != 'newest' ? request('sort') : null, request('status') != 'all' ? request('status') : null])->filter()->count() }} Active Filter(s)</span>
                     </div>
                     <a href="{{ route('admin.template') }}" class="btn-clear-filters">
                         <em class="icon ni ni-cross-circle"></em>
@@ -63,6 +64,17 @@
                         <div class="filter-tag-label">Category</div>
                         <div class="filter-tag-value">{{ ucfirst(request('category')) }}</div>
                         <a href="{{ request()->fullUrlWithQuery(['category' => 'all']) }}" class="filter-tag-remove" title="Remove category filter">
+                            <em class="icon ni ni-cross"></em>
+                        </a>
+                    </div>
+                    @endif
+                    
+                    {{-- Status Filter --}}
+                    @if(request('status') && request('status') !== 'all')
+                    <div class="filter-tag-pro">
+                        <div class="filter-tag-label">Status</div>
+                        <div class="filter-tag-value">{{ ucfirst(request('status')) }}</div>
+                        <a href="{{ request()->fullUrlWithQuery(['status' => 'all']) }}" class="filter-tag-remove" title="Remove status filter">
                             <em class="icon ni ni-cross"></em>
                         </a>
                     </div>
@@ -202,31 +214,57 @@
                             </div>
                             <div class="flex-grow-1">
                                 <h5 class="card-title fs-6 fw-medium mb-1">{{ $item->title }}</h5>
-                                <p class="card-text text-muted small line-clamp-2 line-clamp-md-3 mb-2">{{ $item->description }}</p>
+                                <p class="card-text text-muted small line-clamp-2 line-clamp-md-3">{{ $item->description }}</p>
                             </div>
                         </div>
-                        <div class="card-footer bg-white border-0 py-2 px-3 d-flex justify-content-between align-items-center">
+                        <div class="card-footer bg-white border-0 py-1 px-3 d-flex justify-content-between align-items-center">
                             <small class="text-muted d-flex align-items-center">
                                 <em class="icon ni ni-calendar me-1"></em>
                                 <span class="d-none d-sm-inline">{{ $item->created_at->format('M d, Y') }}</span>
                                 <span class="d-sm-none">{{ $item->created_at->format('M d') }}</span>
                             </small>
 
-                            <div class="d-flex gap-1">
-                                <a href="{{ route('details.template', $item->id) }}" class="btn btn-sm btn-icon btn-light" title="View" data-bs-toggle="tooltip">
-                                    <em class="icon ni ni-eye"></em>
-                                </a>
-                                <a href="{{ route('edit.template', $item->id) }}" class="btn btn-sm btn-icon btn-primary" title="Edit" data-bs-toggle="tooltip">
-                                    <em class="icon ni ni-edit"></em>
-                                </a>
-                                <button class="btn btn-sm btn-icon btn-danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#confirmDeleteModal"
-                                        data-template-id="{{ $item->id }}"
-                                        title="Delete Template">
-                                    <em class="icon ni ni-trash" title="Delete" data-bs-toggle="tooltip"></em>
+                        <div class="d-flex gap-1">
+
+                            {{-- STATUS TOGGLE BUTTON --}}
+                            <form action="{{ route('admin.template.toggle', $item->id) }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                        class="btn btn-sm btn-icon {{ $item->is_active ? 'btn-success' : 'btn-outline-secondary' }}"
+                                        title="{{ $item->is_active ? 'Deactivate' : 'Activate' }}"
+                                        data-bs-toggle="tooltip">
+
+                                    @if($item->is_active)
+                                        <em class="icon ni ni-check-circle"></em>
+                                    @else
+                                        <em class="icon ni ni-na"></em>
+                                    @endif
                                 </button>
-                            </div>
+                            </form>
+
+                            {{-- VIEW --}}
+                            <a href="{{ route('details.template', $item->id) }}"
+                            class="btn btn-sm btn-icon btn-light"
+                            title="View" data-bs-toggle="tooltip">
+                                <em class="icon ni ni-eye"></em>
+                            </a>
+
+                            {{-- EDIT --}}
+                            <a href="{{ route('edit.template', $item->id) }}"
+                            class="btn btn-sm btn-icon btn-primary"
+                            title="Edit" data-bs-toggle="tooltip">
+                                <em class="icon ni ni-edit"></em>
+                            </a>
+
+                            {{-- DELETE --}}
+                            <button class="btn btn-sm btn-icon btn-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#confirmDeleteModal"
+                                    data-template-id="{{ $item->id }}"
+                                    title="Delete Template">
+                                <em class="icon ni ni-trash"></em>
+                            </button>
+                        </div>
                         </div>
                     </div>
                 </div> 
@@ -354,6 +392,9 @@
             {{-- HIDDEN INPUT to hold the selected Category value --}}
             <input type="hidden" id="category_hidden" name="category" value="{{ request('category', 'all') }}">
 
+            {{-- HIDDEN INPUT to hold the selected Status value --}}
+            <input type="hidden" id="status_hidden" name="status" value="{{ request('status', 'all') }}">
+
             {{-- HIDDEN INPUT to hold the selected Sort value --}}
             <input type="hidden" id="sort_hidden" name="sort" value="{{ request('sort', 'newest') }}">
             
@@ -392,6 +433,22 @@
                     </button>
                 </div>
             </div>
+
+            {{-- NEW: STATUS FILTER --}}
+            <div class="mb-4">
+                <h6 class="text-muted mb-2">Status</h6>
+                <div class="btn-group status-segment-control w-100" role="group" id="statusFilter">
+                    <button type="button" class="btn btn-outline-success segment-btn {{ request('status', 'all') == 'all' ? 'active' : '' }}" data-value="all">
+                        <em class="icon ni ni-layers me-1"></em> All
+                    </button>
+                    <button type="button" class="btn btn-outline-success segment-btn {{ request('status') == 'active' ? 'active' : '' }}" data-value="active">
+                        <em class="icon ni ni-check-circle me-1"></em> Active
+                    </button>
+                    <button type="button" class="btn btn-outline-success segment-btn {{ request('status') == 'inactive' ? 'active' : '' }}" data-value="inactive">
+                        <em class="icon ni ni-cross-circle me-1"></em> Inactive
+                    </button>
+                </div>
+            </div>
             @endif
 
             <div class="mb-0">
@@ -426,31 +483,32 @@
 
 {{-- REQUIRED JAVASCRIPT --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Function to handle segment button clicks and update the hidden input
-        function setupSegmentControls(controlId, hiddenInputId) {
-            const controls = document.getElementById(controlId);
-            const hiddenInput = document.getElementById(hiddenInputId);
+document.addEventListener('DOMContentLoaded', function () {
+    // Function to handle segment button clicks and update the hidden input
+    function setupSegmentControls(controlId, hiddenInputId) {
+        const controls = document.getElementById(controlId);
+        const hiddenInput = document.getElementById(hiddenInputId);
 
-            if (!controls || !hiddenInput) return;
+        if (!controls || !hiddenInput) return;
 
-            controls.addEventListener('click', function(e) {
-                const target = e.target.closest('.segment-btn');
-                if (target) {
-                    // Remove 'active' from all siblings
-                    controls.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
-                    // Add 'active' to the clicked button
-                    target.classList.add('active');
-                    // Update the value of the hidden input
-                    hiddenInput.value = target.dataset.value;
-                }
-            });
-        }
+        controls.addEventListener('click', function(e) {
+            const target = e.target.closest('.segment-btn');
+            if (target) {
+                // Remove 'active' from all siblings
+                controls.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+                // Add 'active' to the clicked button
+                target.classList.add('active');
+                // Update the value of the hidden input
+                hiddenInput.value = target.dataset.value;
+            }
+        });
+    }
 
-        // Apply setup to both category and sort filters
-        setupSegmentControls('categoryFilter', 'category_hidden');
-        setupSegmentControls('sortFilter', 'sort_hidden');
-    });
+    // Apply setup to category, status, and sort filters 
+    setupSegmentControls('categoryFilter', 'category_hidden');
+    setupSegmentControls('statusFilter', 'status_hidden'); // 
+    setupSegmentControls('sortFilter', 'sort_hidden');
+});
 </script>
 
 <style>
