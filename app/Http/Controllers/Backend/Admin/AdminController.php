@@ -217,10 +217,25 @@ class AdminController extends Controller
     {
         $user = Auth::user();
 
-        // Step 1: Validate the Current Password is entered
+        // Step 1: Validate all password fields with comprehensive rules
         $request->validate([
             'old_password' => 'required',
-            'new_password' => 'required|confirmed|min:8',
+            'new_password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'max:64',
+                'regex:/[a-z]/',      // at least one lowercase letter
+                'regex:/[A-Z]/',      // at least one uppercase letter
+                'regex:/[0-9]/',      // at least one number
+                'regex:/[@$!%*#?&]/', // at least one special character
+            ],
+        ], [
+            // Custom error messages
+            'new_password.min' => 'Password must be at least 8 characters long.',
+            'new_password.max' => 'Password must not exceed 64 characters.',
+            'new_password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&).',
+            'new_password.confirmed' => 'Password confirmation does not match.',
         ]);
 
         // Step 2: Check if Current Password is correct
@@ -230,25 +245,26 @@ class AdminController extends Controller
             ])->withInput();
         }
 
-        // Step 3: Update new password
+        // Step 3: Check if new password is different from old password
+        if (Hash::check($request->new_password, $user->password)) {
+            return back()->withErrors([
+                'new_password' => 'New password must be different from your current password.',
+            ])->withInput();
+        }
+
+        // Step 4: Update new password
         $user->update([
             'password' => Hash::make($request->new_password)
         ]);
 
-        // Log password change activity (before logout)
-        $this->logActivity(
-            'password_changed',
-            "Changed own password",
-            'user',
-            $user->id
-        );
-
         Auth::logout();
 
-        return redirect()->route('login')->with([
-            'message' => 'Password updated successfully! Please login again.',
+        $notification = array(
+            'message' => 'Password updated successfully! Please login again with your new password.',
             'alert-type' => 'success'
-        ]);
+        );
+
+        return redirect()->route('login')->with($notification);
     }
 
     public function AdminUsers(Request $request)
