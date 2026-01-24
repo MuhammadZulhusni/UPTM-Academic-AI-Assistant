@@ -99,6 +99,204 @@ Users can:
    php artisan serve
    ```
 
+## System Screenshots
+
+### Authentication
+<p align="center">
+  <img src="screenshot/login/signup/login.png" width="750"/>
+  <br/>
+  <em>Login page</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/login/signup/signup.png" width="750"/>
+  <br/>
+  <em>User registration page</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/login/signup/forgot-password.png" width="750"/>
+  <br/>
+  <em>Forgot password page</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/login/signup/reset-password.png" width="750"/>
+  <br/>
+  <em>Password reset page</em>
+</p>
+
+---
+
+### SuperAdmin Module
+<p align="center">
+  <img src="screenshot/superadmin/sa-dashboard.png" width="750"/>
+  <br/>
+  <em>SuperAdmin dashboard</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/manage-all-users.png" width="750"/>
+  <br/>
+  <em>User management</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/addnewuser.png" width="750"/>
+  <br/>
+  <em>Add new user</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/add-template.png" width="750"/>
+  <br/>
+  <em>Create content generation template</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/all-template.png" width="750"/>
+  <br/>
+  <em>Template library</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/document.png" width="750"/>
+  <br/>
+  <em>User-generated documents</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/document-cleanup.png" width="750"/>
+  <br/>
+  <em>Document cleanup</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/admin-activity.png" width="750"/>
+  <br/>
+  <em>Admin activity tracking</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/activity-log-cleanup.png" width="750"/>
+  <br/>
+  <em>Activity log cleanup</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/profile.png" width="750"/>
+  <br/>
+  <em>SuperAdmin profile</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/superadmin/change-password.png" width="750"/>
+  <br/>
+  <em>Change password</em>
+</p>
+
+---
+
+### Admin Module
+<p align="center">
+  <img src="screenshot/admin/dash.png" width="750"/>
+  <br/>
+  <em>Admin dashboard</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/admin/manage-user.png" width="750"/>
+  <br/>
+  <em>User deletion management</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/admin/add-template.png" width="750"/>
+  <br/>
+  <em>Create content generation template</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/admin/all-template.png" width="750"/>
+  <br/>
+  <em>Template library</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/admin/document.png" width="750"/>
+  <br/>
+  <em>Document history</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/admin/profile.png" width="750"/>
+  <br/>
+  <em>Admin profile</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/admin/change-password.png" width="750"/>
+  <br/>
+  <em>Change password</em>
+</p>
+
+---
+
+### User Module (Lecturer / Student)
+<p align="center">
+  <img src="screenshot/user/dash.png" width="750"/>
+  <br/>
+  <em>User dashboard</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/template-provided.png" width="750"/>
+  <br/>
+  <em>Templates provided by administrators</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/content-generator.png" width="750"/>
+  <br/>
+  <em>AI-powered content generator</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/AI-suggestion-based-on-input.png" width="750"/>
+  <br/>
+  <em>AI suggestions based on user input</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/output.png" width="750"/>
+  <br/>
+  <em>Generated content output</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/document.png" width="750"/>
+  <br/>
+  <em>Document history</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/download-as-pdf.png" width="750"/>
+  <br/>
+  <em>Download as PDF</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/profile.png" width="750"/>
+  <br/>
+  <em>User profile</em>
+</p>
+
+<p align="center">
+  <img src="screenshot/user/change-pass.png" width="750"/>
+  <br/>
+  <em>Change password</em>
+</p>
+
 
 
 
