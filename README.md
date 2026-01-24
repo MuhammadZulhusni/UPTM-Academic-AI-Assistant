@@ -99,6 +99,13 @@ Users can:
    php artisan serve
    ```
 
+## Swimlane Diagram
+
+<p align="center">
+  <img src="screenshot/swimlane.png" width="750"/>
+  <br/>
+</p>
+
 ## System Screenshots
 
 ### Authentication
