@@ -780,7 +780,13 @@
                         </div>
                     </div>
                     <ul class="insight-list">
-                        @forelse($topUsers as $topUser)
+                        @php
+                            $filteredUsers = $topUsers->filter(function($user) {
+                                return $user->role !== 'superadmin';
+                            });
+                        @endphp
+                        
+                        @forelse($filteredUsers as $topUser)
                         <li class="insight-item">
                             <span class="insight-item-label">{{ $topUser->name }}</span>
                             <span class="insight-item-value">{{ $topUser->generated_contents_count }} docs</span>

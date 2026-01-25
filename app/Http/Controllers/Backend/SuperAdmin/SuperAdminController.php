@@ -411,48 +411,43 @@ public function Dashboard()
     public function StoreUser(Request $request)
     {
         try {
-            // First validate basic fields
+            // Validate all fields with enhanced password validation
             $request->validate([
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
-                'password' => 'required|confirmed|min:8|max:64',
+                'password' => [
+                    'required',
+                    'confirmed',
+                    'min:8',
+                    'max:64',
+                    'regex:/[a-z]/',      // at least one lowercase letter
+                    'regex:/[A-Z]/',      // at least one uppercase letter
+                    'regex:/[0-9]/',      // at least one number
+                    'regex:/[@$!%*#?&]/', // at least one special character
+                ],
                 'phone' => 'nullable|string|max:20',
                 'address' => 'nullable|string|max:500',
                 'role' => 'required|in:student,lecturer,admin',
                 'is_active' => 'nullable|boolean'
             ], [
+                // Custom error messages
+                'name.required' => 'Full name is required.',
+                'name.max' => 'Full name must not exceed 255 characters.',
+                'email.required' => 'Email address is required.',
+                'email.email' => 'Please provide a valid email address.',
+                'email.unique' => 'This email address is already registered.',
+                'password.required' => 'Password is required.',
+                'password.confirmed' => 'Password confirmation does not match.',
                 'password.min' => 'Password must be at least 8 characters.',
                 'password.max' => 'Password must not exceed 64 characters.',
-                'password.confirmed' => 'Password confirmation does not match.',
+                'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*#?&).',
+                'phone.max' => 'Phone number must not exceed 20 characters.',
+                'address.max' => 'Address must not exceed 500 characters.',
+                'role.required' => 'User role is required.',
+                'role.in' => 'Invalid user role selected.',
             ]);
 
-            // Additional password strength validation with specific messages
-            $password = $request->password;
-            $errors = [];
-
-            if (!preg_match('/[a-z]/', $password)) {
-                $errors[] = 'Password must contain at least one lowercase letter (a-z).';
-            }
-            if (!preg_match('/[A-Z]/', $password)) {
-                $errors[] = 'Password must contain at least one uppercase letter (A-Z).';
-            }
-            if (!preg_match('/[0-9]/', $password)) {
-                $errors[] = 'Password must contain at least one number (0-9).';
-            }
-            if (!preg_match('/[@$!%*#?&]/', $password)) {
-                $errors[] = 'Password must contain at least one special character (@$!%*#?&).';
-            }
-
-            if (!empty($errors)) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['password' => $errors])
-                    ->with([
-                        'message' => 'Please check the password requirements.',
-                        'alert-type' => 'error'
-                    ]);
-            }
-
+            // Create the user
             User::create([
                 'name' => $request->name,
                 'email' => $request->email,
