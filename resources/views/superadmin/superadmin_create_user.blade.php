@@ -79,13 +79,13 @@
                                                 id="role" name="role" required>
                                             <option value="" selected disabled>Choose role...</option>
                                             <option value="student" {{ old('role') == 'student' ? 'selected' : '' }}>
-                                                <i class="bi bi-person"></i> Student
+                                                Student
                                             </option>
                                             <option value="lecturer" {{ old('role') == 'lecturer' ? 'selected' : '' }}>
-                                                <i class="bi bi-person-workspace"></i> Lecturer
+                                                Lecturer
                                             </option>
                                             <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>
-                                                <i class="bi bi-shield-lock"></i> Admin
+                                                Admin
                                             </option>
                                         </select>
                                         @error('role')
@@ -124,10 +124,33 @@
                                                 <i class="bi bi-eye" id="eyeIcon"></i>
                                             </button>
                                         </div>
-                                        <small class="text-muted">Must be 8-64 characters with uppercase, lowercase, number & special character (@$!%*#?&)</small>
                                         @error('password')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
+
+                                        <!-- Password Requirements Checklist -->
+                                        <div class="password-requirements">
+                                            <div class="requirement-item" id="req-length">
+                                                <i class="bi bi-circle"></i>
+                                                <span>8-64 characters</span>
+                                            </div>
+                                            <div class="requirement-item" id="req-lowercase">
+                                                <i class="bi bi-circle"></i>
+                                                <span>At least one lowercase letter (a-z)</span>
+                                            </div>
+                                            <div class="requirement-item" id="req-uppercase">
+                                                <i class="bi bi-circle"></i>
+                                                <span>At least one uppercase letter (A-Z)</span>
+                                            </div>
+                                            <div class="requirement-item" id="req-number">
+                                                <i class="bi bi-circle"></i>
+                                                <span>At least one number (0-9)</span>
+                                            </div>
+                                            <div class="requirement-item" id="req-special">
+                                                <i class="bi bi-circle"></i>
+                                                <span>At least one special character (@$!%*#?&)</span>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -143,6 +166,12 @@
                                             </button>
                                         </div>
                                         <small class="text-muted">Must match password</small>
+
+                                        <!-- Password Match Indicator -->
+                                        <div class="password-match-indicator" id="passwordMatchIndicator">
+                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                            <span id="matchText"></span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -294,17 +323,40 @@
             eyeIconConfirm.classList.toggle('bi-eye-slash');
         });
 
-        // Enhanced Password Strength Checker
+        // Password Requirements Validation
         const passwordInput = document.getElementById('password');
+        const reqLength = document.getElementById('req-length');
+        const reqLowercase = document.getElementById('req-lowercase');
+        const reqUppercase = document.getElementById('req-uppercase');
+        const reqNumber = document.getElementById('req-number');
+        const reqSpecial = document.getElementById('req-special');
         const strengthBar = document.getElementById('strengthBar');
         const strengthText = document.getElementById('strengthText');
         const passwordStrength = document.getElementById('passwordStrength');
+
+        function updateRequirement(element, isValid) {
+            if (isValid) {
+                element.classList.remove('invalid');
+                element.classList.add('valid');
+                element.querySelector('i').classList.remove('bi-circle');
+                element.querySelector('i').classList.add('bi-check-circle-fill');
+            } else {
+                element.classList.remove('valid');
+                element.classList.add('invalid');
+                element.querySelector('i').classList.remove('bi-check-circle-fill');
+                element.querySelector('i').classList.add('bi-circle');
+            }
+        }
 
         passwordInput.addEventListener('input', function() {
             const value = this.value;
             
             if (value.length === 0) {
                 passwordStrength.classList.add('d-none');
+                // Reset all requirements
+                [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => {
+                    updateRequirement(el, false);
+                });
                 return;
             }
 
@@ -321,6 +373,13 @@
             const hasUpperCase = /[A-Z]/.test(value);
             const hasNumber = /[0-9]/.test(value);
             const hasSpecialChar = /[@$!%*#?&]/.test(value);
+
+            // Update individual requirements
+            updateRequirement(reqLength, hasMinLength && hasMaxLength);
+            updateRequirement(reqLowercase, hasLowerCase);
+            updateRequirement(reqUppercase, hasUpperCase);
+            updateRequirement(reqNumber, hasNumber);
+            updateRequirement(reqSpecial, hasSpecialChar);
 
             // Calculate strength based on requirements
             if (hasMinLength && hasMaxLength) strength += 20;
@@ -352,6 +411,32 @@
             strengthText.textContent = text;
         });
 
+        // Password Confirmation Match Checker
+        const passwordMatchIndicator = document.getElementById('passwordMatchIndicator');
+
+        function checkPasswordMatch() {
+            const pass = passwordInput.value;
+            const passConfirm = passwordConfirm.value;
+
+            if (passConfirm.length === 0) {
+                passwordMatchIndicator.style.display = 'none';
+                return;
+            }
+
+            if (pass === passConfirm && pass.length > 0) {
+                passwordMatchIndicator.classList.remove('no-match');
+                passwordMatchIndicator.classList.add('match');
+                passwordMatchIndicator.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i><span>Passwords match!</span>';
+            } else {
+                passwordMatchIndicator.classList.remove('match');
+                passwordMatchIndicator.classList.add('no-match');
+                passwordMatchIndicator.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i><span>Passwords do not match</span>';
+            }
+        }
+
+        passwordInput.addEventListener('input', checkPasswordMatch);
+        passwordConfirm.addEventListener('input', checkPasswordMatch);
+
         // Form Submission Loading State
         const form = document.getElementById('createUserForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -382,6 +467,12 @@
 
                 // Manually re-hide password strength indicator on reset
                 passwordStrength.classList.add('d-none');
+                passwordMatchIndicator.style.display = 'none';
+                
+                // Reset all requirements
+                [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => {
+                    updateRequirement(el, false);
+                });
             });
         }
     });
@@ -458,6 +549,59 @@
 .form-check-input:checked {
     background-color: #6366f1;
     border-color: #6366f1;
+}
+
+/* Password Requirements Styles */
+.password-requirements {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.requirement-item:last-child {
+    margin-bottom: 0;
+}
+
+.requirement-item i {
+    margin-right: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.requirement-item.valid {
+    color: #10b981;
+}
+
+.requirement-item.invalid {
+    color: #6b7280;
+}
+
+/* Password Match Indicator Styles */
+.password-match-indicator {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    display: none;
+}
+
+.password-match-indicator.match {
+    background-color: #d1fae5;
+    color: #065f46;
+    display: block;
+}
+
+.password-match-indicator.no-match {
+    background-color: #fee2e2;
+    color: #991b1b;
+    display: block;
 }
 </style>
 
