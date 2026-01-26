@@ -18,10 +18,10 @@ This project was developed using **Laravel**, **Tailwind CSS**, **Bootstrap**, a
 
 ## Technologies Used
 - **Backend:** Laravel (PHP)
-- **Frontend:** Tailwind CSS, Bootstrap
+- **Frontend:** Tailwind CSS, Bootstrap, JavaScript (AJAX / Fetch API)
 - **Database:** MySQL
 - **AI Integration:** OpenAI API
-- **Authentication:** Role-Based Access Control (RBAC)
+- **Authentication & Authorization:** Role-Based Access Control (RBAC)
 
 ---
 
@@ -38,15 +38,11 @@ SuperAdmin has full system control, including:
 - Clean up old admin activity logs
 - Delete old user-generated documents to optimize database storage
 
----
-
 ### Admin
 Admin has limited administrative privileges:
 - Delete users (Admins, Lecturers, Students)
 - Create AI content templates
 - Manage Template Library (CRUD & status control)
-
----
 
 ### Users (Lecturers / Students)
 Users can:
@@ -54,21 +50,87 @@ Users can:
 - Generate academic-related content
 - View document history for past AI-generated outputs
 
----
-
-## Shared Features (All Roles)
+### Shared Features (All Roles)
 - User profile management
 - Change password
 - Document history (AI-generated output records)
 
 ---
 
-## Security Features
-- Secure authentication system
-- Role-based access control
-- Account status management (Active / Inactive)
-- Activity logging for admin actions
+## Content Generation Workflow
 
+### 1. Template-Based Input
+
+The template defines:
+- Page title and description
+- Dynamic input fields
+- Basic validation rules
+
+All input fields are rendered automatically based on the selected template.  
+Users can also select:
+- Language (English or Bahasa Melayu)
+- AI model (GPT-3.5 Turbo or GPT-4)
+
+### 2. User Input Validation 
+
+Before data is sent to the server:
+- Required fields are checked using **client-side JavaScript**
+- Empty inputs are highlighted
+- The generate button is disabled during processing
+
+### 3. Data Submission (AJAX / Fetch API)
+
+When the user clicks **Generate Content**:
+- Form data is sent using **AJAX (Fetch API)**
+- A **POST** request is sent to the Laravel backend
+- **CSRF protection** is applied
+
+### 4. AI Processing (OpenAI API)
+
+On the backend:
+- Laravel controllers process the request
+- User input is combined with the template prompt
+- The selected AI model is called using the **OpenAI API**
+
+The AI response is returned to the frontend in **JSON format**.
+
+### 5. Output Display 
+
+After content is generated:
+- The AI output is cleaned and formatted using **JavaScript**
+- The content is displayed in the output panel
+
+---
+
+## AI Suggestions for Input Fields
+
+### How it works
+
+1. **User Input**
+   - User types text into a textarea.
+   - Clicks the **"Get AI Suggestions"** button.
+
+2. **AJAX Request**
+   - JavaScript sends the current input, language, and template context to the Laravel backend.
+
+3. **Backend Processing**
+   - Validates input.
+   - Builds a structured prompt for the OpenAI API.
+   - Requests 6 academic suggestions corresponding to Bloom’s Taxonomy levels:
+     1. Remember
+     2. Understand
+     3. Apply
+     4. Analyze
+     5. Evaluate
+     6. Create
+
+4. **OpenAI Response**
+   - Returns suggestions as JSON.
+
+5. **Display Suggestions (Frontend)**
+   - JavaScript shows suggestions in a dropdown under the textarea.
+   - Users can select a suggestion to refine their input before full content generation.
+  
 ---
 
 ## Installation (Local Setup)
@@ -98,6 +160,8 @@ Users can:
    ```bash
    php artisan serve
    ```
+   
+---
 
 ## Swimlane Diagram
 
