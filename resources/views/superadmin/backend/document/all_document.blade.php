@@ -180,17 +180,17 @@
             <nav class="order-1 order-md-2">
                 <ul class="pagination pagination-sm mb-0">
                     <li class="page-item {{ ($document->onFirstPage()) ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ $document->previousPageUrl() }}">Previous</a>
+                        <a class="page-link" href="{{ $document->appends(['sort' => request('sort')])->previousPageUrl() }}">Previous</a>
                     </li>
 
-                    @foreach ($document->getUrlRange(1, $document->lastPage()) as $page => $url)
+                    @foreach ($document->appends(['sort' => request('sort')])->getUrlRange(1, $document->lastPage()) as $page => $url)
                         <li class="page-item {{ ($document->currentPage() == $page) ? 'active' : '' }}">
                             <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                         </li>
                     @endforeach
 
                     <li class="page-item {{ ($document->currentPage() == $document->lastPage()) ? 'disabled' : '' }}">
-                        <a class="page-link" href="{{ $document->nextPageUrl() }}">Next</a>
+                        <a class="page-link" href="{{ $document->appends(['sort' => request('sort')])->nextPageUrl() }}">Next</a>
                     </li>
                 </ul>
             </nav>
@@ -252,7 +252,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form id="sortForm" method="GET" action="{{ route('user.document') }}">
+            <form id="sortForm" method="GET" action="{{ route('superadmin.document') }}">
                 <div class="modal-body px-4 py-3">
                     <p class="text-muted small mb-3">Choose the order for viewing the document list.</p>
 
