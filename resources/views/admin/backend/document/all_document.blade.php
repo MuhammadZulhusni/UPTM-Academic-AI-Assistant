@@ -252,7 +252,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form id="sortForm" method="GET" action="{{ route('user.document') }}">
+            <form id="sortForm" method="GET" action="{{ route('admin.document') }}">
                 <div class="modal-body px-4 py-3">
                     <p class="text-muted small mb-3">Choose the order for viewing the document list.</p>
 
