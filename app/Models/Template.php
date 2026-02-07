@@ -31,7 +31,25 @@ class Template extends Model
     }
 
     public function generatedContents()
-{
-    return $this->hasMany(GeneratedContent::class);
-}
+    {
+        return $this->hasMany(GeneratedContent::class);
+    }
+
+    /**
+     * Generate content by replacing placeholders
+     * Example: "Hello {name}" = "Hello Ali"
+     *
+     * @param array $inputData
+     * @return string
+     */
+    public function generateContent(array $inputData): string
+    {
+        $content = $this->prompt ?? '';
+
+        foreach ($inputData as $key => $value) {
+            $content = str_replace("{" . $key . "}", $value, $content);
+        }
+
+        return $content;
+    }
 }
