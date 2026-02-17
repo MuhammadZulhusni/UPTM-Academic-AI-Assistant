@@ -1775,7 +1775,7 @@ async function fetchAISuggestions(fieldName, currentInput, language) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfMeta.getAttribute('content'), // Fixed: Use getAttribute
+                'X-CSRF-TOKEN': csrfMeta.getAttribute('content'), 
                 'Accept': 'application/json',
             },
             body: JSON.stringify({
@@ -1999,7 +1999,7 @@ function displaySuggestions(fieldName, suggestions) {
 }
 
 /**
- * FIXED: Apply suggestion - REPLACES current text (not append)
+ * Apply suggestion, REPLACES current text 
  */
 function applySuggestion(textarea, container, suggestionId, suggestionMap) {
     try {
