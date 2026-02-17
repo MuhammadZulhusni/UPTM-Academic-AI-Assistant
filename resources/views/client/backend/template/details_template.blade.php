@@ -660,22 +660,30 @@
 
 <div class="nk-content-inner">
     <div class="nk-content-body page-container">
-        
-        <!-- Back Button -->
-        <div class="back-button-wrapper">
-            <a href="{{ route('user.template') }}" class="btn-back">
-                <em class="icon ni ni-arrow-left"></em>
-                <span>Back to All Templates</span>
-            </a>
-        </div>
-        
-        <!-- Page Header -->
-        <div class="nk-block-head nk-page-head mb-4">
-            <div class="nk-block-head-content">
-                <h2 class="display-6">{{ $template->title }}</h2>
-                <p class="text-muted">{{ $template->description }}</p>
+
+            <!-- Back Button (Top Left) -->
+            <div class="mb-3">
+                <a href="{{ route('user.template') }}"
+                class="btn btn-outline-primary d-inline-flex align-items-center px-3 py-2">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to All Templates
+                </a>
             </div>
+
+            <!-- Page Title & Description -->
+            <div class="nk-block-head nk-page-head">
+                <div class="nk-block-head-content">
+                    <h2 class="display-6 mb-1 fw-semibold">
+                        {{ $template->title }}
+                    </h2>
+                    <p class="text-muted mb-0">
+                        {{ $template->description }}
+                    </p>
+                </div>
+            </div>
+
         </div>
+    </div>
         
         <!-- INPUT PANEL (TOP) -->
         <div class="input-panel-card">
