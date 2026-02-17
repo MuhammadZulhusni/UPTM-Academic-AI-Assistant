@@ -88,7 +88,7 @@ class UserTemplateController extends Controller
             ], 401);
         }
 
-        // Validate basic request inputs (REMOVED result_length)
+        // Validate basic request inputs 
         $validatedData = $request->validate([
             'language' => 'required|string|in:English,Bahasa Melayu',
             'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
@@ -119,7 +119,6 @@ class UserTemplateController extends Controller
             $replacements['{' . $key . '}'] = $value;
             $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
         }
-        // REMOVED: result_length replacement
 
         $prompt = strtr($template->prompt, $replacements);
 
