@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="UPTM University">
+    <meta name="csrf-token" content="{{ csrf_token() }}">  
     <title>UPTM Academic AI Assistant Tools - Sign Up</title>
     <link rel="shortcut icon" href="{{ asset('upload/uptm.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -62,14 +63,22 @@
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 text-left mb-2">Email Address</label>
                     <div class="relative">
-                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all" 
+                        <input class="block w-full py-2 px-3 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#60a5fa] focus:border-[#60a5fa] transition-all pr-10" 
                             type="email" 
                             id="email" 
                             name="email"
                             value="{{ old('email') }}"
                             placeholder="Enter your email address"
                             required autocomplete="username" />
+                        <!-- Status icon inside input -->
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2" id="emailStatusIcon">
+                            <i class="fas fa-envelope text-gray-400" id="emailIcon"></i>
+                        </span>
                     </div>
+
+                    <!-- Live feedback banner -->
+                    <div id="emailFeedback" class="mt-2 hidden rounded-lg px-3 py-2 text-xs flex items-center gap-2"></div>
+
                     @error('email')
                         <div class="text-red-500 text-xs mt-1 text-left">{{ $message }}</div>
                     @enderror
@@ -356,6 +365,125 @@
                 matchSuccess.classList.add('hidden');
             }
         }
+
+        // ─── Email Real-Time Validation ────────────────────────────────
+        const emailInput    = document.getElementById('email');
+        const emailFeedback = document.getElementById('emailFeedback');
+        const emailIcon     = document.getElementById('emailIcon');
+
+        function isValidEmailFormat(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+        }
+
+        function setEmailState(state, message) {
+            // Reset classes
+            emailInput.classList.remove(
+                'border-green-400', 'ring-2', 'ring-green-200',
+                'border-red-400',   'ring-red-200',
+                'border-[#e2e8f0]'
+            );
+            emailIcon.className = 'fas';
+            emailFeedback.className = 'mt-2 rounded-lg px-3 py-2 text-xs flex items-center gap-2';
+
+            if (state === 'empty') {
+                emailInput.classList.add('border-[#e2e8f0]');
+                emailIcon.classList.add('fa-envelope', 'text-gray-400');
+                emailFeedback.classList.add('hidden');
+                return;
+            }
+
+            if (state === 'checking') {
+                emailInput.classList.add('border-[#e2e8f0]');
+                emailIcon.classList.add('fa-spinner', 'fa-spin', 'text-gray-400');
+                emailFeedback.classList.remove('hidden');
+                emailFeedback.classList.add('bg-gray-100', 'text-gray-600');
+                emailFeedback.innerHTML = '<i class="fas fa-hourglass-half"></i><span>' + message + '</span>';
+                return;
+            }
+
+            if (state === 'invalid_format') {
+                emailInput.classList.add('border-red-400', 'ring-2', 'ring-red-200');
+                emailIcon.classList.add('fa-times-circle', 'text-red-500');
+                emailFeedback.classList.remove('hidden');
+                emailFeedback.classList.add('bg-red-50', 'text-red-600', 'border', 'border-red-200');
+                emailFeedback.innerHTML = '<i class="fas fa-times-circle"></i><span>' + message + '</span>';
+                return;
+            }
+
+            if (state === 'taken') {
+                emailInput.classList.add('border-red-400', 'ring-2', 'ring-red-200');
+                emailIcon.classList.add('fa-times-circle', 'text-red-500');
+                emailFeedback.classList.remove('hidden');
+                emailFeedback.classList.add('bg-red-50', 'text-red-600', 'border', 'border-red-200');
+                emailFeedback.innerHTML = '<i class="fas fa-times-circle"></i><span>' + message + '</span>';
+                return;
+            }
+
+            if (state === 'available') {
+                emailInput.classList.add('border-green-400', 'ring-2', 'ring-green-200');
+                emailIcon.classList.add('fa-check-circle', 'text-green-500');
+                emailFeedback.classList.remove('hidden');
+                emailFeedback.classList.add('bg-green-50', 'text-green-700', 'border', 'border-green-200');
+                emailFeedback.innerHTML = '<i class="fas fa-check-circle"></i><span>' + message + '</span>';
+            }
+        }
+
+        let emailDebounceTimer = null;
+
+        emailInput.addEventListener('input', function () {
+            clearTimeout(emailDebounceTimer);
+            const value = this.value.trim();
+
+            if (value.length === 0) {
+                setEmailState('empty');
+                return;
+            }
+
+            if (!isValidEmailFormat(value)) {
+                setEmailState('invalid_format', 'Please enter a valid email (e.g. user@example.com)');
+                return;
+            }
+
+            setEmailState('checking', 'Checking availability...');
+
+            emailDebounceTimer = setTimeout(function () {
+                fetch('{{ route('auth.check.email') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({ email: value })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'available') {
+                        setEmailState('available', 'Email is available, you\'re good to go!');
+                    } else if (data.status === 'taken') {
+                        setEmailState('taken', 'This email is already registered. Try signing in instead.');
+                    } else {
+                        setEmailState('invalid_format', data.message || 'Invalid email format');
+                    }
+                })
+                .catch(() => {
+                    setEmailState('invalid_format', 'Could not verify email. Please try again.');
+                });
+            }, 600);
+        });
+
+        // Block form submission if email not confirmed available
+        document.querySelector('form').addEventListener('submit', function (e) {
+            const value = emailInput.value.trim();
+            if (!isValidEmailFormat(value) || !emailInput.classList.contains('border-green-400')) {
+                e.preventDefault();
+                setEmailState('invalid_format', 'Please use a valid, available email before signing up.');
+                emailInput.focus();
+
+                if (typeof toastr !== 'undefined') {
+                    toastr.error('Please fix the email field before submitting.', 'Invalid Email');
+                }
+            }
+        });
 
         // Toastr notifications
         @if(Session::has('message'))
