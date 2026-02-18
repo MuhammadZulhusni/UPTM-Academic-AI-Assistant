@@ -70,4 +70,23 @@ class RegisteredUserController extends Controller
             'alert-type' => 'success'
         ]);
     }
+
+    public function checkEmail(Request $request)
+    {
+        $email = $request->get('email', '');
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'status'  => 'invalid_format',
+                'message' => 'Invalid email format'
+            ]);
+        }
+
+        $exists = User::where('email', $email)->exists();
+
+        return response()->json([
+            'status'  => $exists ? 'taken' : 'available',
+            'message' => $exists ? 'This email is already registered' : 'Email is available'
+        ]);
+    }
 }
