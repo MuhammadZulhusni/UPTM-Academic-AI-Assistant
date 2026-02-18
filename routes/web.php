@@ -88,7 +88,9 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::get('/change/password', 'ChangePassword')->name('superadmin.change.password');
         Route::post('/password/update', 'PasswordUpdate')->name('superadmin.password.update');
         Route::get('/logout', 'Logout')->name('superadmin.logout');
+        Route::post('/superadmin/check-email', 'checkEmail')->name('superadmin.check.email');
     });
+
     
     Route::get('/users', [SuperAdminController::class, 'Users'])->name('superadmin.users');
     Route::get('/users/edit/{id}', [SuperAdminController::class, 'EditUser'])->name('superadmin.user.edit');

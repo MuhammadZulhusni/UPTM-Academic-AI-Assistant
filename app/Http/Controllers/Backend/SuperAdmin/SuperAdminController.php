@@ -740,4 +740,32 @@ public function Dashboard()
             ]);
         }
     }
+    
+    public function checkEmail(Request $request)
+    {
+        $email = $request->get('email');
+        
+        // Validate email format
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json([
+                'status' => 'invalid_format',
+                'message' => 'Invalid email format'
+            ]);
+        }
+        
+        // Check if email exists in database
+        $exists = User::where('email', $email)->exists();
+        
+        if ($exists) {
+            return response()->json([
+                'status' => 'taken',
+                'message' => 'This email is already registered'
+            ]);
+        }
+        
+        return response()->json([
+            'status' => 'available',
+            'message' => 'Email is available'
+        ]);
+    }
 }

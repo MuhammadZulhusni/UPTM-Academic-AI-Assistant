@@ -53,24 +53,31 @@
                                         <label for="email" class="form-label fw-semibold">
                                             Email Address <span class="text-danger">*</span>
                                         </label>
-                                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                               id="email" name="email" value="{{ old('email') }}" 
-                                               placeholder="user@example.com" required>
+                                        <div class="input-group">
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                                id="email" name="email" value="{{ old('email') }}" 
+                                                placeholder="user@example.com" required>
+                                            <span class="input-group-text" id="emailStatusIcon">
+                                                <i class="bi bi-envelope text-muted" id="emailIcon"></i>
+                                            </span>
+                                        </div>
                                         @error('email')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
+                                        <!-- Email Preview Indicator -->
+                                        <div class="email-feedback mt-1" id="emailFeedback" style="display:none;"></div>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label for="phone" class="form-label fw-semibold">Phone Number</label>
                                         <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                                               id="phone" name="phone" value="{{ old('phone') }}" 
-                                               placeholder="+60 12-345 6789">
+                                            id="phone" name="phone" value="{{ old('phone') }}" 
+                                            placeholder="60123456789" inputmode="numeric" maxlength="15">
+                                        <small class="text-muted">Numbers only, no symbols or spaces</small>
                                         @error('phone')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                     <div class="col-md-6">
                                         <label for="role" class="form-label fw-semibold">
                                             User Role <span class="text-danger">*</span>
@@ -298,184 +305,288 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Toggle Password Visibility
-        const togglePassword = document.getElementById('togglePassword');
-        const password = document.getElementById('password');
-        const eyeIcon = document.getElementById('eyeIcon');
+document.addEventListener('DOMContentLoaded', function () {
 
-        togglePassword.addEventListener('click', function() {
-            const type = password.type === 'password' ? 'text' : 'password';
-            password.type = type;
-            eyeIcon.classList.toggle('bi-eye');
-            eyeIcon.classList.toggle('bi-eye-slash');
-        });
+    // ─── Password Toggle ───────────────────────────────────────────
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
 
-        // Toggle Password Confirmation Visibility
-        const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
-        const passwordConfirm = document.getElementById('password_confirmation');
-        const eyeIconConfirm = document.getElementById('eyeIconConfirm');
+    togglePassword.addEventListener('click', function () {
+        const type = password.type === 'password' ? 'text' : 'password';
+        password.type = type;
+        eyeIcon.classList.toggle('bi-eye');
+        eyeIcon.classList.toggle('bi-eye-slash');
+    });
 
-        togglePasswordConfirm.addEventListener('click', function() {
-            const type = passwordConfirm.type === 'password' ? 'text' : 'password';
-            passwordConfirm.type = type;
-            eyeIconConfirm.classList.toggle('bi-eye');
-            eyeIconConfirm.classList.toggle('bi-eye-slash');
-        });
+    const togglePasswordConfirm = document.getElementById('togglePasswordConfirm');
+    const passwordConfirm = document.getElementById('password_confirmation');
+    const eyeIconConfirm = document.getElementById('eyeIconConfirm');
 
-        // Password Requirements Validation
-        const passwordInput = document.getElementById('password');
-        const reqLength = document.getElementById('req-length');
-        const reqLowercase = document.getElementById('req-lowercase');
-        const reqUppercase = document.getElementById('req-uppercase');
-        const reqNumber = document.getElementById('req-number');
-        const reqSpecial = document.getElementById('req-special');
-        const strengthBar = document.getElementById('strengthBar');
-        const strengthText = document.getElementById('strengthText');
-        const passwordStrength = document.getElementById('passwordStrength');
+    togglePasswordConfirm.addEventListener('click', function () {
+        const type = passwordConfirm.type === 'password' ? 'text' : 'password';
+        passwordConfirm.type = type;
+        eyeIconConfirm.classList.toggle('bi-eye');
+        eyeIconConfirm.classList.toggle('bi-eye-slash');
+    });
 
-        function updateRequirement(element, isValid) {
-            if (isValid) {
-                element.classList.remove('invalid');
-                element.classList.add('valid');
-                element.querySelector('i').classList.remove('bi-circle');
-                element.querySelector('i').classList.add('bi-check-circle-fill');
-            } else {
-                element.classList.remove('valid');
-                element.classList.add('invalid');
-                element.querySelector('i').classList.remove('bi-check-circle-fill');
-                element.querySelector('i').classList.add('bi-circle');
-            }
+    // ─── Password Requirements ─────────────────────────────────────
+    const passwordInput = document.getElementById('password');
+    const reqLength    = document.getElementById('req-length');
+    const reqLowercase = document.getElementById('req-lowercase');
+    const reqUppercase = document.getElementById('req-uppercase');
+    const reqNumber    = document.getElementById('req-number');
+    const reqSpecial   = document.getElementById('req-special');
+    const strengthBar  = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const passwordStrength = document.getElementById('passwordStrength');
+
+    function updateRequirement(element, isValid) {
+        if (isValid) {
+            element.classList.remove('invalid');
+            element.classList.add('valid');
+            element.querySelector('i').classList.remove('bi-circle');
+            element.querySelector('i').classList.add('bi-check-circle-fill');
+        } else {
+            element.classList.remove('valid');
+            element.classList.add('invalid');
+            element.querySelector('i').classList.remove('bi-check-circle-fill');
+            element.querySelector('i').classList.add('bi-circle');
+        }
+    }
+
+    passwordInput.addEventListener('input', function () {
+        const value = this.value;
+
+        if (value.length === 0) {
+            passwordStrength.classList.add('d-none');
+            [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => updateRequirement(el, false));
+            return;
         }
 
-        passwordInput.addEventListener('input', function() {
-            const value = this.value;
-            
-            if (value.length === 0) {
-                passwordStrength.classList.add('d-none');
-                // Reset all requirements
-                [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => {
-                    updateRequirement(el, false);
-                });
-                return;
-            }
+        passwordStrength.classList.remove('d-none');
 
-            passwordStrength.classList.remove('d-none');
-            
-            let strength = 0;
-            let text = '';
-            let color = '';
+        const hasMinLength  = value.length >= 8;
+        const hasMaxLength  = value.length <= 64;
+        const hasLowerCase  = /[a-z]/.test(value);
+        const hasUpperCase  = /[A-Z]/.test(value);
+        const hasNumber     = /[0-9]/.test(value);
+        const hasSpecialChar = /[@$!%*#?&]/.test(value);
 
-            // Check password criteria
-            const hasMinLength = value.length >= 8;
-            const hasMaxLength = value.length <= 64;
-            const hasLowerCase = /[a-z]/.test(value);
-            const hasUpperCase = /[A-Z]/.test(value);
-            const hasNumber = /[0-9]/.test(value);
-            const hasSpecialChar = /[@$!%*#?&]/.test(value);
+        updateRequirement(reqLength,    hasMinLength && hasMaxLength);
+        updateRequirement(reqLowercase, hasLowerCase);
+        updateRequirement(reqUppercase, hasUpperCase);
+        updateRequirement(reqNumber,    hasNumber);
+        updateRequirement(reqSpecial,   hasSpecialChar);
 
-            // Update individual requirements
-            updateRequirement(reqLength, hasMinLength && hasMaxLength);
-            updateRequirement(reqLowercase, hasLowerCase);
-            updateRequirement(reqUppercase, hasUpperCase);
-            updateRequirement(reqNumber, hasNumber);
-            updateRequirement(reqSpecial, hasSpecialChar);
+        let strength = 0;
+        if (hasMinLength && hasMaxLength) strength += 20;
+        if (hasLowerCase)  strength += 20;
+        if (hasUpperCase)  strength += 20;
+        if (hasNumber)     strength += 20;
+        if (hasSpecialChar) strength += 20;
 
-            // Calculate strength based on requirements
-            if (hasMinLength && hasMaxLength) strength += 20;
-            if (hasLowerCase) strength += 20;
-            if (hasUpperCase) strength += 20;
-            if (hasNumber) strength += 20;
-            if (hasSpecialChar) strength += 20;
+        let color = '', text = '';
+        if      (strength < 40)  { color = 'bg-danger';  text = 'Very Weak - Missing required characters'; }
+        else if (strength < 60)  { color = 'bg-warning'; text = 'Weak - Add more character types'; }
+        else if (strength < 80)  { color = 'bg-info';    text = 'Medium - Almost there'; }
+        else if (strength < 100) { color = 'bg-primary'; text = 'Good - Add special character'; }
+        else                     { color = 'bg-success'; text = 'Strong - All requirements met!'; }
 
-            // Set color and text based on strength
-            if (strength < 40) {
-                color = 'bg-danger';
-                text = 'Very Weak - Missing required characters';
-            } else if (strength < 60) {
-                color = 'bg-warning';
-                text = 'Weak - Add more character types';
-            } else if (strength < 80) {
-                color = 'bg-info';
-                text = 'Medium - Almost there';
-            } else if (strength < 100) {
-                color = 'bg-primary';
-                text = 'Good - Add special character';
-            } else {
-                color = 'bg-success';
-                text = 'Strong - All requirements met!';
-            }
+        strengthBar.style.width  = strength + '%';
+        strengthBar.className    = 'progress-bar ' + color;
+        strengthText.textContent = text;
 
-            strengthBar.style.width = strength + '%';
-            strengthBar.className = 'progress-bar ' + color;
-            strengthText.textContent = text;
-        });
+        checkPasswordMatch();
+    });
 
-        // Password Confirmation Match Checker
-        const passwordMatchIndicator = document.getElementById('passwordMatchIndicator');
+    // ─── Password Match ────────────────────────────────────────────
+    const passwordMatchIndicator = document.getElementById('passwordMatchIndicator');
 
-        function checkPasswordMatch() {
-            const pass = passwordInput.value;
-            const passConfirm = passwordConfirm.value;
+    function checkPasswordMatch() {
+        const pass        = passwordInput.value;
+        const passConfirm = passwordConfirm.value;
 
-            if (passConfirm.length === 0) {
-                passwordMatchIndicator.style.display = 'none';
-                return;
-            }
-
-            if (pass === passConfirm && pass.length > 0) {
-                passwordMatchIndicator.classList.remove('no-match');
-                passwordMatchIndicator.classList.add('match');
-                passwordMatchIndicator.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i><span>Passwords match!</span>';
-            } else {
-                passwordMatchIndicator.classList.remove('match');
-                passwordMatchIndicator.classList.add('no-match');
-                passwordMatchIndicator.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i><span>Passwords do not match</span>';
-            }
+        if (passConfirm.length === 0) {
+            passwordMatchIndicator.style.display = 'none';
+            return;
         }
 
-        passwordInput.addEventListener('input', checkPasswordMatch);
-        passwordConfirm.addEventListener('input', checkPasswordMatch);
-
-        // Form Submission Loading State
-        const form = document.getElementById('createUserForm');
-        const submitBtn = document.getElementById('submitBtn');
-        
-        if (form && submitBtn) {
-            form.addEventListener('submit', function() {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
-            });
+        if (pass === passConfirm) {
+            passwordMatchIndicator.classList.remove('no-match');
+            passwordMatchIndicator.classList.add('match');
+            passwordMatchIndicator.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i><span>Passwords match!</span>';
+        } else {
+            passwordMatchIndicator.classList.remove('match');
+            passwordMatchIndicator.classList.add('no-match');
+            passwordMatchIndicator.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i><span>Passwords do not match</span>';
         }
+    }
 
-        // Reset Button with Toastr
-        const resetFormBtn = document.getElementById('resetFormBtn');
+    passwordConfirm.addEventListener('input', checkPasswordMatch);
 
-        if (resetFormBtn) {
-            resetFormBtn.addEventListener('click', function(e) {
-                // Show Toastr message after form reset
-                if (typeof toastr !== 'undefined') {
-                    toastr.info('The form fields have been cleared and reset.', 'Form Reset', {
-                        "closeButton": true,
-                        "progressBar": true,
-                        "positionClass": "toast-top-right",
-                        "timeOut": "3000"
-                    });
-                } else {
-                    console.warn('Toastr is not defined. Please ensure the library is included.');
-                }
+    // ─── Phone: Numbers Only ───────────────────────────────────────
+    const phoneInput = document.getElementById('phone');
 
-                // Manually re-hide password strength indicator on reset
-                passwordStrength.classList.add('d-none');
-                passwordMatchIndicator.style.display = 'none';
-                
-                // Reset all requirements
-                [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => {
-                    updateRequirement(el, false);
-                });
-            });
+    phoneInput.addEventListener('input', function () {
+        // Strip anything that is not a digit
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    phoneInput.addEventListener('keypress', function (e) {
+        if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
         }
     });
+
+    // Block paste of non-numeric content
+    phoneInput.addEventListener('paste', function (e) {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text');
+        this.value = (this.value + pasted).replace(/\D/g, '').slice(0, 15);
+    });
+
+    // ─── Email Real-Time Validation ────────────────────────────────
+    const emailInput    = document.getElementById('email');
+    const emailFeedback = document.getElementById('emailFeedback');
+    const emailIcon     = document.getElementById('emailIcon');
+
+    // Basic RFC-ish email format check
+    function isValidEmailFormat(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+    }
+
+    function setEmailState(state, message) {
+        // state: 'checking' | 'invalid_format' | 'taken' | 'available' | 'empty'
+        emailInput.classList.remove('is-valid', 'is-invalid');
+        emailIcon.className = 'bi';
+
+        emailFeedback.style.display = 'none';
+        emailFeedback.className = 'email-feedback mt-1';
+
+        if (state === 'empty') {
+            emailIcon.classList.add('bi-envelope', 'text-muted');
+            return;
+        }
+
+        if (state === 'checking') {
+            emailIcon.classList.add('bi-hourglass-split', 'text-muted');
+            emailFeedback.style.display = 'block';
+            emailFeedback.classList.add('text-muted');
+            emailFeedback.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>' + message;
+            return;
+        }
+
+        if (state === 'invalid_format') {
+            emailInput.classList.add('is-invalid');
+            emailIcon.classList.add('bi-x-circle-fill', 'text-danger');
+            emailFeedback.style.display = 'block';
+            emailFeedback.classList.add('text-danger');
+            emailFeedback.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>' + message;
+            return;
+        }
+
+        if (state === 'taken') {
+            emailInput.classList.add('is-invalid');
+            emailIcon.classList.add('bi-x-circle-fill', 'text-danger');
+            emailFeedback.style.display = 'block';
+            emailFeedback.classList.add('text-danger');
+            emailFeedback.innerHTML = '<i class="bi bi-x-circle-fill me-1"></i>' + message;
+            return;
+        }
+
+        if (state === 'available') {
+            emailInput.classList.add('is-valid');
+            emailIcon.classList.add('bi-check-circle-fill', 'text-success');
+            emailFeedback.style.display = 'block';
+            emailFeedback.classList.add('text-success');
+            emailFeedback.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>' + message;
+            return;
+        }
+    }
+
+    let emailDebounceTimer = null;
+
+    emailInput.addEventListener('input', function () {
+        clearTimeout(emailDebounceTimer);
+        const value = this.value.trim();
+
+        if (value.length === 0) {
+            setEmailState('empty');
+            return;
+        }
+
+        if (!isValidEmailFormat(value)) {
+            setEmailState('invalid_format', 'Please enter a valid email address (e.g. user@example.com)');
+            return;
+        }
+
+        // Format is valid — debounce the AJAX check
+        setEmailState('checking', 'Checking availability...');
+
+        emailDebounceTimer = setTimeout(function () {
+            fetch('{{ route('superadmin.check.email') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ email: value })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'available') {
+                    setEmailState('available', 'Email is available and ready to use');
+                } else if (data.status === 'taken') {
+                    setEmailState('taken', 'This email is already registered in the system');
+                } else {
+                    setEmailState('invalid_format', data.message || 'Invalid email format');
+                }
+            })
+            .catch(() => {
+                setEmailState('invalid_format', 'Could not verify email. Please try again.');
+            });
+        }, 600); // wait 600ms after user stops typing
+    });
+
+    // ─── Form Submit ───────────────────────────────────────────────
+    const form      = document.getElementById('createUserForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function (e) {
+            // Block submit if email is not confirmed available
+            if (!emailInput.classList.contains('is-valid')) {
+                e.preventDefault();
+                setEmailState('invalid_format', 'Please enter a valid, available email before submitting');
+                emailInput.focus();
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Creating...';
+        });
+    }
+
+    // ─── Reset ─────────────────────────────────────────────────────
+    const resetFormBtn = document.getElementById('resetFormBtn');
+
+    if (resetFormBtn) {
+        resetFormBtn.addEventListener('click', function () {
+            passwordStrength.classList.add('d-none');
+            passwordMatchIndicator.style.display = 'none';
+            [reqLength, reqLowercase, reqUppercase, reqNumber, reqSpecial].forEach(el => updateRequirement(el, false));
+            setEmailState('empty');
+
+            if (typeof toastr !== 'undefined') {
+                toastr.info('The form fields have been cleared and reset.', 'Form Reset', {
+                    closeButton: true, progressBar: true,
+                    positionClass: 'toast-top-right', timeOut: '3000'
+                });
+            }
+        });
+    }
+});
 </script>
 
 <style>
@@ -603,6 +714,16 @@
     color: #991b1b;
     display: block;
 }
+
+/* Email feedback */
+.email-feedback {
+    font-size: 0.875rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: 6px;
+}
+.email-feedback.text-success { background: #d1fae5; }
+.email-feedback.text-danger  { background: #fee2e2; }
+.email-feedback.text-muted   { background: #f3f4f6; }
 </style>
 
 @endsection
