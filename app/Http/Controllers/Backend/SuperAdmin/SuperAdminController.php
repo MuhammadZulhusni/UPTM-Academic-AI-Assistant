@@ -741,6 +741,7 @@ public function Dashboard()
         }
     }
     
+    // This method checks if an email address is already registered in the system
     public function checkEmail(Request $request)
     {
         $email = $request->get('email');
