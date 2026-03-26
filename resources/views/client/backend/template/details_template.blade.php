@@ -3,6 +3,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<!-- After finalizing, separate to another file for css. -->
 <style>
     :root {
         --primary-color: #007bff;
@@ -760,7 +761,8 @@
                             maxlength="50000"
                             required></textarea>
                         
-                        <!-- AI Suggestion Button -->
+                        <!-- AI Suggestion Button = Suggestion1 -->
+                        <!-- user enters content in the textarea & clicks the “Get AI Suggestions” button to request cognitive-level enhancements -->
                         <div class="ai-suggestion-wrapper mt-3">
                             <button type="button" 
                                     class="ai-suggest-btn" 
@@ -889,8 +891,8 @@
 
 
 <script>
-// --- JAVASCRIPT LOGIC (FIXED) ---
-
+// AJAX Submission = Generator4
+// Form data is submitted using Fetch API with CSRF protection to backend.
 document.getElementById('generateForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -908,6 +910,10 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); 
 
+    // Uses Fetch API
+    // Sends POST request
+    // Sends data asynchronously
+    // Accepts JSON response
     fetch(form.action, {
         method: 'POST',
         body: formData,
@@ -1020,10 +1026,14 @@ function simulateProgress() {
     window.currentLoadingInterval = interval;
 }
 
+// This function performs frontend validation before sending data to the server to improve UX
 function validateForm(form) {
     const requiredFields = form.querySelectorAll('[required]');
     let isValid = true;
     
+    // Frontend validation improves UX.
+    // Backend validation ensures security and data integrity.
+    // (Client and Server Validation JS: submit handler logic) 
     requiredFields.forEach(field => {
         if (!field.value.trim()) {
             field.classList.add('is-invalid');
@@ -1050,7 +1060,7 @@ function updateCounts() {
 }
 
 /**
- * FIX: Corrected counter animation logic to prevent non-stop incrementing.
+ * Corrected counter animation logic to prevent non-stop incrementing.
  */
 function animateCounter(elementId, targetValue) {
     const element = document.getElementById(elementId);
@@ -1080,7 +1090,7 @@ function animateCounter(elementId, targetValue) {
     }
 }
 
-// UPDATED formatContent function to match Documents modal format
+// formatContent function to match Documents modal format
 function formatContent(output, formData) {
     if (!output) return "";
 
@@ -1149,9 +1159,9 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-/* ========================================
+/*
    DOCUMENT CONTENT STYLES (Match Documents Modal)
-   ======================================== */
+ */
 const documentStyles = `
 <style>
     /* Match the exact styles from Documents modal */
@@ -1326,9 +1336,7 @@ async function downloadPDF(editor, fileName) {
         // Extract template title
         const templateTitle = document.querySelector('.nk-editor-title h4')?.textContent?.trim() || 'Generated Content';
         
-        // ==========================================
         // TITLE PAGE
-        // ==========================================
         
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
@@ -1366,9 +1374,7 @@ async function downloadPDF(editor, fileName) {
         doc.addPage();
         yPosition = margin;
         
-        // ==========================================
-        // CONTENT PAGES - CLEAN LAYOUT
-        // ==========================================
+        // CONTENT PAGES CLEAN LAYOUT
         
         const contentElements = editor.querySelectorAll('.doc-paragraph, .doc-h2, .doc-h3, .doc-h4, .doc-list');
         
@@ -1564,9 +1570,7 @@ async function downloadPDF(editor, fileName) {
             });
         }
         
-        // ==========================================
         // PAGE NUMBERS AND HEADERS
-        // ==========================================
         const totalPages = doc.internal.getNumberOfPages();
         
         for (let i = 1; i <= totalPages; i++) {
@@ -1649,9 +1653,7 @@ function showError(message) {
     }
 }
 
-// ========================================
 // RESET BUTTON FUNCTIONALITY
-// ========================================
 document.addEventListener('DOMContentLoaded', function() {
     const resetBtn = document.querySelector('.btn-outline-secondary');
     const generateForm = document.getElementById('generateForm');
@@ -1710,7 +1712,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script>
-// NEW: AI Suggestion Feature (OPTIMIZED & BUG-FIXED)
+// AI Suggestion Feature 
 document.addEventListener('DOMContentLoaded', function() {
     const textareas = document.querySelectorAll('.ai-textarea');
     
@@ -1779,6 +1781,7 @@ async function fetchAISuggestions(fieldName, currentInput, language) {
             throw new Error('CSRF token not found in page');
         }
         
+        // JS captures the user input and sends it asynchronously to the Laravel backend using AJAX, including the selected language. = Suggestion2
         const response = await fetch('{{ route("user.ai.suggestion") }}', {
             method: 'POST',
             headers: {
@@ -1828,7 +1831,7 @@ async function fetchAISuggestions(fieldName, currentInput, language) {
 }
 
 /**
- * Display suggestions with aesthetic soft color design
+ * Display suggestions, the frontend dynamically renders the suggestions in a dropdown menu under the textarea without reloading the page. = Suggestion7
  */
 function displaySuggestions(fieldName, suggestions) {
     const container = document.getElementById(`suggestions-${fieldName.replace(/ /g, '-')}`);

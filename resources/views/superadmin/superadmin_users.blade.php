@@ -353,20 +353,12 @@
                             <input type="email" class="form-control" id="edit_email" name="email" required>
                         </div>
                         <div class="col-md-6">
-                            <label for="edit_phone" class="form-label fw-medium">Phone</label>
-                            <input type="text" class="form-control" id="edit_phone" name="phone">
-                        </div>
-                        <div class="col-md-6">
                             <label for="edit_role" class="form-label fw-medium">Role <span class="text-danger">*</span></label>
                             <select class="form-select" id="edit_role" name="role" required>
                                 <option value="student">Student</option>
                                 <option value="lecturer">Lecturer</option>
                                 <option value="admin">Admin</option>
                             </select>
-                        </div>
-                        <div class="col-12">
-                            <label for="edit_address" class="form-label fw-medium">Address</label>
-                            <textarea class="form-control" id="edit_address" name="address" rows="2"></textarea>
                         </div>
                         <div class="col-12">
                             <div class="form-check form-switch">
@@ -379,7 +371,6 @@
                     </div>
                 </div>
                 <div class="modal-footer justify-content-end border-0 px-4 py-3">
-                    <!-- <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button> -->
                     <button type="submit" class="btn btn-primary rounded-pill">Save Changes</button>
                 </div>
             </form>
@@ -479,8 +470,6 @@
                 .then(user => {
                     document.getElementById('edit_name').value = user.name;
                     document.getElementById('edit_email').value = user.email;
-                    document.getElementById('edit_phone').value = user.phone || '';
-                    document.getElementById('edit_address').value = user.address || '';
                     document.getElementById('edit_role').value = user.role;
                     document.getElementById('edit_is_active').checked = user.is_active;
                     
