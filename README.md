@@ -1,135 +1,141 @@
 # UPTM Academic AI Assistant System
 
 ## Overview
-The **UPTM Academic AI Assistant System** is a web-based academic support platform designed to simplify learning, teaching, and academic writing for **students and lecturers**.  
-The system integrates **AI-powered content generation** to assist users with academic tasks while maintaining structured access control through multiple user roles.
 
-This project was developed using **Laravel**, **Tailwind CSS**, **Bootstrap**, and the **OpenAI API**, focusing on security, usability, and role-based functionality.
+The UPTM Academic AI Assistant System is a web-based academic support platform for students and lecturers. It uses AI-powered templates to help with academic writing and learning tasks, with access controlled by role-based authentication.
 
----
+The system is built with Laravel 12, MySQL, and the OpenAI API. Dashboards use the Softnio NioBoard UI (Bootstrap-based). Tailwind CSS is used on the authentication pages.
 
 ## Objectives
-- Provide AI-assisted academic support for students and lecturers  
-- Implement secure authentication and role-based access control  
-- Allow administrators to manage users, templates, and system activities  
-- Maintain document history for academic reference  
 
----
+- Provide AI-assisted academic writing support for students and lecturers
+- Implement secure authentication and role-based access control
+- Allow SuperAdmin to manage users, templates, activity logs, and document retention
+- Allow Admin to manage templates and student/lecturer accounts
+- Keep a document history of AI-generated outputs per user
 
 ## Technologies Used
-- **Backend:** Laravel (PHP)
-- **Frontend:** Tailwind CSS, Bootstrap, JavaScript (AJAX / Fetch API)
-- **Database:** MySQL
-- **AI Integration:** OpenAI API
-- **Authentication & Authorization:** Role-Based Access Control (RBAC)
 
----
+- **Backend:** Laravel 12 (PHP 8.2+)
+- **Frontend:** Softnio NioBoard (Bootstrap) for dashboards; Tailwind CSS for login, register, and password reset; JavaScript (Fetch API)
+- **Database:** MySQL
+- **AI Integration:** OpenAI PHP SDK (`openai-php/laravel`)
+- **Authentication:** Laravel Breeze with role middleware (`superadmin`, `admin`, `student`, `lecturer`)
 
 ## User Roles & Features
 
+There are four roles. Students and lecturers share the same user portal. Templates are filtered by category (`student` or `lecturer`).
+
 ### SuperAdmin
-SuperAdmin has full system control, including:
-- Manage all users (**Admins, Lecturers, Students**) = CRUD
-- Activate / deactivate user accounts
-- Create new user accounts
-- Create and manage AI content templates
-- Template Library management (CRUD & status control)
-- Track admin activities
-- Clean up old admin activity logs
-- Delete old user-generated documents to optimize database storage
+
+- Create, view, update, and delete Admin, Lecturer, and Student accounts (soft delete)
+- Activate or deactivate user accounts
+- Search users and send password-reset emails
+- Create and manage AI templates (CRUD and active/inactive status)
+- Generate content from templates and keep own document history
+- View Admin activity logs, export them as CSV, and clean up old logs
+- Configure activity-log and document retention, including manual cleanup of old generated documents
 
 ### Admin
-Admin has limited administrative privileges:
-- Delete users (Admins, Lecturers, Students)
-- Create AI content templates
-- Manage Template Library (CRUD & status control)
+
+- View and delete Lecturer and Student accounts only (cannot create users, activate accounts, or delete other Admins)
+- Create and manage AI templates (CRUD and status toggle)
+- Generate content from templates and manage own document history
+- Update profile and password
+- No access to system activity logs or retention settings
 
 ### Users (Lecturers / Students)
-Users can:
-- Use AI templates provided by SuperAdmin or Admin
-- Generate academic-related content
-- View document history for past AI-generated outputs
+
+- Register for a Lecturer or Student account
+- Use active templates that match their role category
+- Generate academic content and request AI suggestions for input fields
+- View, edit, and delete own document history
+- Update profile and password
+- Inactive accounts cannot sign in
 
 ### Shared Features (All Roles)
+
 - User profile management
 - Change password
-- Document history (AI-generated output records)
-
----
+- Document history for that user's AI-generated outputs (view, edit, delete)
+- SuperAdmin and Admin can also generate content, not only Lecturers and Students
 
 ## Content Generation Workflow
 
-### 1. Template-Based Input
+### 1. Template-based input
 
-The template defines:
+Each template defines:
+
 - Page title and description
 - Dynamic input fields
-- Basic validation rules
+- Validation rules for those fields
 
-All input fields are rendered automatically based on the selected template.  
-Users can also select:
-- Language (English or Bahasa Melayu)
-- AI model (GPT-3.5 Turbo or GPT-4)
+Input fields are rendered from the selected template. Users can also choose:
 
-### 2. User Input Validation 
+- Language: English or Bahasa Melayu
+- AI model: GPT-3.5 Turbo or GPT-4
 
-Before data is sent to the server:
-- Required fields are checked using **client-side JavaScript**
+### 2. User input validation
+
+Before the request is sent:
+
+- Required fields are checked in the browser
 - Empty inputs are highlighted
-- The generate button is disabled during processing
+- The generate button is disabled while the request is in progress
 
-### 3. Data Submission (AJAX / Fetch API)
+### 3. Data submission
 
-When the user clicks **Generate Content**:
-- Form data is sent using **AJAX (Fetch API)**
-- A **POST** request is sent to the Laravel backend
-- **CSRF protection** is applied
+When the user clicks Generate Content:
 
-### 4. AI Processing (OpenAI API)
+- Form data is sent with the Fetch API
+- A POST request goes to the Laravel backend
+- CSRF protection is applied
+
+### 4. AI processing (OpenAI API)
 
 On the backend:
-- Laravel controllers process the request
-- User input is combined with the template prompt
-- The selected AI model is called using the **OpenAI API**
 
-The AI response is returned to the frontend in **JSON format**.
+- The controller validates the request
+- User input is inserted into the template prompt
+- The selected model (`gpt-3.5-turbo` or `gpt-4`) is called through the OpenAI API
+- The response is returned to the frontend as JSON
 
-### 5. Output Display 
+### 5. Output display
 
 After content is generated:
-- The AI output is cleaned and formatted using **JavaScript**
-- The content is displayed in the output panel
 
----
+- The AI output is cleaned and formatted in JavaScript
+- The content is shown in the output panel
+- The result can be saved to document history
 
 ## AI Suggestions for Input Fields
 
 ### How it works
 
-1. **User Input**
-   - User types text into a textarea.
-   - Clicks the **"Get AI Suggestions"** button.
+1. **User input**  
+   The user types into a textarea and clicks Get AI Suggestions.
 
-2. **AJAX Request**
-   - JavaScript sends the current input, language, and template context to the Laravel backend.
+2. **AJAX request**  
+   JavaScript sends the current input, language, and template context to Laravel.
 
-3. **Backend Processing**
-   - Validates input.
-   - Builds a structured prompt for the OpenAI API.
-   - Requests 6 academic suggestions corresponding to Bloom’s Taxonomy levels:
-     1. Remember
-     2. Understand
-     3. Apply
-     4. Analyze
-     5. Evaluate
-     6. Create
+3. **Backend processing**  
+   The controller validates the input and builds a structured prompt. It asks OpenAI for 6 academic suggestions mapped to Bloom's Taxonomy:
 
-4. **OpenAI Response**
-   - Returns suggestions as JSON.
+   - Remember
+   - Understand
+   - Apply
+   - Analyze
+   - Evaluate
+   - Create
 
-5. **Display Suggestions (Frontend)**
-   - JavaScript shows suggestions in a dropdown under the textarea.
-   - Users can select a suggestion to refine their input before full content generation.
+   Suggestion requests use GPT-4 (the generation form still lets the user pick GPT-3.5 Turbo or GPT-4 for full content).
+
+4. **OpenAI response**  
+   Suggestions are returned as JSON.
+
+5. **Display**  
+   JavaScript shows the suggestions in a dropdown under the textarea, with Bloom's level labels. The user can select a suggestion to refine the input before generating full content.
+
   
 ---
 
