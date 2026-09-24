@@ -26,7 +26,7 @@
             <div class="nk-header-tools">
                 <ul class="nk-quick-nav ms-2">
                     <li class="dropdown d-inline-flex">
-                        <a data-bs-toggle="dropdown" class="d-inline-flex" href="#">
+                        <a class="d-inline-flex"href="{{ route('admin.profile') }}">
                             <div class="media media-md media-circle media-middle text-bg-primary" 
                                 style="border-radius:50%; overflow:hidden; width:50px; height:50px; display:flex; align-items:center; justify-content:center;">
                                 <img src="{{ (!empty($profileData->photo)) ? url('upload/admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" 

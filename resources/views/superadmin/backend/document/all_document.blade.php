@@ -442,9 +442,6 @@
 </style>
 
 <script>
-// ==========================================
-// DOCUMENT CONTENT LOADING
-// ==========================================
 function loadDocumentContentFromData(button) {
     const id = button.getAttribute('data-document-id');
     const title = button.getAttribute('data-document-title');
@@ -514,12 +511,6 @@ function formatDocument(text) {
     return parts.map(p => `<p class="doc-paragraph">${p}</p>`).join("");
 }
 
-// ==========================================
-// COPY CONTENT FUNCTION - IMPROVED
-// ==========================================
-// ==========================================
-// COPY CONTENT FUNCTION - IMPROVED
-// ==========================================
 function copyContent() {
     const contentElement = document.getElementById('documentContentText');
     if (!contentElement) {
@@ -615,9 +606,6 @@ function fallbackCopy(text) {
     document.body.removeChild(textArea);
 }
 
-// ==========================================
-// DOWNLOAD PDF FUNCTION
-// ==========================================
 function downloadPDF() {
     const titleElement = document.getElementById('documentTitle');
     const contentElement = document.getElementById('documentContentText');
@@ -658,7 +646,6 @@ function downloadPDF() {
         const listItemGap = 3;
         const listBottomGap = 6;
 
-        // TITLE PAGE
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
         
@@ -694,7 +681,6 @@ function downloadPDF() {
         doc.addPage();
         yPosition = margin;
         
-        // CONTENT PAGES
         const contentElements = contentElement.querySelectorAll('.doc-paragraph, .doc-h2, .doc-h3, .doc-h4, .doc-list');
         
         if (contentElements.length === 0) {
@@ -834,7 +820,6 @@ function downloadPDF() {
             });
         }
         
-        // PAGE NUMBERS AND HEADERS
         const totalPages = doc.internal.getNumberOfPages();
         
         for (let i = 1; i <= totalPages; i++) {
@@ -871,9 +856,6 @@ function downloadPDF() {
     resetButton(btn, originalHTML);
 }
 
-// ==========================================
-// UTILITY FUNCTIONS
-// ==========================================
 function resetButton(btn, originalHTML) {
     setTimeout(() => {
         btn.disabled = false;
@@ -927,9 +909,6 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// ==========================================
-// SEARCH FUNCTIONALITY
-// ==========================================
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.document-row');
@@ -954,9 +933,6 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     }
 });
 
-// ==========================================
-// BOOTSTRAP TOOLTIPS INITIALIZATION
-// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -964,9 +940,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ==========================================
-// DELETE MODAL HANDLER
-// ==========================================
 const confirmDeleteModal = document.getElementById('confirmDeleteModal');
 confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget;

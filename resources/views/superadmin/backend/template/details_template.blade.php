@@ -16,7 +16,6 @@
         --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
 
-    /* --- Base Resets & Typography --- */
     body {
         font-family: var(--font-family-base);
         background-color: var(--panel-bg);
@@ -29,7 +28,6 @@
         margin-bottom: 0.25rem;
     }
     
-    /* --- Back Button Styles --- */
     .back-button-wrapper {
         margin-bottom: 1.5rem;
     }
@@ -69,7 +67,6 @@
         transform: translateX(-3px);
     }
     
-    /* --- Main Structure & Layout --- */
     .page-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
@@ -77,7 +74,6 @@
         margin: 0 auto;
     }
 
-    /* --- Input Panel (Top Section) --- */
     .input-panel-card {
         background-color: var(--card-bg);
         border: none;
@@ -120,7 +116,6 @@
         grid-column: 1 / -1;
     }
 
-    /* --- Output Panel (Bottom Section) --- */
     .output-panel-card {
         background-color: var(--card-bg);
         border: none;
@@ -177,7 +172,6 @@
         min-height: 500px;
     }
 
-    /* --- Form Elements --- */
     .form-label {
         font-weight: 600;
         color: var(--dark-color);
@@ -208,7 +202,6 @@
         background-color: #ffffff;
     }
 
-    /* --- Buttons & Actions --- */
     .action-buttons {
         display: flex;
         gap: 1rem;
@@ -251,7 +244,6 @@
         color: #495057;
     }
     
-    /* --- Loading Overlay --- */
     .loading-overlay {
         position: absolute;
         top: 0;
@@ -347,7 +339,6 @@
         40% { transform: scale(1); opacity: 1; }
     }
 
-    /* --- Placeholder --- */
     .placeholder-content {
         display: flex;
         flex-direction: column;
@@ -376,11 +367,6 @@
         color: #adb5bd;
         font-size: 0.95rem;
     }
-    
-    /* ========================================
-       DYNAMIC CONTENT STYLING
-       Same text size and weight, balanced spacing
-       ======================================== */
     
     .content-wrapper {
         max-width: 100%;
@@ -479,7 +465,6 @@
         }
     }
 
-    /* --- Statistics Bar --- */
     .stats-bar {
         display: flex;
         align-items: center;
@@ -506,9 +491,6 @@
         font-size: 1rem;
     }
 
-    /* ========================================
-       AI SUGGESTION STYLES
-       ======================================== */
     .ai-suggest-btn {
         display: inline-flex;
         align-items: center;
@@ -834,7 +816,7 @@
                     
                     <div class="d-flex align-items-center gap-3 flex-wrap">
                         <!-- Statistics -->
-                        <div class="stats-bar">
+                        <!-- <div class="stats-bar">
                             <div class="stat-item">
                                 <em class="icon ni ni-text"></em>
                                 <span>Words: <span class="stat-value" id="word-count">0</span></span>
@@ -843,7 +825,7 @@
                                 <em class="icon ni ni-edit"></em>
                                 <span>Characters: <span class="stat-value" id="char-count">0</span></span>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Export Dropdown -->
                         <div class="dropdown">
@@ -889,7 +871,6 @@
 </div>
 
 <script>
-// --- JAVASCRIPT LOGIC (FIXED) ---
 
 document.getElementById('generateForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -1149,9 +1130,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-/* ========================================
-   DOCUMENT CONTENT STYLES (Match Documents Modal)
-   ======================================== */
 const documentStyles = `
 <style>
     /* Match the exact styles from Documents modal */
@@ -1326,9 +1304,6 @@ async function downloadPDF(editor, fileName) {
         // Extract template title
         const templateTitle = document.querySelector('.nk-editor-title h4')?.textContent?.trim() || 'Generated Content';
         
-        // ==========================================
-        // TITLE PAGE
-        // ==========================================
         
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
@@ -1366,9 +1341,6 @@ async function downloadPDF(editor, fileName) {
         doc.addPage();
         yPosition = margin;
         
-        // ==========================================
-        // CONTENT PAGES - CLEAN LAYOUT
-        // ==========================================
         
         const contentElements = editor.querySelectorAll('.doc-paragraph, .doc-h2, .doc-h3, .doc-h4, .doc-list');
         
@@ -1564,9 +1536,6 @@ async function downloadPDF(editor, fileName) {
             });
         }
         
-        // ==========================================
-        // PAGE NUMBERS AND HEADERS
-        // ==========================================
         const totalPages = doc.internal.getNumberOfPages();
         
         for (let i = 1; i <= totalPages; i++) {
@@ -1649,9 +1618,6 @@ function showError(message) {
     }
 }
 
-// ========================================
-// RESET BUTTON FUNCTIONALITY
-// ========================================
 document.addEventListener('DOMContentLoaded', function() {
     const resetBtn = document.querySelector('.btn-outline-secondary');
     const generateForm = document.getElementById('generateForm');

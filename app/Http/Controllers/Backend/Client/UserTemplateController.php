@@ -49,7 +49,7 @@ class UserTemplateController extends Controller
             });
         }
         
-        // Sort filter - Added 'oldest' option
+        // Sort filter = Added 'oldest' option
         $sort = $request->get('sort', 'newest');
         
         if ($sort === 'title') {
@@ -88,20 +88,22 @@ class UserTemplateController extends Controller
             ], 401);
         }
 
-        // Validate basic request inputs 
+        // Validate selected language and AI model to prevent invalid or unauthorized input. = Generator1
         $validatedData = $request->validate([
             'language' => 'required|string|in:English,Bahasa Melayu',
             'ai_model' => 'required|string|in:gpt-4,gpt-3.5-turbo',
         ]);
 
-        // Step 2: Fetch template and validate dynamic input fields
+        // Step 2: Fetch template and validate dynamic input fields 
+        // Retrieve selected template with dynamic input fields and predefined AI prompt structure (AI prompt already written or set by admin/superadmin) = Generator2
         $template = Template::with(['inputFields' => function ($query) {
             $query->select('id', 'template_id', 'title');
         }])
         ->select('id', 'prompt')
         ->findOrFail($id);
 
-        // Build dynamic validation rules
+        // Generate validation rules dynamically based on template-defined input fields (no hardcoding). = Generator3
+        // The system automatically shows input fields based on the chosen template, no hardcoding needed.
         $dynamicRules = [];
         $fieldNames = [];
         foreach ($template->inputFields as $field) {
@@ -110,16 +112,17 @@ class UserTemplateController extends Controller
             $fieldNames[] = $fieldName;
         }
 
+        // Dynamic validation for input fields defined in the template
         $request->validate($dynamicRules);
         $inputData = $request->only($fieldNames);
 
         // Step 3: Build AI prompt with input replacements
+        // Construct dynamic AI prompt by replacing template placeholders with validated user inputs = Generator5
         $replacements = [];
         foreach ($inputData as $key => $value) {
             $replacements['{' . $key . '}'] = $value;
             $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
         }
-
         $prompt = strtr($template->prompt, $replacements);
 
         // Build messages without length constraint
@@ -130,6 +133,7 @@ class UserTemplateController extends Controller
             // Determine appropriate max_tokens based on model
             $maxTokens = $validatedData['ai_model'] === 'gpt-4' ? 4096 : 3000;
             
+            // Send structured prompt to selected OpenAI model for AI-based content generation = Generator6
             $response = OpenAI::chat()->create([
                 'model' => $validatedData['ai_model'],
                 'messages' => $messages,
@@ -139,7 +143,7 @@ class UserTemplateController extends Controller
 
             $output = $response->choices[0]->message->content;
 
-            // Validate output language
+            // Perform post-generation language validation to ensure output quality and compliance = Generator7
             $languageCheck = $this->validateOutputLanguage($output, $validatedData['language']);
             if (!$languageCheck['valid']) {
                 Log::warning('Generated content language mismatch', [
@@ -156,6 +160,7 @@ class UserTemplateController extends Controller
             DB::transaction(function () use ($user, $template, $inputData, $output, $wordCount) {
                 User::where('id', $user->id)->increment('words_used', $wordCount);
 
+                // Store generated content within a database = Generator8
                 GeneratedContent::create([
                     'user_id' => $user->id,
                     'template_id' => $template->id,
@@ -167,6 +172,7 @@ class UserTemplateController extends Controller
                 ]);
             });
 
+            // Return structured JSON response to frontend for dynamic content rendering. = Generator9
             return response()->json([
                 'success' => true,
                 'output' => $output,
@@ -342,7 +348,7 @@ class UserTemplateController extends Controller
             ], 401);
         }
 
-        // Validate request
+        // Validates user input to ensure data integrity and prevent invalid data from reaching the AI API = Suggestion3
         $validated = $request->validate([
             'field_name' => 'required|string',
             'current_input' => 'required|string|min:3|max:500',
@@ -350,6 +356,7 @@ class UserTemplateController extends Controller
             'template_context' => 'nullable|string|max:200'
         ]);
 
+        // The system dynamically constructs a structured prompt instructing the AI to generate six suggestions aligned with Bloom’s Taxonomy cognitive levels = Suggestion4
         try {
             // Build ACADEMIC-FOCUSED context-aware prompt with Bloom's Taxonomy
             $isMalay = $validated['language'] === 'Bahasa Melayu';
@@ -399,7 +406,7 @@ class UserTemplateController extends Controller
                 $userPrompt .= $contextNote;
             }
 
-            // Call OpenAI with optimized settings for academic content
+            // The backend sends the structured prompt to the OpenAI API using the Chat Completion endpoint and retrieves AI-generated suggestions. = Suggestion5
             $response = OpenAI::chat()->create([
                 'model' => 'gpt-4',
                 'messages' => [
@@ -416,6 +423,7 @@ class UserTemplateController extends Controller
             $suggestionArray = preg_split('/\n+|\d+\.\s*/', trim($suggestions), -1, PREG_SPLIT_NO_EMPTY);
             $suggestionArray = array_filter(array_map('trim', $suggestionArray));
 
+            // The backend returns the AI suggestions in JSON format to the frontend for dynamic rendering. = Suggestion6
             return response()->json([
                 'success' => true,
                 'suggestions' => array_values($suggestionArray)

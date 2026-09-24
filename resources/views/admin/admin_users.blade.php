@@ -37,9 +37,7 @@
             </div>
         </div>
 
-        {{--
-            Search bar, section header (Now cleaner as filters moved to header).
-        --}}
+        {{-- Search and table header --}}
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between border-bottom border-light mt-3 mt-md-5 mb-4 pb-2 gap-3">
             <div class="d-flex align-items-center gap-3">
                 <h5 class="mb-0">User Table</h5>
@@ -272,11 +270,7 @@
     </div>
 </div>
 
-{{--
-    ======================================
-    Filter Modal (Soft Color & Minimalist Design)
-    ======================================
---}}
+{{-- Filter modal --}}
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-sm modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
@@ -314,9 +308,7 @@
     </div>
 </div>
 
-{{--
-    Delete Confirmation Modal
---}}
+{{-- Delete confirmation modal --}}
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-md">
         <div class="modal-content text-center p-4">
@@ -347,9 +339,7 @@
     </div>
 </div>
 
-{{--
-    JavaScript for interactive features
---}}
+{{-- Interactive filters --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const modalFilterButtons = document.querySelectorAll('.role-filter-modal-btn');
@@ -403,7 +393,6 @@
 </script>
 
 <style>
-/* --- RESPONSIVE TABLE CSS (Card View) --- */
 @media screen and (max-width: 767px) { /* Applies to screens smaller than the 'md' breakpoint */
 
     /* Force table elements to display as block elements */

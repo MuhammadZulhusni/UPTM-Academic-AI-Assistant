@@ -277,7 +277,6 @@ $(document).ready(function() {
         }
     });
 
-    // --- Specific Toastr Errors ---
     @if($errors->has('old_password'))
         toastr.error("{{ $errors->first('old_password') }}");
     @endif
@@ -290,7 +289,6 @@ $(document).ready(function() {
         toastr.error("{{ $errors->first('new_password_confirmation') }}");
     @endif
 
-    // --- Reset Feedback ---
     $('#passwordForm').on('reset', function() {
         $('#old_password, #new_password, #new_password_confirmation')
             .attr('type', 'password');

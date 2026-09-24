@@ -532,7 +532,6 @@ document.addEventListener('DOMContentLoaded', function () {
     border-radius: 6px;
 }
 
-/* --- Other Styles --- */
 .category-segment-control .btn,
 .sort-segment-control .btn {
     border-radius: 8px !important;

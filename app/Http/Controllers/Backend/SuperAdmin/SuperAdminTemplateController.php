@@ -80,6 +80,7 @@ class SuperAdminTemplateController extends Controller
 
     public function Store(Request $request)
     {
+        // Step 1: Validate incoming request data
         $validated = $request->validate([
             'title' => 'required',
             'description' => 'required',
@@ -89,6 +90,8 @@ class SuperAdminTemplateController extends Controller
             'input_fields' => 'required|array'
         ]);
 
+        // Step 2: Create main template record in database
+        // Save template basic information
         $template = Template::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
@@ -99,9 +102,10 @@ class SuperAdminTemplateController extends Controller
             'created_by' => Auth::id()
         ]);
 
+        // Step 3: Store dynamic input fields related to this template
         foreach ($validated['input_fields'] as $field) {
             TemplateInputFields::create([
-                'template_id' => $template->id,
+                'template_id' => $template->id, // Link field to the created template
                 'title' => $field['title'],
                 'description' => $field['description'],
                 'type' => 'textarea',
@@ -109,6 +113,7 @@ class SuperAdminTemplateController extends Controller
             ]);
         }
 
+         // Step 4: Redirect back with success message
         return redirect()->route('superadmin.template')->with([
             'message' => 'Template Created Successfully',
             'alert-type' => 'success'

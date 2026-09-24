@@ -128,7 +128,7 @@
                             </div>
 
                             <!-- Preview Box -->
-                            <div class="preview-box mb-4">
+                            <!-- <div class="preview-box mb-4">
                                 <div class="d-flex align-items-start">
                                     <div class="preview-icon">
                                         <i class="bi bi-eye"></i>
@@ -140,7 +140,7 @@
                                         </p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="warning-box mb-4">
                                 <div class="d-flex align-items-start">
