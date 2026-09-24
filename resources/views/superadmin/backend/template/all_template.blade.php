@@ -191,9 +191,7 @@
         @endif
         {{-- END STATS CARD BLOCK --}}
 
-        {{-- =========================
-            TEMPLATE CARDS + ACTIONS
-        ========================= --}}
+        {{-- Template cards --}}
         <div class="row g-3 g-md-4 mt-2" id="templates-container">
             @foreach ($templates as $item)
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3 template-item"
@@ -272,9 +270,7 @@
             @endforeach
         </div>
 
-        {{-- =========================
-            STATUS CHANGE MODAL
-        ========================= --}}
+        {{-- Status change modal --}}
         <div class="modal fade" id="statusModal" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -576,7 +572,6 @@
     border-radius: 6px;
 }
 
-/* --- Other Styles --- */
 .category-segment-control .btn,
 .sort-segment-control .btn,
 .status-segment-control .btn {
@@ -1014,9 +1009,6 @@
     });
 </script>
 
-{{-- =========================
-     JAVASCRIPT: wire up modals  set form actions & text
-   ========================= --}}
 <script>
     // STATUS modal handler
     const statusModalEl = document.getElementById('statusModal');

@@ -8,7 +8,6 @@
 <!-- Custom Styles for Form Appearance (Copied from Create Page) -->
 <style>
 
-/* --- Back Button Styles --- */
 .back-button-wrapper {
     margin-bottom: 1.5rem;
 }

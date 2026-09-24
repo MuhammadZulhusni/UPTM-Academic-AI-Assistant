@@ -68,7 +68,7 @@
                                         <div class="email-feedback mt-1" id="emailFeedback" style="display:none;"></div>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <label for="phone" class="form-label fw-semibold">Phone Number</label>
                                         <input type="text" class="form-control @error('phone') is-invalid @enderror" 
                                             id="phone" name="phone" value="{{ old('phone') }}" 
@@ -77,7 +77,7 @@
                                         @error('phone')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                    </div>
+                                    </div> -->
                                     <div class="col-md-6">
                                         <label for="role" class="form-label fw-semibold">
                                             User Role <span class="text-danger">*</span>
@@ -100,7 +100,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="col-12">
+                                    <!-- <div class="col-12">
                                         <label for="address" class="form-label fw-semibold">Address</label>
                                         <textarea class="form-control @error('address') is-invalid @enderror" 
                                                   id="address" name="address" rows="2" 
@@ -108,7 +108,7 @@
                                         @error('address')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
 
@@ -426,25 +426,25 @@ document.addEventListener('DOMContentLoaded', function () {
     passwordConfirm.addEventListener('input', checkPasswordMatch);
 
     // ─── Phone: Numbers Only ───────────────────────────────────────
-    const phoneInput = document.getElementById('phone');
+    // const phoneInput = document.getElementById('phone');
 
-    phoneInput.addEventListener('input', function () {
-        // Strip anything that is not a digit
-        this.value = this.value.replace(/\D/g, '');
-    });
+    // phoneInput.addEventListener('input', function () {
+    //     // Strip anything that is not a digit
+    //     this.value = this.value.replace(/\D/g, '');
+    // });
 
-    phoneInput.addEventListener('keypress', function (e) {
-        if (!/[0-9]/.test(e.key)) {
-            e.preventDefault();
-        }
-    });
+    // phoneInput.addEventListener('keypress', function (e) {
+    //     if (!/[0-9]/.test(e.key)) {
+    //         e.preventDefault();
+    //     }
+    // });
 
     // Block paste of non-numeric content
-    phoneInput.addEventListener('paste', function (e) {
-        e.preventDefault();
-        const pasted = (e.clipboardData || window.clipboardData).getData('text');
-        this.value = (this.value + pasted).replace(/\D/g, '').slice(0, 15);
-    });
+    // phoneInput.addEventListener('paste', function (e) {
+    //     e.preventDefault();
+    //     const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    //     this.value = (this.value + pasted).replace(/\D/g, '').slice(0, 15);
+    // });
 
     // ─── Email Real-Time Validation ────────────────────────────────
     const emailInput    = document.getElementById('email');

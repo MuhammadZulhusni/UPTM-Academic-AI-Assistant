@@ -61,7 +61,7 @@
                                         <div class="caption-text fw-medium">{{ $document->firstItem() + $loop->index }}</div>
                                     </td>
                                     <td class="tb-col">
-                                        <div class="fs-6 fw-medium text-dark text-truncate" style="max-width: 350px;">{{ $item->template->title }}</div>
+                                        <div class="fs-6 fw-medium text-dark text-truncate" style="max-width: 350px;">{{ $item->template?->title ?? 'No Template' }}</div>
                                     </td>
                                     <td class="tb-col">
                                         <div class="fs-7 text-muted">
@@ -75,7 +75,7 @@
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#viewDocumentModal"
                                                     data-document-id="{{ $item->id }}"
-                                                    data-document-title="{{ $item->template->title }}"
+                                                    data-document-title="{{ $item->template?->title ?? 'No Template' }}"
                                                     data-output="{{ base64_encode($item->output) }}"
                                                     onclick="loadDocumentContentFromData(this)">
                                                 <i class="bi bi-eye"></i>
@@ -112,8 +112,8 @@
                             <div class="card-body p-3">
                                 <div class="d-flex align-items-center mb-2">
                                     <div class="flex-grow-1">
-                                        <h6 class="mb-0 text-dark fw-bold text-truncate" title="{{ $item->template->title }}">
-                                            {{ $document->firstItem() + $loop->index }}. {{ $item->template->title }}
+                                        <h6 class="mb-0 text-dark fw-bold text-truncate" title="{{ $item->template?->title ?? 'No Template' }}">
+                                            {{ $document->firstItem() + $loop->index }}. {{ $item->template?->title ?? 'No Template' }}
                                         </h6>
                                     </div>
                                     <span class="badge bg-light text-muted fw-normal ms-3">
@@ -127,7 +127,7 @@
                                             data-bs-toggle="modal"
                                             data-bs-target="#viewDocumentModal"
                                             data-document-id="{{ $item->id }}"
-                                            data-document-title="{{ $item->template->title }}"
+                                            data-document-title="{{ $item->template?->title ?? 'No Template' }}"
                                             data-output="{{ base64_encode($item->output) }}"
                                             onclick="loadDocumentContentFromData(this)">
                                         <i class="bi bi-eye"></i> View
@@ -442,9 +442,6 @@
 </style>
 
 <script>
-// ==========================================
-// DOCUMENT CONTENT LOADING
-// ==========================================
 function loadDocumentContentFromData(button) {
     const id = button.getAttribute('data-document-id');
     const title = button.getAttribute('data-document-title');
@@ -514,12 +511,6 @@ function formatDocument(text) {
     return parts.map(p => `<p class="doc-paragraph">${p}</p>`).join("");
 }
 
-// ==========================================
-// COPY CONTENT FUNCTION - IMPROVED
-// ==========================================
-// ==========================================
-// COPY CONTENT FUNCTION - IMPROVED
-// ==========================================
 function copyContent() {
     const contentElement = document.getElementById('documentContentText');
     if (!contentElement) {
@@ -615,9 +606,6 @@ function fallbackCopy(text) {
     document.body.removeChild(textArea);
 }
 
-// ==========================================
-// DOWNLOAD PDF FUNCTION
-// ==========================================
 function downloadPDF() {
     const titleElement = document.getElementById('documentTitle');
     const contentElement = document.getElementById('documentContentText');
@@ -658,7 +646,6 @@ function downloadPDF() {
         const listItemGap = 3;
         const listBottomGap = 6;
 
-        // TITLE PAGE
         doc.setFont("helvetica", "bold");
         doc.setFontSize(18);
         
@@ -694,7 +681,6 @@ function downloadPDF() {
         doc.addPage();
         yPosition = margin;
         
-        // CONTENT PAGES
         const contentElements = contentElement.querySelectorAll('.doc-paragraph, .doc-h2, .doc-h3, .doc-h4, .doc-list');
         
         if (contentElements.length === 0) {
@@ -834,7 +820,6 @@ function downloadPDF() {
             });
         }
         
-        // PAGE NUMBERS AND HEADERS
         const totalPages = doc.internal.getNumberOfPages();
         
         for (let i = 1; i <= totalPages; i++) {
@@ -871,9 +856,6 @@ function downloadPDF() {
     resetButton(btn, originalHTML);
 }
 
-// ==========================================
-// UTILITY FUNCTIONS
-// ==========================================
 function resetButton(btn, originalHTML) {
     setTimeout(() => {
         btn.disabled = false;
@@ -927,9 +909,6 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// ==========================================
-// SEARCH FUNCTIONALITY
-// ==========================================
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
     const rows = document.querySelectorAll('.document-row');
@@ -954,9 +933,6 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     }
 });
 
-// ==========================================
-// BOOTSTRAP TOOLTIPS INITIALIZATION
-// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -964,9 +940,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// ==========================================
-// DELETE MODAL HANDLER
-// ==========================================
 const confirmDeleteModal = document.getElementById('confirmDeleteModal');
 confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
     const button = event.relatedTarget;
