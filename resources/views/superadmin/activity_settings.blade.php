@@ -65,14 +65,9 @@
             <div class="col-lg-8 col-xl-7">
                 <div class="card border-0 shadow cleanup-card">
                     <div class="card-header cleanup-header">
-                        <div class="d-flex align-items-center">
-                            <div class="header-icon">
-                                <i class="bi bi-trash"></i>
-                            </div>
-                            <div class="ms-3">
-                                <h5 class="mb-0 fw-bold text-white">Delete Old Activity Logs</h5>
-                                <small class="text-white-50">Cleanup tool</small>
-                            </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold text-white">Delete Old Activity Logs</h5>
+                            <small class="text-white-50">Cleanup tool</small>
                         </div>
                     </div>
                     <div class="card-body p-4">
@@ -141,18 +136,6 @@
                                     </div>
                                 </div>
                             </div> -->
-
-                            <div class="warning-box mb-4">
-                                <div class="d-flex align-items-start">
-                                    <div class="warning-icon-sm">
-                                        <i class="bi bi-exclamation-triangle"></i>
-                                    </div>
-                                    <div class="ms-3">
-                                        <h6 class="fw-bold mb-1">Important Warning</h6>
-                                        <p class="mb-0 small">Once deleted, logs cannot be recovered. This action is permanent.</p>
-                                    </div>
-                                </div>
-                            </div>
 
                             <button 
                                 type="button" 
@@ -290,21 +273,6 @@
     border: none;
 }
 
-.header-icon {
-    width: 48px;
-    height: 48px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.header-icon i {
-    font-size: 24px;
-    color: white;
-}
-
 /* Input Styling */
 .cleanup-input-group {
     position: relative;
@@ -412,30 +380,6 @@
 }
 
 .preview-icon i {
-    color: white;
-    font-size: 18px;
-}
-
-/* Warning Box */
-.warning-box {
-    background: linear-gradient(135deg, #fff3cd 0%, #fff8e1 100%);
-    border: 2px solid #ffc107;
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-}
-
-.warning-icon-sm {
-    width: 36px;
-    height: 36px;
-    background: #ffc107;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.warning-icon-sm i {
     color: white;
     font-size: 18px;
 }

@@ -14,6 +14,7 @@
                  <div class="nk-block-head-content mt-4">
                      <div class="d-flex gap-2 align-items-center flex-wrap">
                          {{-- Filter Button --}}
+                         @include('components.find_template_modal', ['matchUrl' => route('admin.template.match')])
                          <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#templateFilterModal">
                              <em class="icon ni ni-filter me-1"></em>
                              <span>Filter & Search</span>

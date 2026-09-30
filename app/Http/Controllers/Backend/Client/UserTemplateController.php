@@ -12,6 +12,7 @@ use OpenAI\Laravel\Facades\OpenAI;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Services\AssignmentBriefExtractor;
 
 
 class UserTemplateController extends Controller
@@ -99,29 +100,42 @@ class UserTemplateController extends Controller
         $template = Template::with(['inputFields' => function ($query) {
             $query->select('id', 'template_id', 'title');
         }])
-        ->select('id', 'prompt')
+        ->select('id', 'prompt', 'allow_brief_upload')
         ->findOrFail($id);
 
         // Generate validation rules dynamically based on template-defined input fields (no hardcoding). = Generator3
         // The system automatically shows input fields based on the chosen template, no hardcoding needed.
+        $usesBrief = (bool) $template->allow_brief_upload;
         $dynamicRules = [];
         $fieldNames = [];
         foreach ($template->inputFields as $field) {
             $fieldName = str_replace(' ', '_', $field->title);
-            $dynamicRules[$fieldName] = 'required|string|max:1000';
+            $dynamicRules[$fieldName] = ($usesBrief ? 'nullable' : 'required').'|string|max:4000';
             $fieldNames[] = $fieldName;
+        }
+        if ($usesBrief) {
+            $dynamicRules['brief'] = 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:8192';
         }
 
         // Dynamic validation for input fields defined in the template
-        $request->validate($dynamicRules);
+        $request->validate($dynamicRules, [
+            'brief.required' => 'Upload a JPG, PNG, WEBP, or PDF, then generate.',
+        ]);
         $inputData = $request->only($fieldNames);
 
         // Step 3: Build AI prompt with input replacements
         // Construct dynamic AI prompt by replacing template placeholders with validated user inputs = Generator5
         $replacements = [];
         foreach ($inputData as $key => $value) {
-            $replacements['{' . $key . '}'] = $value;
-            $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
+            $text = trim((string) $value);
+            if ($text === '' && $usesBrief) {
+                $text = 'Take this from the attached assignment brief.';
+            }
+            $replacements['{' . $key . '}'] = $text;
+            $replacements['{' . str_replace('_', ' ', $key) . '}'] = $text;
+        }
+        if ($usesBrief && $request->file('brief')) {
+            $inputData['assignment_brief'] = $request->file('brief')->getClientOriginalName();
         }
         $prompt = strtr($template->prompt, $replacements);
 
@@ -134,14 +148,22 @@ class UserTemplateController extends Controller
             $maxTokens = $validatedData['ai_model'] === 'gpt-4' ? 4096 : 3000;
             
             // Send structured prompt to selected OpenAI model for AI-based content generation = Generator6
-            $response = OpenAI::chat()->create([
-                'model' => $validatedData['ai_model'],
-                'messages' => $messages,
-                'max_tokens' => $maxTokens, // Allow full response
-                'temperature' => 0.7,
-            ]);
+            if ($usesBrief) {
+                $output = app(AssignmentBriefExtractor::class)->generateFromBrief(
+                    $request->file('brief'),
+                    $messages,
+                    $validatedData['ai_model']
+                );
+            } else {
+                $response = OpenAI::chat()->create([
+                    'model' => $validatedData['ai_model'],
+                    'messages' => $messages,
+                    'max_tokens' => $maxTokens, // Allow full response
+                    'temperature' => 0.7,
+                ]);
 
-            $output = $response->choices[0]->message->content;
+                $output = $response->choices[0]->message->content;
+            }
 
             // Perform post-generation language validation to ensure output quality and compliance = Generator7
             $languageCheck = $this->validateOutputLanguage($output, $validatedData['language']);
@@ -179,6 +201,11 @@ class UserTemplateController extends Controller
                 'language_confidence' => $languageCheck['confidence'] ?? null
             ]);
 
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\OpenAI\Exceptions\ErrorException $e) {
             Log::error('OpenAI API error: ' . $e->getMessage(), [
                 'user_id' => $user->id,

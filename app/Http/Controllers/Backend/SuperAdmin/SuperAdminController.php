@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Carbon\Carbon;
 use App\Models\AdminActivity;
+use App\Models\AiOpsBrief;
 use App\Models\SystemSetting;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Support\Facades\Artisan;
@@ -90,6 +91,7 @@ public function Dashboard()
 
     // Latest templates for display
     $templates = Template::latest()->limit(6)->get();
+    $latestAiOpsBrief = AiOpsBrief::latest()->first();
 
     return view('superadmin.index', compact(
         'user',
@@ -117,7 +119,8 @@ public function Dashboard()
         'recentDocuments',
         'userGrowthRate',
         'documentGrowthRate',
-        'templates'
+        'templates',
+        'latestAiOpsBrief'
     ));
 }
 

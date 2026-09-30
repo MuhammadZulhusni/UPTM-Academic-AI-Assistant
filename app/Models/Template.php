@@ -9,8 +9,12 @@ class Template extends Model
 {
 
     use SoftDeletes;
-    
+
     protected $guarded = [];
+
+    protected $casts = [
+        'allow_brief_upload' => 'boolean',
+    ];
 
     /**
      * Defines a relationship where a Template belongs to a User.

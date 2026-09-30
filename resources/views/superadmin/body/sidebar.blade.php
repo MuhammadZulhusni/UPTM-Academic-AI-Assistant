@@ -126,6 +126,14 @@
                         </a>
                     </li>
                     <li class="nk-menu-item">
+                        <a href="{{ route('superadmin.inactive.nudge.index') }}" class="nk-menu-link">
+                            <span class="nk-menu-icon">
+                                <em class="icon bi bi-envelope-exclamation icon-outline-purple"></em>
+                            </span>
+                            <span class="nk-menu-text">User Reminders</span>
+                        </a>
+                    </li>
+                    <li class="nk-menu-item">
                         <a href="{{ route('superadmin.document') }}" class="nk-menu-link">
                             <span class="nk-menu-icon">
                                 <em class="icon bi bi-file-spreadsheet-fill icon-outline-blue"></em>

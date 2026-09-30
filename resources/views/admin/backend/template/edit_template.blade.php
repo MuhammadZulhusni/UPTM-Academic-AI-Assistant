@@ -147,6 +147,7 @@
                                     </select>
                                 </div>
                             </div>
+                            @include('components.template_brief_upload_option')
                         </div>
                     </div>
                     
@@ -169,7 +170,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="input_fields_0_title" class="form-label small">Field Title (Variable Name)</label>
-                                            <input type="text" name="input_fields[0][title]" id="input_fields_0_title" class="form-control form-control-sm" placeholder="e.g., topic" value="{{ $field->title }}" required>
+                                            <input type="text" name="input_fields[0][title]" id="input_fields_0_title" class="form-control form-control-sm" placeholder="e.g., topic" value="{{ $field->title }}" maxlength="30" required>
                                         </div> 
                                     </div>
                                     <div class="col-md-5">

@@ -12,7 +12,9 @@ use App\Models\GeneratedContent;
 use OpenAI\Laravel\Facades\OpenAI;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use App\Services\AssignmentBriefExtractor;
 use App\Traits\LogsAdminActivity; // Activities logging trait
+use App\Services\TemplateSuggestionService;
 
 class TemplateController extends Controller
 {
@@ -91,10 +93,11 @@ class TemplateController extends Controller
             'category' => 'required|string',
             'icon' => 'required|in:writing.png,teaching.png,learning.png',
             'prompt' => 'required|string',
+            'allow_brief_upload' => 'required|in:0,1',
             // Update this rule to use 'is_active_checkbox' from the form
             'is_active_checkbox' => 'nullable|in:on', // "on" is the value for checked checkboxes
             'input_fields' => 'required|array', // Allow for one or more fields
-            'input_fields.*.title' => 'required|string|max:255',
+            'input_fields.*.title' => 'required|string|max:30',
             'input_fields.*.description' => 'required|string',
             'input_fields.*.type' => 'nullable',
         ]);
@@ -108,6 +111,7 @@ class TemplateController extends Controller
         $template->category = $validateData['category'];
         $template->icon = $validateData['icon'];
         $template->prompt = $validateData['prompt'];
+        $template->allow_brief_upload = $validateData['allow_brief_upload'] === '1';
 
         // Convert the checkbox value to 1 or 0
         $template->is_active = isset($validateData['is_active_checkbox']) ? 0 : 1;
@@ -162,8 +166,9 @@ class TemplateController extends Controller
             'category' => 'required|string',
             'icon' => 'required|string',
             'prompt' => 'required|string',
+            'allow_brief_upload' => 'required|in:0,1',
             'input_fields' => 'required|array|size:1',
-            'input_fields.*.title' => 'required|string|max:255',
+            'input_fields.*.title' => 'required|string|max:30',
             'input_fields.*.description' => 'required|string',
         ]);
 
@@ -176,6 +181,7 @@ class TemplateController extends Controller
             'description' => $template->description,
             'category' => $template->category,
             'icon' => $template->icon,
+            'allow_brief_upload' => (bool) $template->allow_brief_upload,
         ];
         
         // Updates the template's properties with the validated data from the request.
@@ -184,6 +190,7 @@ class TemplateController extends Controller
         $template->category = $validateData['category'];
         $template->icon = $validateData['icon'];
         $template->prompt = $validateData['prompt'];
+        $template->allow_brief_upload = $validateData['allow_brief_upload'] === '1';
         $template->save();
 
         // The code below handles updating the related input fields.
@@ -244,26 +251,39 @@ class TemplateController extends Controller
         $template = Template::with(['inputFields' => function ($query) {
             $query->select('id', 'template_id', 'title');
         }])
-        ->select('id', 'prompt')
+        ->select('id', 'prompt', 'allow_brief_upload')
         ->findOrFail($id);
 
         // Build dynamic validation rules
+        $usesBrief = (bool) $template->allow_brief_upload;
         $dynamicRules = [];
         $fieldNames = [];
         foreach ($template->inputFields as $field) {
             $fieldName = str_replace(' ', '_', $field->title);
-            $dynamicRules[$fieldName] = 'required|string|max:1000';
+            $dynamicRules[$fieldName] = ($usesBrief ? 'nullable' : 'required').'|string|max:4000';
             $fieldNames[] = $fieldName;
         }
+        if ($usesBrief) {
+            $dynamicRules['brief'] = 'required|file|mimes:jpg,jpeg,png,webp,pdf|max:8192';
+        }
 
-        $request->validate($dynamicRules);
+        $request->validate($dynamicRules, [
+            'brief.required' => 'Upload a JPG, PNG, WEBP, or PDF, then generate.',
+        ]);
         $inputData = $request->only($fieldNames);
 
         // Step 3: Build AI prompt with input replacements
         $replacements = [];
         foreach ($inputData as $key => $value) {
-            $replacements['{' . $key . '}'] = $value;
-            $replacements['{' . str_replace('_', ' ', $key) . '}'] = $value;
+            $text = trim((string) $value);
+            if ($text === '' && $usesBrief) {
+                $text = 'Take this from the attached assignment brief.';
+            }
+            $replacements['{' . $key . '}'] = $text;
+            $replacements['{' . str_replace('_', ' ', $key) . '}'] = $text;
+        }
+        if ($usesBrief && $request->file('brief')) {
+            $inputData['assignment_brief'] = $request->file('brief')->getClientOriginalName();
         }
         // REMOVED: result_length replacement
 
@@ -277,14 +297,22 @@ class TemplateController extends Controller
             // Determine appropriate max_tokens based on model
             $maxTokens = $validatedData['ai_model'] === 'gpt-4' ? 4096 : 3000;
             
-            $response = OpenAI::chat()->create([
-                'model' => $validatedData['ai_model'],
-                'messages' => $messages,
-                'max_tokens' => $maxTokens, // Allow full response
-                'temperature' => 0.7,
-            ]);
+            if ($usesBrief) {
+                $output = app(AssignmentBriefExtractor::class)->generateFromBrief(
+                    $request->file('brief'),
+                    $messages,
+                    $validatedData['ai_model']
+                );
+            } else {
+                $response = OpenAI::chat()->create([
+                    'model' => $validatedData['ai_model'],
+                    'messages' => $messages,
+                    'max_tokens' => $maxTokens, // Allow full response
+                    'temperature' => 0.7,
+                ]);
 
-            $output = $response->choices[0]->message->content;
+                $output = $response->choices[0]->message->content;
+            }
 
             // Validate output language
             $languageCheck = $this->validateOutputLanguage($output, $validatedData['language']);
@@ -320,6 +348,11 @@ class TemplateController extends Controller
                 'language_confidence' => $languageCheck['confidence'] ?? null
             ]);
 
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
         } catch (\OpenAI\Exceptions\ErrorException $e) {
             Log::error('OpenAI API error: ' . $e->getMessage(), [
                 'user_id' => $user->id,
@@ -565,5 +598,57 @@ private function validateOutputLanguage($output, $requestedLanguage)
             'message' => 'Template status updated successfully',
             'alert-type' => 'success'
         ]);
+    }
+
+    public function WritePrompt(Request $request, TemplateSuggestionService $service)
+    {
+        $validated = $request->validate([
+            'wish' => 'required|string|min:10|max:500',
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:500',
+            'category' => 'nullable|string|max:50',
+            'fields' => 'required|array|min:1|max:8',
+            'fields.*.title' => 'required|string|max:30',
+            'fields.*.description' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            $prompt = $service->writePrompt(
+                $validated['wish'],
+                (string) ($validated['title'] ?? ''),
+                (string) ($validated['description'] ?? ''),
+                (string) ($validated['category'] ?? ''),
+                $validated['fields']
+            );
+
+            return response()->json([
+                'success' => true,
+                'prompt' => $prompt,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Custom prompt write failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Could not write the prompt. Please try again.',
+            ], 500);
+        }
+    }
+
+    public function SuggestTemplates(TemplateSuggestionService $service)
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'suggestions' => $service->suggest(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Template suggestions failed: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Could not generate template suggestions. Please try again.',
+            ], 500);
+        }
     }
 }

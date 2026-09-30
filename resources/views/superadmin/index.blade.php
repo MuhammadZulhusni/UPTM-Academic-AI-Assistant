@@ -411,6 +411,131 @@
     z-index: 1;
 }
 
+.ops-brief-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+}
+
+.ops-brief-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.25rem;
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.ops-brief-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.3rem 0;
+}
+
+.ops-brief-desc {
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 640px;
+}
+
+.ops-brief-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-shrink: 0;
+}
+
+.ops-brief-run {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+}
+
+.ops-brief-run:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.ops-brief-run:disabled {
+    opacity: 0.7;
+}
+
+.ops-brief-meta {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.ops-brief-body {
+    padding: 0.25rem 0;
+}
+
+.ops-brief-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: brief;
+}
+
+.ops-brief-list li {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.75rem;
+    padding: 0.95rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.ops-brief-list li:last-child {
+    border-bottom: none;
+}
+
+.ops-brief-list li::before {
+    counter-increment: brief;
+    content: counter(brief, decimal-leading-zero);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.15rem;
+}
+
+.ops-brief-empty {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .ops-brief-card-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ops-brief-actions {
+        justify-content: space-between;
+    }
+
+    .ops-brief-run {
+        width: auto;
+    }
+}
+
 .templates-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -524,6 +649,44 @@
             <div class="greeting-subtext">
                 <span class="status-dot"></span>
                 <span id="greeting-text">All systems operational</span>
+            </div>
+        </div>
+
+        <div class="ops-brief-card animate-in">
+            <div class="ops-brief-card-header">
+                <div>
+                    <h3 class="ops-brief-title">Weekly AI Ops Brief</h3>
+                    <p class="ops-brief-desc">
+                        Monday 8:00 AM report covering the previous week of platform activity.
+                    </p>
+                </div>
+                <div class="ops-brief-actions">
+                    @if($latestAiOpsBrief)
+                        <span class="ops-brief-meta">{{ $latestAiOpsBrief->period_start->format('d M Y') }} – {{ $latestAiOpsBrief->period_end->format('d M Y') }}</span>
+                    @endif
+                    <form action="{{ route('superadmin.ai.ops.brief.generate') }}" method="POST" onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').innerText = 'Generating...';">
+                        @csrf
+                        <button type="submit" class="ops-brief-run">Generate brief</button>
+                    </form>
+                </div>
+            </div>
+            <div class="ops-brief-body">
+                @if($latestAiOpsBrief)
+                    @php
+                        $briefLines = collect(preg_split('/\r\n|\r|\n/', $latestAiOpsBrief->summary ?? ''))
+                            ->map(fn ($line) => trim($line))
+                            ->filter()
+                            ->map(fn ($line) => ltrim($line, "-•* \t"))
+                            ->reject(fn ($line) => str_contains(strtolower($line), 'openai was unavailable'));
+                    @endphp
+                    <ol class="ops-brief-list">
+                        @foreach($briefLines as $line)
+                            <li>{{ $line }}</li>
+                        @endforeach
+                    </ol>
+                @else
+                    <p class="ops-brief-empty">No brief yet. Generate one to summarise the last 7 days of system usage.</p>
+                @endif
             </div>
         </div>
 
@@ -897,17 +1060,6 @@ function updateGreeting() {
         greetingEl.textContent = 'Good evening! All systems running smoothly.';
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    updateGreeting();
-    
-    setTimeout(() => {
-        document.querySelectorAll('[data-count]').forEach(element => {
-            const endValue = parseInt(element.getAttribute('data-count'));
-            animateValue(element, 0, endValue, 2000);
-        });
-    }, 300);
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     updateGreeting();
