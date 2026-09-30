@@ -57,6 +57,11 @@ class User extends Authenticatable
         return $this->hasMany(GeneratedContent::class);
     }
 
+    public function inactiveNudges(): HasMany
+    {
+        return $this->hasMany(InactiveUserNudge::class);
+    }
+
     /**
      * Get the templates created by the user.
      * The foreign key is `created_by` on the `templates` table.

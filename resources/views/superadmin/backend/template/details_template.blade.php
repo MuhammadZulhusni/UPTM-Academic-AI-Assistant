@@ -124,6 +124,7 @@
         overflow: hidden;
     }
 
+
     .nk-editor {
         position: relative;
         background-color: var(--card-bg);
@@ -717,12 +718,14 @@
                     </div> -->
                 </div>
 
+                @include('components.assignment_brief_upload')
+
                 <!-- Dynamic Template Fields -->
                 @foreach ($template->inputFields as $field)
                 <div class="form-group form-group-full">
                     <label for="{{ $field->title }}" class="form-label">
                         {{ $field->title }}
-                        <span class="badge bg-primary">Required</span>
+                        <span class="badge {{ $template->allow_brief_upload ? 'bg-secondary' : 'bg-primary' }}">{{ $template->allow_brief_upload ? 'Optional' : 'Required' }}</span>
                     </label>
                     
                     @if ($field->type === 'text')
@@ -732,7 +735,7 @@
                             class="form-control" 
                             placeholder="Enter {{ $field->title }}"
                             maxlength="10000"
-                            required>
+                            {{ $template->allow_brief_upload ? '' : 'required' }}>
                     @elseif ($field->type === 'textarea')
                         <textarea name="{{ str_replace(' ', '_', $field->title) }}" 
                             id="{{ $field->title }}" 
@@ -741,7 +744,7 @@
                             placeholder="Provide detailed description..."
                             data-field-name="{{ $field->title }}"
                             maxlength="50000"
-                            required></textarea>
+                            {{ $template->allow_brief_upload ? '' : 'required' }}></textarea>
                         
                         <!-- AI Suggestion Button -->
                         <div class="ai-suggestion-wrapper mt-3">
@@ -852,6 +855,7 @@
                     </div>
                 </div>
 
+
                 <!-- Editor Body -->
                 <div class="nk-editor-main">
                     <div class="nk-editor-body">
@@ -887,7 +891,7 @@ document.getElementById('generateForm').addEventListener('submit', function(e) {
     showLoading(generateBtn, loadingOverlay);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); 
+    const timeoutId = setTimeout(() => controller.abort(), 120000); 
 
     fetch(form.action, {
         method: 'POST',

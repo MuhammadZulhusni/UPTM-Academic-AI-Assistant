@@ -41,6 +41,30 @@ class Kernel extends ConsoleKernel
             ->onFailure(function () {
                 \Illuminate\Support\Facades\Log::error('Documents cleanup failed');
             });
+
+        $schedule->command('ops:weekly-brief')
+            ->weeklyOn(1, '08:00')
+            ->when(function () {
+                return \App\Models\SystemSetting::isAiOpsBriefEnabled();
+            })
+            ->onSuccess(function () {
+                \Illuminate\Support\Facades\Log::info('Weekly AI ops brief completed successfully');
+            })
+            ->onFailure(function () {
+                \Illuminate\Support\Facades\Log::error('Weekly AI ops brief failed');
+            });
+
+        $schedule->command('users:inactive-nudge')
+            ->weeklyOn(1, '09:00')
+            ->when(function () {
+                return \App\Models\SystemSetting::isInactiveUserNudgeEnabled();
+            })
+            ->onSuccess(function () {
+                \Illuminate\Support\Facades\Log::info('Inactive user reminders completed successfully');
+            })
+            ->onFailure(function () {
+                \Illuminate\Support\Facades\Log::error('Inactive user reminders failed');
+            });
     }
 
     /**

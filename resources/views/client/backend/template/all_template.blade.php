@@ -11,7 +11,8 @@
                     <h2 class="display-6 mb-1 animate-fade-in">Template Library</h2>
                     <p class="text-muted mb-0">Browse and select from our curated collection</p>
                 </div>
-                <div class="col-lg-5 text-lg-end">
+                <div class="col-lg-5 text-lg-end d-flex gap-2 justify-content-lg-end flex-wrap">
+                    @include('components.find_template_modal', ['matchUrl' => route('user.template.match'), 'buttonClass' => 'btn-lg shadow-sm'])
                     <button class="btn btn-primary btn-lg shadow-sm" data-bs-toggle="modal" data-bs-target="#filterModal">
                         <em class="icon ni ni-filter"></em>
                         <span class="ms-2">Filters</span>

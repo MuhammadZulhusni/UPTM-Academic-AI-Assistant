@@ -9,9 +9,12 @@ use App\Http\Controllers\Backend\Client\UserController;
 use App\Http\Controllers\Backend\Admin\DocumentController;
 use App\Http\Controllers\Backend\Admin\TemplateController;
 use App\Http\Controllers\Backend\Client\UserTemplateController;
+use App\Http\Controllers\Backend\TemplateMatchController;
 use App\Http\Controllers\Backend\SuperAdmin\SuperAdminController;
 use App\Http\Controllers\Backend\SuperAdmin\SuperAdminTemplateController;
 use App\Http\Controllers\Backend\SuperAdmin\SuperAdminDocumentController;
+use App\Http\Controllers\Backend\SuperAdmin\SuperAdminAiOpsBriefController;
+use App\Http\Controllers\Backend\SuperAdmin\SuperAdminInactiveUserNudgeController;
 
 // Public Routes
 Route::get('/', function () {
@@ -33,6 +36,7 @@ Route::middleware(['auth', IsUser::class, 'verified'])->group(function () {
     // User Template & Document Management
     Route::controller(UserTemplateController::class)->group(function () {
         Route::get('/user/template', 'UserTemplate')->name('user.template');
+        Route::post('/user/template/match', [TemplateMatchController::class, 'match'])->name('user.template.match');
         Route::get('/user/template/{id}', 'UserDetailsTemplate')->name('user.details.template');
         Route::post('/user/content/generate/{id}', 'UserContentGenerate')->name('user.content.generate');
         Route::get('/user/document', 'UserDocument')->name('user.document');
@@ -59,6 +63,7 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
 
     Route::controller(TemplateController::class)->group(function () {
         Route::get('/template', 'AdminTemplate')->name('admin.template');
+        Route::post('/template/match', [TemplateMatchController::class, 'match'])->name('admin.template.match');
         Route::get('/add/template', 'AddTemplate')->name('add.template');
         Route::post('/store/template', 'StoreTemplate')->name('store.template');
         Route::get('/edit/template/{id}', 'EditTemplate')->name('edit.template');
@@ -67,6 +72,8 @@ Route::middleware(['auth', IsAdmin::class])->prefix('admin')->group(function () 
         Route::post('/content/generate/{id}', 'AdminContentGenerate')->name('content.generate');
         Route::post('/templates/delete/{id}', 'DeleteTemplate')->name('delete.template');
         Route::post('/ai/suggestion', 'AISuggestion')->name('ai.suggestion');
+        Route::post('/templates/suggest', 'SuggestTemplates')->name('admin.template.suggest');
+        Route::post('/templates/write-prompt', 'WritePrompt')->name('admin.template.write-prompt');
         Route::post('/templates/toggle/{id}', 'toggleStatus')->name('admin.template.toggle');
     });
 
@@ -113,6 +120,7 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
     
     Route::controller(SuperAdminTemplateController::class)->group(function () {
         Route::get('/template', 'Index')->name('superadmin.template');
+        Route::post('/template/match', [TemplateMatchController::class, 'match'])->name('superadmin.template.match');
         Route::get('/add/template', 'Create')->name('superadmin.add.template');
         Route::post('/store/template', 'Store')->name('superadmin.store.template');
         Route::get('/edit/template/{id}', 'Edit')->name('superadmin.edit.template');
@@ -122,6 +130,8 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::post('/templates/delete/{id}', 'Destroy')->name('superadmin.delete.template');
         Route::post('/template/toggle-status/{id}', 'ToggleStatus')->name('superadmin.template.toggle-status');
         Route::post('/ai/suggestion', 'SuperAdmingetAISuggestion')->name('superadmin.ai.suggestion');
+        Route::post('/templates/suggest', 'SuggestTemplates')->name('superadmin.template.suggest');
+        Route::post('/templates/write-prompt', 'WritePrompt')->name('superadmin.template.write-prompt');
     });
     
     Route::controller(SuperAdminDocumentController::class)->group(function () {
@@ -132,6 +142,21 @@ Route::middleware(['auth', 'superadmin'])->prefix('superadmin')->group(function 
         Route::get('/retention-settings',  'DocumentSettings')->name('superadmin.document.settings');
         Route::post('/document-settings/update','UpdateDocumentSettings')->name('superadmin.document.settings.update');
         Route::post('/document-manual-cleanup','ManualDocumentCleanup')->name('superadmin.document.manual.cleanup');
+    });
+
+    Route::controller(SuperAdminAiOpsBriefController::class)->group(function () {
+        Route::get('/ai-ops-brief', 'index')->name('superadmin.ai.ops.brief');
+        Route::post('/ai-ops-brief/generate', 'generateNow')->name('superadmin.ai.ops.brief.generate');
+    });
+
+    Route::controller(SuperAdminInactiveUserNudgeController::class)->group(function () {
+        Route::get('/inactive-user-reminders', 'index')->name('superadmin.inactive.nudge.index');
+        Route::post('/inactive-user-reminders/settings', 'updateSettings')->name('superadmin.inactive.nudge.settings');
+        Route::get('/inactive-user-reminders/preview', 'previewHtml')->name('superadmin.inactive.nudge.preview');
+        Route::post('/inactive-user-reminders/send-user', 'sendToUser')->name('superadmin.inactive.nudge.send.user');
+        Route::post('/inactive-user-reminders/send-me', 'sendPreviewToMe')->name('superadmin.inactive.nudge.send.me');
+        Route::post('/inactive-user-nudge/send', 'generateNow')->name('superadmin.inactive.nudge.send');
+        Route::delete('/inactive-user-reminders', 'clear')->name('superadmin.inactive.nudge.clear');
     });
 });
 

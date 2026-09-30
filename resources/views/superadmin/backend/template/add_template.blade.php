@@ -56,9 +56,16 @@
     <div class="nk-content-body">
         <!-- Page Header -->
         <div class="nk-block-head nk-page-head">
-            <div class="nk-block-head-content">
-                <h2 class="display-6">Add Template</h2>
-                <p class="text-muted">Create a new template for the content generation tool.</p>
+            <div class="nk-block-head-between flex-wrap g-2 align-items-start">
+                <div class="nk-block-head-content">
+                    <h2 class="display-6">Add Template</h2>
+                    <p class="text-muted mb-0">Create a new template for the content generation tool.</p>
+                </div>
+                <div class="nk-block-head-content">
+                    <button type="button" class="btn btn-outline-primary" id="suggestTemplatesBtn">
+                        <i class="bi bi-lightbulb me-1"></i> Suggest templates
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -112,6 +119,7 @@
                                     </select>
                                 </div>
                             </div>
+                            @include('components.template_brief_upload_option')
                         </div>
                     </div>
                     
@@ -130,7 +138,11 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="input_fields_0_title" class="form-label small">Field Title (Variable Name)</label>
-                                            <input type="text" name="input_fields[0][title]" id="input_fields_0_title" class="form-control form-control-sm" placeholder="e.g., topic" required>
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" name="input_fields[0][title]" id="input_fields_0_title" class="form-control field-variable-title" value="topic" placeholder="e.g., topic" maxlength="30" required>
+                                                <button type="button" class="btn btn-outline-primary copy-variable-btn" data-copy="{topic}">Copy</button>
+                                            </div>
+                                            <small class="text-muted">Copy <span class="variable-preview">{topic}</span>, then paste it into the custom prompt.</small>
                                         </div> 
                                     </div>
                                     <div class="col-md-5">
@@ -190,7 +202,10 @@
                         <h6 class="text-uppercase fw-bold text-primary mb-3">4. Generation Prompt Code</h6>
                         <div class="card bg-light border-0 p-4">
                             <div class="form-group">
-                                <label for="prompt" class="form-label fw-bold mb-2">Custom Prompt Code</label>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label for="prompt" class="form-label fw-bold mb-0">Custom Prompt Code</label>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#writePromptModal">Write with AI</button>
+                                </div>
                                 <textarea name="prompt" id="prompt" placeholder="Add your prompt code here..." class="form-control" rows="8" required></textarea>
                                 <small class="text-muted mt-2 d-block">
                                     Reference the guide above (Section 3) for instructions on creating effective prompts and using variables.
@@ -214,8 +229,25 @@
     </div>
 </div>
 
-<!-- Dependencies (Assumed) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<div class="modal fade" id="writePromptModal" tabindex="-1" aria-labelledby="writePromptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="writePromptModalLabel">Write with AI</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="small text-muted">Describe how you want the custom prompt to work. AI fills Custom Prompt Code and keeps your variable names.</p>
+                <label for="promptWish" class="form-label">How should this prompt work?</label>
+                <textarea id="promptWish" class="form-control" rows="4" maxlength="500" placeholder="Example: Suggest 3 classroom activities with headings for Activity Name, Instructions, and Learning Outcome."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="writePromptBtn">Write with AI</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <!-- JavaScript for Dynamic Fields and Reset -->
@@ -230,7 +262,10 @@ $(document).ready(function() {
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="form-label small">Field Title (Variable Name)</label>
-                        <input type="text" name="input_fields[${fieldIndex}][title]" class="form-control form-control-sm" placeholder="e.g., length" required>
+                        <div class="input-group input-group-sm">
+                            <input type="text" name="input_fields[${fieldIndex}][title]" class="form-control field-variable-title" value="topic" placeholder="e.g., topic" maxlength="30" required>
+                            <button type="button" class="btn btn-outline-primary copy-variable-btn" data-copy="{topic}">Copy</button>
+                        </div>
                     </div> 
                 </div>
                 <div class="col-md-5">
@@ -256,6 +291,131 @@ $(document).ready(function() {
         fieldIndex++;
     });
 
+    function syncVariableCopy(input) {
+        const name = (input.value || '').trim();
+        const token = name ? '{' + name + '}' : '';
+        const group = input.closest('.form-group');
+        if (!group) return;
+        const button = group.querySelector('.copy-variable-btn');
+        const preview = group.querySelector('.variable-preview');
+        if (button) button.setAttribute('data-copy', token);
+        if (preview) preview.textContent = token || '{topic}';
+    }
+
+    function copyToken(token) {
+        const holder = document.createElement('textarea');
+        holder.value = token;
+        holder.setAttribute('readonly', '');
+        holder.style.position = 'fixed';
+        holder.style.left = '-9999px';
+        document.body.appendChild(holder);
+        holder.select();
+        document.execCommand('copy');
+        holder.remove();
+    }
+
+    $(document).on('input', '.field-variable-title', function () {
+        syncVariableCopy(this);
+    });
+
+    function clearModalBackdrop() {
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+        document.querySelectorAll('.modal-backdrop').forEach(function (el) {
+            el.remove();
+        });
+    }
+
+    function closeWritePromptModal() {
+        const modalEl = document.getElementById('writePromptModal');
+        if (modalEl && window.bootstrap) {
+            const instance = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
+            modalEl.addEventListener('hidden.bs.modal', clearModalBackdrop, { once: true });
+            instance.hide();
+        }
+        setTimeout(clearModalBackdrop, 350);
+    }
+
+    $('#writePromptBtn').on('click', function () {
+        const wish = ($('#promptWish').val() || '').trim();
+        const fields = [];
+
+        $('.field-variable-title').each(function () {
+            const name = ($(this).val() || '').trim();
+            if (!name) return;
+            const helper = ($(this).closest('.input-field-row').find('input[name$="[description]"]').val() || '').trim();
+            fields.push({ title: name, description: helper });
+        });
+
+        if (wish.length < 10) {
+            toastr.warning('Describe how you want the prompt to work.');
+            return;
+        }
+        if (!fields.length) {
+            toastr.warning('Enter a variable name first.');
+            return;
+        }
+
+        const promptBox = document.getElementById('prompt');
+        if (promptBox.value.trim() && !window.confirm('Replace the current custom prompt?')) {
+            return;
+        }
+
+        const button = $(this);
+        button.prop('disabled', true).text('Writing...');
+
+        $.ajax({
+            url: @json(route('superadmin.template.write-prompt')),
+            method: 'POST',
+            timeout: 60000,
+            headers: {
+                'X-CSRF-TOKEN': $('#templateForm input[name="_token"]').val(),
+                'Accept': 'application/json'
+            },
+            data: {
+                wish: wish,
+                title: ($('#template_name').val() || '').trim(),
+                description: ($('#template_desc').val() || '').trim(),
+                category: $('#category').val() || '',
+                fields: fields
+            },
+            success: function (res) {
+                if (!res.success || !res.prompt) {
+                    toastr.error(res.message || 'Could not write the prompt.');
+                    return;
+                }
+                promptBox.value = res.prompt;
+                closeWritePromptModal();
+                toastr.success('Custom prompt is ready. You can still edit it.');
+            },
+            error: function (xhr) {
+                const message = xhr.responseJSON?.message
+                    || (xhr.status === 422 ? 'Check the description and variable names, then try again.' : 'Could not write the prompt. Please try again.');
+                toastr.error(message);
+            },
+            complete: function () {
+                button.prop('disabled', false).text('Write with AI');
+            }
+        });
+    });
+
+    $(document).on('click', '.copy-variable-btn', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const input = this.closest('.input-group')?.querySelector('.field-variable-title');
+        if (input) syncVariableCopy(input);
+        const token = this.getAttribute('data-copy') || '';
+        if (!token) {
+            toastr.warning('Enter a variable name first.');
+            return;
+        }
+        copyToken(token);
+        const button = this;
+        button.textContent = 'Copied';
+        setTimeout(function () { button.textContent = 'Copy'; }, 1200);
+    });
+
     // Logic to Remove an Input Field (Event delegation required)
     $(document).on('click', '.remove-field', function() {
         $(this).closest('.input-field-row').remove();
@@ -270,7 +430,7 @@ $(document).ready(function() {
         $('.input-field-row').not(':first').remove();
         
         // Clear the first field's inputs
-        $('#input_fields_0_title').val('');
+        $('#input_fields_0_title').val('topic').trigger('input');
         $('#input_fields_0_description').val('');
         
         // Reset fieldIndex counter
@@ -286,5 +446,7 @@ $(document).ready(function() {
     });
 });
 </script>
+
+@include('components.template_suggestion_modal', ['suggestUrl' => route('superadmin.template.suggest')])
 
 @endsection

@@ -89,4 +89,24 @@ class SystemSetting extends Model
     {
         return self::get('document_retention_days', 90);
     }
+
+    /**
+     * Check if the weekly AI operations brief is enabled
+     */
+    public static function isAiOpsBriefEnabled()
+    {
+        return self::get('ai_ops_brief_enabled', true);
+    }
+
+    public static function isInactiveUserNudgeEnabled()
+    {
+        return self::get('inactive_user_nudge_enabled', true);
+    }
+
+    public static function getInactiveUserNudgeIdleDays()
+    {
+        $days = (int) self::get('inactive_user_nudge_idle_days', 14);
+
+        return max(1, min(90, $days));
+    }
 }
